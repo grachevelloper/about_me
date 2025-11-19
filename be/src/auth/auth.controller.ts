@@ -145,7 +145,6 @@ export class AuthController {
         @Res({passthrough: true}) response: Response,
     ) {
         const refreshToken = req.cookies?.refreshToken;
-        console.log(req.user, "bbbbbbbbbb");
         if (refreshToken) {
             await this.refreshTokensService.revokeToken(
                 req.user.id,

@@ -5,23 +5,22 @@ import {
     PrimaryGeneratedColumn,
 } from "typeorm";
 
-@Entity("refresh_tokens")
-export class RefreshToken {
+export type EntityLikeType = "comment" | "todo" | "article";
+
+@Entity("likes")
+export class Like {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
     @Column("uuid")
-    userId: string;
+    authorId: string;
 
     @Column()
-    tokenHash: string;
+    entityType: EntityLikeType;
 
-    @Column()
-    expiresAt: Date;
-
-    @Column({default: false})
-    revoked: boolean;
+    @Column("uuid")
+    entityId: string;
 
     @CreateDateColumn()
-    createdAt: Date;
+    createdAt: string;
 }

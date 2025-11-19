@@ -11,13 +11,17 @@ import {
 import {Request} from "express";
 import {AuthGuard} from "src/guards/auth.guard";
 
+import {ChecklistService} from "./checklists/checklists.service";
 import type {CreateTodoDto, UpdateTodoDto} from "./dto";
 import {TodosService} from "./todos.service";
 
 @UseGuards(AuthGuard)
 @Controller("todos")
 export class TodosController {
-    constructor(private readonly todosService: TodosService) {}
+    constructor(
+        private readonly todosService: TodosService,
+        private readonly checklistService: ChecklistService,
+    ) {}
 
     @Post()
     async create(
@@ -39,7 +43,7 @@ export class TodosController {
 
     @Get(":id")
     async findOne(@Param("id") id: string) {
-        return this.todosService.findOne(id);
+        return this.todosService.findTodoWithComments(id);
     }
     @Patch(":id")
     async update(@Param("id") id: string, updateTodo: UpdateTodoDto) {

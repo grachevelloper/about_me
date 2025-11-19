@@ -2,11 +2,13 @@ import {
     Column,
     CreateDateColumn,
     Entity,
+    OneToOne,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from "typeorm";
 
 import {TodoPriority, TodoState} from "../types/todo";
+import {CheckList} from "./checklists/checklists.entity";
 
 @Entity("todos")
 export class Todo {
@@ -27,6 +29,15 @@ export class Todo {
 
     @Column({default: TodoState.PLANNING})
     state: TodoState;
+
+    @OneToOne(() => CheckList, (item) => item.todo, {
+        cascade: true,
+        nullable: true,
+    })
+    checklist: CheckList;
+
+    @Column({default: 0})
+    likesCount: number;
 
     @UpdateDateColumn()
     updatedAt: string;

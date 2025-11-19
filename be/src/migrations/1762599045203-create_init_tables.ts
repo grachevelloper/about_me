@@ -35,6 +35,21 @@ export class CreateInitTables1762599045203 implements MigrationInterface {
         `);
 
         await queryRunner.query(`
+            CREATE TABLE IF NOT EXISTS checklists (
+                id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+                todo_id UUID NOT NULL UNIQUE, 
+                text TEXT[] NOT NULL DEFAULT '{}',  
+                progress INTEGER NOT NULL DEFAULT 0,
+                created_at TIMESTAMP NOT NULL DEFAULT now(),
+                updated_at TIMESTAMP NOT NULL DEFAULT now(),
+                
+                CONSTRAINT fk_checklists_todo_id 
+                FOREIGN KEY (todo_id) REFERENCES todos(id) 
+                ON DELETE CASCADE
+            )
+        `);
+
+        await queryRunner.query(`
             ALTER TABLE todos 
             ADD CONSTRAINT fk_todos_author_id 
             FOREIGN KEY (author_id) REFERENCES users(id) ON DELETE CASCADE
@@ -43,16 +58,27 @@ export class CreateInitTables1762599045203 implements MigrationInterface {
         await queryRunner.query(`
             CREATE INDEX idx_todos_author_id ON todos (author_id)
         `);
+
+        await queryRunner.query(`
+            CREATE INDEX idx_checklists_todo_id ON checklists (todo_id)
+        `);
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
+        await queryRunner.query(`DROP INDEX idx_checklists_todo_id`);
         await queryRunner.query(`DROP INDEX idx_todos_author_id`);
+
+        await queryRunner.query(`
+            ALTER TABLE checklists
+            DROP CONSTRAINT fk_checklists_todo_id
+        `);
 
         await queryRunner.query(`
             ALTER TABLE todos
             DROP CONSTRAINT fk_todos_author_id
         `);
 
+        await queryRunner.query(`DROP TABLE checklists`);
         await queryRunner.query(`DROP TABLE todos`);
         await queryRunner.query(`DROP TABLE users`);
 

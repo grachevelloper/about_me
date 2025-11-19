@@ -2,6 +2,7 @@ import {Injectable, NotFoundException} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
 
+import {Comment} from "../comments/comments.entity";
 import {TodoState} from "../types/todo";
 import {CreateTodoDto, UpdateTodoDto} from "./dto";
 import {Todo} from "./todos.entity";
@@ -11,11 +12,13 @@ export class TodosService {
     constructor(
         @InjectRepository(Todo)
         private todosRepository: Repository<Todo>,
+        @InjectRepository(Comment)
+        private commentRepository: Repository<Comment>,
     ) {}
 
     async create(createTodoData: CreateTodoDto): Promise<Todo> {
         const todo = this.todosRepository.create(createTodoData);
-        return this.todosRepository.save(todo);
+        return await this.todosRepository.save(todo);
     }
 
     async delete(id: string): Promise<void> {
@@ -34,6 +37,29 @@ export class TodosService {
 
         Object.assign(todo, updatedTodo);
         return this.todosRepository.save(todo);
+    }
+
+    async incrementLikesCount(todoId: string): Promise<void> {
+        await this.todosRepository
+            .createQueryBuilder()
+            .update(Todo)
+            .set({
+                likesCount: () => "likesCount + 1",
+            })
+            .where("id = :todoId", {todoId})
+            .execute();
+    }
+
+    async decrementLikesCount(todoId: string): Promise<void> {
+        await this.todosRepository
+            .createQueryBuilder()
+            .update(Todo)
+            .set({
+                likesCount: () => "likesCount - 1",
+            })
+            .where("id = :todoId", {todoId})
+            .andWhere("likesCount > 0")
+            .execute();
     }
 
     async findOne(id: string): Promise<Todo> {
@@ -57,5 +83,15 @@ export class TodosService {
             },
         });
         return todos;
+    }
+
+    async findTodoWithComments(todoId: string) {
+        const [todo, comments] = await Promise.all([
+            this.todosRepository.findOne({where: {id: todoId}}),
+            this.commentRepository.find({
+                where: {entityType: "todo", entityId: todoId},
+            }),
+        ]);
+        return {...todo, comments};
     }
 }

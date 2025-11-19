@@ -7,8 +7,10 @@ import * as dotenv from "dotenv";
 import {AppController} from "./app.controller";
 import {AppService} from "./app.service";
 import {AuthModule} from "./auth/auth.module";
+import {CommentsModule} from "./comments/comments.module";
 import dataSourceOptions from "./data-source";
 import {AuthGuard} from "./guards/auth.guard";
+import {LikesModule} from "./likes/likes.module";
 import {TodosModule} from "./todos/todos.module";
 import {UsersModule} from "./users/users.module";
 
@@ -23,9 +25,9 @@ dotenv.config();
             imports: [ConfigModule],
             useFactory: () => ({
                 ...dataSourceOptions,
-                synchronize: false,
+                synchronize: true,
                 autoLoadEntities: true,
-                migrationsRun: process.env.NODE_ENV !== "production",
+                migrationsRun: true,
                 migrationsTableName: "migrations",
             }),
             inject: [ConfigService],
@@ -33,6 +35,8 @@ dotenv.config();
         TodosModule,
         AuthModule,
         UsersModule,
+        LikesModule,
+        CommentsModule,
     ],
     controllers: [AppController],
     providers: [
