@@ -27,6 +27,7 @@ apiAxios.interceptors.response.use(
                 return apiAxios(originalRequest);
             } catch (refreshError) {
                 console.error('Token refresh failed:', refreshError);
+                delete originalRequest._retry;
                 throw refreshError;
             }
         }
@@ -55,6 +56,7 @@ export const queryClient = new QueryClient({
     defaultOptions: {
         queries: {
             staleTime: Infinity,
+            retry: 3,
         },
     },
 });

@@ -16,9 +16,10 @@ export interface Todo {
     id: string;
     title: string;
     content: string;
-    authorId: string;
     priority: TodoPriority;
     state: TodoState;
+    checklist?: string[];
+    authorId: string;
     createdAt?: Date;
     updatedAt?: Date;
 }

@@ -9,7 +9,7 @@ export const todosRoutes: RouteProps[] = [
         element: <TodosListPage />,
     },
     {
-        path: '/:id',
+        path: '/todos/:id',
         element: <TodoDetailsPage />,
     },
 ];

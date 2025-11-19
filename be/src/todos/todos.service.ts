@@ -2,7 +2,7 @@ import {Injectable, NotFoundException} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
 
-import {Comment} from "../comments/comments.entity";
+import {CommentsService} from "../comments/comments.service";
 import {TodoState} from "../types/todo";
 import {CreateTodoDto, UpdateTodoDto} from "./dto";
 import {Todo} from "./todos.entity";
@@ -12,8 +12,7 @@ export class TodosService {
     constructor(
         @InjectRepository(Todo)
         private todosRepository: Repository<Todo>,
-        @InjectRepository(Comment)
-        private commentRepository: Repository<Comment>,
+        private commentsService: CommentsService,
     ) {}
 
     async create(createTodoData: CreateTodoDto): Promise<Todo> {
@@ -88,9 +87,7 @@ export class TodosService {
     async findTodoWithComments(todoId: string) {
         const [todo, comments] = await Promise.all([
             this.todosRepository.findOne({where: {id: todoId}}),
-            this.commentRepository.find({
-                where: {entityType: "todo", entityId: todoId},
-            }),
+            this.commentsService.findByEntity("todo", todoId),
         ]);
         return {...todo, comments};
     }

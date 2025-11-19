@@ -7,6 +7,7 @@ import {
     Patch,
     Post,
 } from "@nestjs/common";
+import {IsString} from "class-validator";
 
 import {ChecklistService} from "./checklists.service";
 
@@ -15,6 +16,7 @@ class AddItemDto {
 }
 
 class UpdateItemTextDto {
+    @IsString()
     text: string;
 }
 

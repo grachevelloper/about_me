@@ -14,7 +14,7 @@ const b = block('state');
 interface StateProps {
     state: TodoState;
     editable?: false | {isEdited: boolean};
-    onClick?: () => void;
+    onUpdate?: () => void;
     isLoading?: boolean;
 }
 
@@ -32,7 +32,7 @@ const getColor = (state: TodoState) => {
 };
 
 export const State = forwardRef<HTMLButtonElement, StateProps>(
-    ({state, editable, onClick, isLoading}, ref) => {
+    ({state, editable, onUpdate, isLoading}, ref) => {
         const {t} = useTranslation('todo');
 
         const isEdited = editable && editable?.isEdited;
@@ -54,7 +54,7 @@ export const State = forwardRef<HTMLButtonElement, StateProps>(
                     className={b({
                         'is-edited': isEdited,
                     })}
-                    onClick={onClick}
+                    onClick={onUpdate}
                     type='primary'
                     color={getColor(state)}
                     variant='solid'

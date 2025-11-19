@@ -84,6 +84,7 @@ export const NewTodoForm = ({isSuggest = false}: NewTodoFormProps) => {
                 form={form}
                 layout='vertical'
                 onValuesChange={handleValuesChange}
+                onFinish={handleOk}
             >
                 <Typography.Title>
                     {tTodo('new-todo-form.title')}

@@ -1,7 +1,7 @@
 import {useCallback, useRef} from 'react';
 
 import {State} from '@/todos/components/State';
-import {useTodoMutation, useTodoQuery} from '@/todos/hooks';
+import {useTodoMutations, useTodoQuery} from '@/todos/hooks';
 import {TodoState} from '@/todos/types';
 
 interface TodoStateCellProps {
@@ -24,17 +24,14 @@ const switchNewState = (state: TodoState): TodoState => {
 
 export const StateCell = ({state, todoId}: TodoStateCellProps) => {
     const isEdited = useRef<boolean>(false);
-    const {mutateAsync} = useTodoMutation();
+    const {updateState} = useTodoMutations();
     const {isPending} = useTodoQuery(todoId);
 
     const stateRef = useRef<HTMLButtonElement>(null);
 
     const handleUpdateState = useCallback(() => {
         isEdited.current = true;
-        mutateAsync({
-            id: todoId,
-            state: switchNewState(state),
-        });
+        updateState(todoId, switchNewState(state));
     }, [todoId, isEdited]);
 
     return (
@@ -42,7 +39,7 @@ export const StateCell = ({state, todoId}: TodoStateCellProps) => {
             ref={stateRef}
             state={state}
             editable={{isEdited: isEdited.current}}
-            onClick={handleUpdateState}
+            onUpdate={handleUpdateState}
             isLoading={isPending}
         />
     );

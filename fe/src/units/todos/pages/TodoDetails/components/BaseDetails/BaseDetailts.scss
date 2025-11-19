@@ -1,0 +1,21 @@
+.base-details {
+    display: flex;
+    flex-direction: column;
+    padding: 0 5%;
+
+    &__content {
+        max-width: 700px !important;
+        margin: 10px 0;
+        // background: linear-gradient(to right, #fbe2c2 1px, transparent 1px),
+        //     linear-gradient(to left, #fbe2c2 1px, transparent 1px),
+        //     linear-gradient(to bottom, #fbe2c2 3px, transparent 3px);
+
+        // background-size: 10px 100%, 10px 100%, 100% 22px;
+
+        // background-position: left top, right top, left top;
+
+        // background-repeat: no-repeat, no-repeat, repeat-y;
+        // padding: 5px 15px;
+        // overflow-y: hidden;
+    }
+}

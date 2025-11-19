@@ -19,19 +19,22 @@ interface SignUpFormData {
     username: string;
     email: string;
     password: string;
+    confirmPassword: string;
 }
+
+const initialSignUpData: SignUpFormData = {
+    username: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+};
 
 export const SignUpPage = () => {
     const [signStep, setSignStep] = useLocalStorage(SIGN_UP_STEP_SLUG, 0);
     const [visibleStep, setVisibleStep] = useState(signStep);
     const [form] = Form.useForm<SignUpFormData>();
-    const [username, setUsername] = useLocalStorage<string>('username', '');
-    const [, setConfirmPassword] = useLocalStorage<string>(
-        'username',
-        ''
-    );
-    const [password, setPassword] = useLocalStorage<string>('password', '');
-    const [email, setEmail] = useLocalStorage<string>('email', '');
+    const [localSignUpData, setLocalSignUpData] =
+        useLocalStorage<SignUpFormData>('sign-up', initialSignUpData);
 
     const {isPending, isError, mutateAsync} = useSignUpMutation();
 
@@ -43,10 +46,7 @@ export const SignUpPage = () => {
                 'username',
             ]);
             await mutateAsync(userData);
-            setConfirmPassword('')
-            setPassword('')
-            setUsername('')
-            setEmail('')
+            setLocalSignUpData(initialSignUpData);
         })();
     }, [form]);
 
@@ -80,17 +80,27 @@ export const SignUpPage = () => {
     }
     const type = 'placeholder' in visibleStepData ? 'form' : 'text';
 
+    const handleValuesChange = (changedValues: Partial<SignUpFormData>) => {
+        setLocalSignUpData((prev) => ({
+            ...prev,
+            ...changedValues,
+        }));
+    };
+
+    useEffect(() => {
+        if (localSignUpData) {
+            form.setFieldsValue(localSignUpData);
+        }
+    }, [localSignUpData, form]);
+
     return (
         <Flex className={b()} align='center' justify='center'>
             <Form
                 className={b('form')}
                 layout='vertical'
                 form={form}
-                initialValues={{
-                    password: password || '',
-                    email: email || '',
-                    username: username || '',
-                }}
+                onValuesChange={handleValuesChange}
+                initialValues={initialSignUpData}
                 onFinish={handleSubmit}
             >
                 {type === 'form' ? (

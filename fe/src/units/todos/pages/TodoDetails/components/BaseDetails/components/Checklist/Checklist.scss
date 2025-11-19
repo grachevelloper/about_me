@@ -1,0 +1,41 @@
+.checklist {
+    &__title {
+        display: inline-flex;
+        width: 100%;
+        justify-content: space-between;
+        padding: 0 5px;
+    }
+    &__popover {
+        .ant-popover-inner-content {
+            padding: 16px;
+        }
+    }
+
+    .ant-steps-item {
+        &-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+    }
+
+    .ant-steps-vertical {
+        .ant-steps-item {
+            padding-bottom: 16px;
+
+            &:last-child {
+                padding-bottom: 0;
+            }
+        }
+    }
+
+    &__actions {
+        margin-left: 8px;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+    }
+
+    .ant-steps-item:hover &__actions {
+        opacity: 1;
+    }
+}

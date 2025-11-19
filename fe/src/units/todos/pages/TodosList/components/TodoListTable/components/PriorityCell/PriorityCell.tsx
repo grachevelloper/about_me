@@ -1,7 +1,7 @@
 import {useCallback, useRef} from 'react';
 
 import {Priority} from '@/todos/components/Priority';
-import {useTodoMutation, useTodoQuery} from '@/todos/hooks';
+import {useTodoMutations, useTodoQuery} from '@/todos/hooks';
 import {TodoPriority} from '@/todos/types';
 
 interface TodoStateCellProps {
@@ -24,22 +24,19 @@ const switchNewPriority = (priority: TodoPriority): TodoPriority => {
 
 export const PriorityCell = ({priority, todoId}: TodoStateCellProps) => {
     const {isPending} = useTodoQuery(todoId);
-    const {mutateAsync} = useTodoMutation();
+    const {updatePriority} = useTodoMutations();
     const isEdited = useRef<boolean>(false);
 
     const handleUpdatePriority = useCallback(() => {
         isEdited.current = true;
-        mutateAsync({
-            id: todoId,
-            priority: switchNewPriority(priority),
-        });
+        updatePriority(todoId, switchNewPriority(priority));
     }, [todoId, isEdited]);
 
     return (
         <Priority
             priority={priority}
             editable={{isEdited: isEdited.current}}
-            onClick={handleUpdatePriority}
+            onUpdate={handleUpdatePriority}
             isLoading={isPending}
         />
     );

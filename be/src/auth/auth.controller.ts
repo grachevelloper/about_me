@@ -1,23 +1,27 @@
 import {
     Body,
     Controller,
+    Get,
     HttpCode,
     HttpStatus,
     Post,
     Req,
     Res,
     UnauthorizedException,
+    UseGuards,
 } from "@nestjs/common";
 import {JwtService} from "@nestjs/jwt";
 import {Request, Response} from "express";
 
 import {SignInDto, SignUpDto} from "@/users/dto/auth";
 
+import {AuthGuard} from "../guards/auth.guard";
 import {Public} from "../utils/auth";
 import {AuthService} from "./auth.service";
 import {ACCESS_TOKEN_TTL_IN_MS, REFRESH_TOKEN_TTL_IN_MS} from "./constants";
 import {RefreshTokensService} from "./refresh-token/refresh-token.service";
 import {hashToken, tokenConfig} from "./utils";
+
 @Controller("auth")
 export class AuthController {
     constructor(
@@ -160,5 +164,12 @@ export class AuthController {
         });
 
         return {message: "Logged out successfully"};
+    }
+
+    @HttpCode(HttpStatus.OK)
+    @Get("check")
+    @UseGuards(AuthGuard)
+    getMe(@Req() req: Request) {
+        return !!req.user;
     }
 }

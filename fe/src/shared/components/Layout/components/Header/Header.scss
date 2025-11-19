@@ -1,0 +1,21 @@
+.header {
+    display: flex;
+    flex-direction: row;
+    justify-content: end;
+    gap: 10%;
+    align-items: center;
+
+    &__menu {
+        display: flex;
+        width: fit-content;
+        height: 100%;
+        align-items: center;
+    }
+
+    &__logout-icon {
+        position: relative;
+        z-index: 100;
+        color: red;
+        cursor: pointer;
+    }
+}

@@ -24,62 +24,149 @@ const BUTTON_PADDING = {
     paddingInlineLG: 20,
     paddingInlineSM: 10,
 };
+
 const lightTheme: CustomThemeConfig = {
     name: 'light',
     token: {
-        colorPrimary: '#f6bb72ff',
-        colorBgBase: '#ffffff',
-        colorTextBase: '#000000',
-        colorBgContainer: '#fafafa',
-        colorBorder: '#d9d9d9',
-        borderRadius: 6,
+        colorPrimary: '#e8b4a9',
+        colorSuccess: '#a8d5ba',
+        colorWarning: '#f5d6ba',
+        colorError: '#e8a9b4',
+        colorInfo: '#a9b4e8',
 
-        colorPrimaryBg: '#f0f8ff',
-        colorPrimaryBorder: '#91d5ff',
+        colorBgBase: '#fefaf6',
+        colorBgContainer: '#fdf5f0',
+        colorBgElevated: '#fcf0e6',
+
+        colorTextBase: '#5d4037',
+        colorTextSecondary: '#8d6e63',
+        colorTextTertiary: '#a1887f',
+        colorTextQuaternary: '#bcaaa4',
+
+        colorBorder: '#d7ccc8',
+        colorBorderSecondary: '#e0e0e0',
+
+        borderRadius: 8,
+        fontSize: 14,
+        lineHeight: 1.5715,
+
+        colorPrimaryBg: '#f9f0eb',
+        colorPrimaryBorder: '#e8b4a9',
+        colorBgLayout: '#fefaf6',
     },
     components: {
+        Layout: {
+            headerBg: '#fefaf6',
+            bodyBg: '#fefaf6',
+            siderBg: '#fdf5f0',
+            triggerBg: '#f5d6ba',
+            triggerColor: '#5d4037',
+        },
         Input: {
             colorBgContainer: 'transparent',
-            hoverBorderColor: '#40a9ff',
-            activeBorderColor: '#1890ff',
+            hoverBorderColor: '#e8b4a9',
+            activeBorderColor: '#e8b4a9',
+            colorText: '#5d4037',
+            colorTextPlaceholder: '#a1887f',
         },
         Button: {
             ...BUTTON_PADDING,
-            colorPrimary: '#1890ff',
-            colorPrimaryHover: '#40a9ff',
+            colorPrimary: '#e8b4a9',
+            colorPrimaryHover: '#d4a299',
+            colorPrimaryActive: '#c09189',
+            colorText: '#5d4037',
         },
-        Card: CARD,
+        Card: {
+            ...CARD,
+            colorBgContainer: '#fdf5f0',
+            colorBorder: '#d7ccc8',
+        },
+        Menu: {
+            colorBgContainer: '#faebe1ff',
+            itemBg: '#ecc4acff',
+            itemSelectedBg: '#f8bf8dff',
+            itemColor: '#5d4037',
+            itemSelectedColor: '#5d4037',
+        },
+        Table: {
+            colorBgContainer: '#fdf5f0',
+            colorBorderSecondary: '#d7ccc8',
+            colorFillAlter: '#f9f0eb',
+        },
     },
 };
 
 const darkTheme: CustomThemeConfig = {
     name: 'dark',
     token: {
-        colorPrimary: '#177ddc',
-        colorBgBase: '#141414',
-        colorTextBase: '#ffffff',
-        colorBgContainer: '#1f1f1f',
-        colorBorder: '#434343',
-        borderRadius: 6,
+        colorPrimary: '#d4a299',
+        colorSuccess: '#8dc4a8',
+        colorWarning: '#d4b8a8',
+        colorError: '#d499a3',
+        colorInfo: '#999fd4',
 
-        colorPrimaryBg: '#111d2c',
-        colorPrimaryBorder: '#153450',
+        colorBgBase: '#2a211c',
+        colorBgContainer: '#352a24',
+        colorBgElevated: '#40332c',
+
+        colorTextBase: '#e8d5c9',
+        colorTextSecondary: '#d4c0b4',
+        colorTextTertiary: '#c0ab9f',
+        colorTextQuaternary: '#ac968a',
+
+        colorBorder: '#5d4a3f',
+        colorBorderSecondary: '#6d5a4f',
+
+        borderRadius: 8,
+        fontSize: 14,
+        lineHeight: 1.5715,
+
+        colorPrimaryBg: '#3a2d26',
+        colorPrimaryBorder: '#d4a299',
+        colorBgLayout: '#2a211c',
     },
     components: {
+        Layout: {
+            headerBg: '#2a211c',
+            bodyBg: '#2a211c',
+            siderBg: '#352a24',
+            triggerBg: '#40332c',
+            triggerColor: '#e8d5c9',
+        },
         Input: {
-            colorBgContainer: '#1f1f1f',
-            hoverBorderColor: '#177ddc',
-            activeBorderColor: '#177ddc',
-            colorText: '#ffffff',
+            colorBgContainer: '#352a24',
+            hoverBorderColor: '#d4a299',
+            activeBorderColor: '#d4a299',
+            colorText: '#e8d5c9',
+            colorTextPlaceholder: '#c0ab9f',
         },
         Button: {
             ...BUTTON_PADDING,
-            colorPrimary: '#177ddc',
-            colorPrimaryHover: '#3c9ae8',
+            colorPrimary: '#d4a299',
+            colorPrimaryHover: '#c09189',
+            colorPrimaryActive: '#ac8079',
+            colorText: '#2a211c',
         },
-        Card: CARD,
+        Card: {
+            ...CARD,
+            colorBgContainer: '#352a24',
+            colorBorder: '#5d4a3f',
+        },
+        Menu: {
+            colorBgContainer: '#352a24',
+            itemBg: '#352a24',
+            itemSelectedBg: '#d4a299',
+            itemColor: '#ffd5baff',
+            itemSelectedColor: '#2a211c',
+        },
+        Table: {
+            colorBgContainer: '#352a24',
+            colorBorderSecondary: '#5d4a3f',
+            colorFillAlter: '#3a2d26',
+        },
     },
 };
+
 export const themes: Record<ThemeMode, CustomThemeConfig> = {
     light: lightTheme,
     dark: darkTheme,

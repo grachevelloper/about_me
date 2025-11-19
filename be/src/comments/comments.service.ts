@@ -3,7 +3,7 @@ import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
 
 import {CreateCommentDto, UpdateCommentDto} from "./comments.controller";
-import {Comment} from "./comments.entity";
+import {Comment, EntityCommentType} from "./comments.entity";
 
 @Injectable()
 export class CommentsService {
@@ -53,6 +53,14 @@ export class CommentsService {
             throw new NotFoundException("Comment not found");
         }
         return comment;
+    }
+    async findByEntity(
+        entityType: EntityCommentType,
+        entityId: string,
+    ): Promise<Comment[]> {
+        return this.commentRepository.find({
+            where: {entityType, entityId},
+        });
     }
 
     async incrementLikesCount(commentId: string): Promise<void> {

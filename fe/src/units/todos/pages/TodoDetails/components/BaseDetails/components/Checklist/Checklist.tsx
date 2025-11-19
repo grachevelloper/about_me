@@ -1,0 +1,404 @@
+import {
+    DeleteOutlined,
+    EditOutlined,
+    FileAddOutlined,
+    PlusOutlined,
+} from '@ant-design/icons';
+import {
+    Button,
+    Card,
+    Empty,
+    Input,
+    Modal,
+    Popover,
+    Space,
+    Steps,
+    Typography,
+} from 'antd';
+import block from 'bem-cn-lite';
+import {useState} from 'react';
+
+import {
+    useChecklistMutations,
+    useChecklistQuery,
+} from '@/todos/hooks/useChecklist';
+
+import './Checklist.scss';
+
+const {Text} = Typography;
+const b = block('checklist');
+
+interface ChecklistProps {
+    todoId: string;
+}
+
+export const Checklist = ({todoId}: ChecklistProps) => {
+    const [editing, setEditing] = useState(false);
+    const [popoverVisible, setPopoverVisible] = useState(false);
+    const [newItemText, setNewItemText] = useState('');
+    const [editingIndex, setEditingIndex] = useState<number | null>(null);
+    const [editingText, setEditingText] = useState('');
+
+    const {data: checklistData} = useChecklistQuery(todoId);
+    const {
+        addItem,
+        updateItemText,
+        removeItem,
+        updateProgress,
+        createChecklist,
+        isPending,
+    } = useChecklistMutations(todoId);
+
+    const steps = checklistData?.text || [];
+
+    const ensureChecklistExists = async () => {
+        if (!checklistData) {
+            try {
+                await createChecklist();
+            } catch (error) {
+                console.error('Failed to create checklist:', error);
+                throw error; // Пробрасываем ошибку дальше
+            }
+        }
+    };
+
+    const handleAddItem = async () => {
+        if (newItemText.trim()) {
+            try {
+                await ensureChecklistExists();
+                await addItem(newItemText.trim());
+                setNewItemText('');
+                setPopoverVisible(false);
+            } catch (error) {
+                console.error('Failed to add item:', error);
+            }
+        }
+    };
+
+    const handleStartEditing = async () => {
+        try {
+            await ensureChecklistExists();
+            setEditing(true);
+        } catch (error) {
+            console.error('Failed to start editing:', error);
+        }
+    };
+
+    const handleDeleteItem = async (index: number) => {
+        Modal.confirm({
+            title: 'Удалить пункт?',
+            content: 'Вы уверены, что хотите удалить этот пункт из чек-листа?',
+            okText: 'Удалить',
+            cancelText: 'Отмена',
+            okType: 'danger',
+            onOk: async () => {
+                try {
+                    await removeItem(index);
+                } catch (error) {
+                    console.error('Failed to remove item:', error);
+                }
+            },
+        });
+    };
+
+    const handleStartEdit = (index: number) => {
+        setEditingIndex(index);
+        setEditingText(steps[index] || '');
+    };
+
+    const handleSaveEdit = async () => {
+        if (editingIndex !== null && editingText.trim()) {
+            try {
+                await updateItemText(editingIndex, editingText.trim());
+                setEditingIndex(null);
+                setEditingText('');
+            } catch (error) {
+                console.error('Failed to update item:', error);
+            }
+        }
+    };
+
+    const handleCancelEdit = () => {
+        setEditingIndex(null);
+        setEditingText('');
+    };
+
+    const handleStepChange = async (current: number) => {
+        try {
+            if (!checklistData) {
+                await ensureChecklistExists();
+            }
+            await updateProgress(current - (checklistData?.progress || 0));
+        } catch (error) {
+            console.error('Failed to update progress:', error);
+        }
+    };
+
+    const handleCreateChecklist = async () => {
+        try {
+            await createChecklist();
+        } catch (error) {
+            console.error('Failed to create checklist:', error);
+        }
+    };
+
+    const popoverContent = (
+        <div style={{width: 300}}>
+            <Space direction='vertical' style={{width: '100%'}}>
+                <Input
+                    placeholder='Введите название пункта...'
+                    value={newItemText}
+                    onChange={(e) => setNewItemText(e.target.value)}
+                    onPressEnter={handleAddItem}
+                    disabled={isPending}
+                />
+                <Button
+                    type='primary'
+                    icon={<PlusOutlined />}
+                    onClick={handleAddItem}
+                    block
+                    disabled={!newItemText.trim() || isPending}
+                    loading={isPending}
+                >
+                    Добавить запись
+                </Button>
+            </Space>
+        </div>
+    );
+
+    // Если чеклист загружается
+    if (isPending) {
+        return (
+            <Card title='Чек-лист' size='small' className={b()}>
+                <Empty description='Загрузка...' />
+            </Card>
+        );
+    }
+
+    // Если чеклиста нет - показываем кнопку создания
+    if (!checklistData) {
+        return (
+            <Card
+                title='Чек-лист'
+                size='small'
+                className={b()}
+                extra={
+                    <Button
+                        type='primary'
+                        icon={<FileAddOutlined />}
+                        size='small'
+                        onClick={handleCreateChecklist}
+                        loading={isPending}
+                    >
+                        Создать чек-лист
+                    </Button>
+                }
+            >
+                <Empty
+                    description={
+                        <Space direction='vertical' size='small'>
+                            <Text type='secondary'>Чек-лист еще не создан</Text>
+                            <Text type='secondary'>
+                                Начните планирование задач
+                            </Text>
+                        </Space>
+                    }
+                >
+                    <Button
+                        type='primary'
+                        icon={<FileAddOutlined />}
+                        onClick={handleCreateChecklist}
+                        loading={isPending}
+                    >
+                        Создать чек-лист
+                    </Button>
+                </Empty>
+            </Card>
+        );
+    }
+
+    // Если чеклист пустой
+    if (steps.length === 0) {
+        return (
+            <Card
+                title={
+                    <Space className={b('title')}>
+                        Чек-лист
+                        <Button
+                            type={editing ? 'primary' : 'text'}
+                            icon={<EditOutlined />}
+                            size='small'
+                            onClick={() => setEditing(!editing)}
+                            disabled={isPending}
+                        >
+                            {editing ? 'Завершить' : 'Редактировать'}
+                        </Button>
+                    </Space>
+                }
+                size='small'
+                className={b()}
+                extra={
+                    <Popover
+                        title='Добавить новый пункт'
+                        content={popoverContent}
+                        trigger='click'
+                        open={popoverVisible}
+                        onOpenChange={setPopoverVisible}
+                        placement='bottomRight'
+                    >
+                        <Button
+                            type='dashed'
+                            icon={<PlusOutlined />}
+                            size='small'
+                            disabled={isPending}
+                        >
+                            Добавить пункт
+                        </Button>
+                    </Popover>
+                }
+            >
+                <Empty
+                    description='Чек-лист пустой'
+                    image={Empty.PRESENTED_IMAGE_SIMPLE}
+                >
+                    <Popover
+                        title='Добавить новый пункт'
+                        content={popoverContent}
+                        trigger='click'
+                        open={popoverVisible}
+                        onOpenChange={setPopoverVisible}
+                        placement='bottom'
+                    >
+                        <Button
+                            type='primary'
+                            icon={<PlusOutlined />}
+                            onClick={() => setPopoverVisible(true)}
+                            loading={isPending}
+                        >
+                            Добавить первый пункт
+                        </Button>
+                    </Popover>
+                </Empty>
+            </Card>
+        );
+    }
+
+    // Обычное отображение чеклиста с данными
+    const stepItems = steps.map((stepText, index) => ({
+        title:
+            editingIndex === index ? (
+                <Space>
+                    <Input
+                        size='small'
+                        value={editingText}
+                        onChange={(e) => setEditingText(e.target.value)}
+                        onPressEnter={handleSaveEdit}
+                        disabled={isPending}
+                    />
+                    <Button
+                        size='small'
+                        type='link'
+                        onClick={handleSaveEdit}
+                        loading={isPending}
+                    >
+                        ✓
+                    </Button>
+                    <Button
+                        size='small'
+                        type='link'
+                        danger
+                        onClick={handleCancelEdit}
+                        disabled={isPending}
+                    >
+                        ✕
+                    </Button>
+                </Space>
+            ) : (
+                <Space>
+                    {stepText}
+                    {editing && (
+                        <Space size='small' style={{marginLeft: 8}}>
+                            <Button
+                                type='link'
+                                size='small'
+                                onClick={() => handleStartEdit(index)}
+                                disabled={isPending}
+                            >
+                                Изменить
+                            </Button>
+                            <Button
+                                type='link'
+                                danger
+                                size='small'
+                                icon={<DeleteOutlined />}
+                                onClick={() => handleDeleteItem(index)}
+                                disabled={isPending}
+                            />
+                        </Space>
+                    )}
+                </Space>
+            ),
+        description:
+            index < (checklistData?.progress || 0)
+                ? 'Выполнено'
+                : index === (checklistData?.progress || 0)
+                ? 'Текущий шаг'
+                : 'Не выполнено',
+    }));
+
+    return (
+        <Card
+            title={
+                <Space className={b('title')}>
+                    Чек-лист
+                    <Popover
+                        title='Добавить новый пункт'
+                        content={popoverContent}
+                        trigger='click'
+                        open={popoverVisible}
+                        onOpenChange={setPopoverVisible}
+                        placement='bottomRight'
+                    >
+                        <Button
+                            type={editing ? 'primary' : 'text'}
+                            icon={<EditOutlined />}
+                            size='small'
+                            onClick={() => setEditing(!editing)}
+                            disabled={isPending}
+                        >
+                            {editing ? 'Завершить' : 'Редактировать'}
+                        </Button>
+                    </Popover>
+                </Space>
+            }
+            size='small'
+            className={b()}
+            extra={
+                editing && (
+                    <Button
+                        type='dashed'
+                        icon={<PlusOutlined />}
+                        size='small'
+                        onClick={() => setPopoverVisible(true)}
+                        disabled={isPending}
+                    >
+                        Добавить
+                    </Button>
+                )
+            }
+        >
+            <Steps
+                current={checklistData?.progress || 0}
+                items={stepItems}
+                direction='vertical'
+                size='default'
+                style={{
+                    height: '100%',
+                    minHeight: '300px',
+                }}
+                onChange={handleStepChange}
+                responsive
+            />
+        </Card>
+    );
+};

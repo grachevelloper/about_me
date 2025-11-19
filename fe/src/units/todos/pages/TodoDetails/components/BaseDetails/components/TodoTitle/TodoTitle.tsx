@@ -1,29 +1,20 @@
-import {Typography} from 'antd';
+import {Skeleton, Typography} from 'antd';
 import block from 'bem-cn-lite';
 import {useState} from 'react';
-import {useParams} from 'react-router-dom';
 
 import {TODO_TITLE_MAX_LENGTH} from '@/shared/utils/constants';
 
-import {useTodoMutation, useTodoQuery} from '@/todos/hooks';
-
-const b = block('todo-title');
+import {BaseDetail} from '../types';
 
 import './TodoTitile.scss';
 
-export const TodoTitle = () => {
-    const {todoId} = useParams();
-    const {mutateAsync} = useTodoMutation();
-    const {todo} = useTodoQuery(todoId!);
+const b = block('todo-title');
 
-    const [newTitle, setNewTitle] = useState<string>('');
-
-    const handleEnd = (newTitle: string) => {
-        mutateAsync({
-            id: todoId!,
-            title: newTitle,
-        });
-    };
+export const TodoTitle = ({content, onEnd, isPending}: BaseDetail<string>) => {
+    if (isPending) {
+        return <Skeleton.Input active size='small' style={{width: 200}} />;
+    }
+    const [newTitle, setNewTitle] = useState<string>(content as string);
     return (
         <Typography.Title
             level={1}
@@ -34,11 +25,11 @@ export const TodoTitle = () => {
                 enterIcon: null,
                 autoSize: true,
                 onChange: setNewTitle,
-                onEnd: () => handleEnd(newTitle),
+                onEnd: () => onEnd('title', newTitle),
             }}
             rootClassName={b('textarea')}
         >
-            {todo?.title}
+            {content}
         </Typography.Title>
     );
 };

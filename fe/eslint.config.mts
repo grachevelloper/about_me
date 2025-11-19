@@ -62,6 +62,7 @@ export default defineConfig([
     reactPlugin.configs.flat.recommended,
     {
         rules: {
+            'no-case-declarations': 'off',
             '@typescript-eslint/only-throw-error': 'off',
             '@typescript-eslint/no-unused-vars': 'warn',
             'react/display-name': 'off',

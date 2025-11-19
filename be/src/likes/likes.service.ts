@@ -28,6 +28,8 @@ export class LikesService {
 
         await this.usersService.findById(authorId);
 
+        await this.checkEntityExists(entityId, entityType);
+
         const existingLike = await this.likesRepository.findOne({
             where: {entityId, entityType, authorId},
         });
@@ -48,6 +50,7 @@ export class LikesService {
         const {entityId, authorId, entityType} = deleteLikeData;
 
         const like = await this.likesRepository.findOneBy(deleteLikeData);
+
         if (!like) {
             throw new NotFoundException("Like not found");
         }
@@ -83,6 +86,19 @@ export class LikesService {
                 break;
             case "comment":
                 await this.commentsService.decrementLikesCount(entityId);
+                break;
+            default:
+                throw new BadRequestException("Invalid entity type");
+        }
+    }
+
+    private async checkEntityExists(entityId: string, entityType: string) {
+        switch (entityType) {
+            case "todo":
+                await this.todosService.findOne(entityId);
+                break;
+            case "comment":
+                await this.commentsService.findOne(entityId);
                 break;
             default:
                 throw new BadRequestException("Invalid entity type");

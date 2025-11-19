@@ -11,17 +11,13 @@ import {
 import {Request} from "express";
 import {AuthGuard} from "src/guards/auth.guard";
 
-import {ChecklistService} from "./checklists/checklists.service";
 import type {CreateTodoDto, UpdateTodoDto} from "./dto";
 import {TodosService} from "./todos.service";
 
 @UseGuards(AuthGuard)
 @Controller("todos")
 export class TodosController {
-    constructor(
-        private readonly todosService: TodosService,
-        private readonly checklistService: ChecklistService,
-    ) {}
+    constructor(private readonly todosService: TodosService) {}
 
     @Post()
     async create(

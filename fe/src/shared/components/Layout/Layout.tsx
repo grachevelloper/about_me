@@ -1,28 +1,26 @@
-import {BulbOutlined, HomeOutlined, LogoutOutlined} from '@ant-design/icons';
+import {BulbOutlined} from '@ant-design/icons';
 import {QueryErrorResetBoundary} from '@tanstack/react-query';
-import {Layout as AntLayout, Button, Menu, theme, Tooltip} from 'antd';
+import {Layout as AntLayout, Button, Menu, theme} from 'antd';
 import {MenuItemType} from 'antd/es/menu/interface';
 import block from 'bem-cn-lite';
 import {ErrorBoundary} from 'react-error-boundary';
 import {useTranslation} from 'react-i18next';
-import {Outlet, useNavigate} from 'react-router-dom';
-
-import {useLogoutMutation} from '@/users/hooks';
+import {Outlet} from 'react-router-dom';
 
 import {useTodoForm} from '../../context';
 import {NewTodoForm} from '../NewTodoForm';
 
 import './Layout.scss';
+import {Header} from './components/Header';
 
 const b = block('layout');
 
-const {Header, Content, Sider} = AntLayout;
+const {Content, Sider} = AntLayout;
 
 export const Layout = () => {
     const {t} = useTranslation('common');
     const {setIsOpen} = useTodoForm();
-    const {mutateAsync, isPending, isError} = useLogoutMutation();
-    const navigate = useNavigate();
+
     const {
         token: {colorBgContainer, borderRadiusLG},
     } = theme.useToken();
@@ -38,20 +36,6 @@ export const Layout = () => {
         },
     ];
 
-    const topItems: MenuItemType[] = [
-        {
-            icon: <HomeOutlined />,
-            label: t('layout.top.main'),
-            key: 'nav-0',
-            onClick: () => {
-                navigate('/todos');
-            },
-        },
-    ];
-
-    const handleLogout = async () => {
-        await mutateAsync();
-    };
     return (
         <QueryErrorResetBoundary>
             {({reset}) => (
@@ -76,22 +60,8 @@ export const Layout = () => {
                             />
                         </Sider>
                         <AntLayout>
-                            <Header className={b('header')}>
-                                <Menu
-                                    theme='light'
-                                    mode='inline'
-                                    items={topItems}
-                                    defaultSelectedKeys={[]}
-                                    rootClassName={b('menu')}
-                                />
-                                <Tooltip title={t('logout')}>
-                                    <LogoutOutlined
-                                        onClick={handleLogout}
-                                        className={b('logout-icon')}
-                                    />
-                                </Tooltip>
-                            </Header>
-                            <Content>
+                            <Header />
+                            <Content className={b('content')}>
                                 <Outlet />
                             </Content>
                         </AntLayout>

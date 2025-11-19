@@ -41,8 +41,8 @@ export const useSignUpFields = (
         });
     }, [setSignStep]);
 
-    const handleSubmit = useCallback(async () => {
-        await onSubmit();
+    const handleSubmit = useCallback(() => {
+        onSubmit();
 
         setSignStep((prev) => {
             const nextStep = prev + 1;
@@ -53,6 +53,12 @@ export const useSignUpFields = (
 
     const handleEndAuth = useCallback(() => {
         navigate('/todos');
+        setSignStep(() => {
+            const firstStep = 0;
+            AuthEmitter.emit(SIGN_UP_EVENT, firstStep);
+            return firstStep;
+        });
+        AuthEmitter.emit(SIGN_UP_EVENT, 0);
     }, [navigate]);
 
     useEffect(() => {
@@ -99,7 +105,6 @@ export const useSignUpFields = (
             title: t('auth.name.username.title'),
             name: 'username',
             label: t('auth.username.label'),
-            type: 'text',
             placeholder: t('auth.username.placeholder'),
             rules: [{required: true, message: t('auth.username.required')}],
             index: 2,

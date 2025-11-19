@@ -1,5 +1,6 @@
 import {createHash} from "crypto";
 import type {CookieOptions} from "express";
+
 export function hashToken(token: string): string {
     return createHash("sha256").update(token).digest("hex");
 }

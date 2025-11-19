@@ -12,8 +12,8 @@ const b = block('priority');
 interface PriorityProps {
     priority: TodoPriority;
     editable?: {isEdited: boolean};
-    onClick?: () => void;
-    isLoading: boolean;
+    onUpdate?: () => void;
+    isLoading?: boolean;
 }
 
 const getCustomize = (priority: TodoPriority) => {
@@ -44,7 +44,7 @@ const getCustomize = (priority: TodoPriority) => {
 
 export const Priority = ({
     priority,
-    onClick,
+    onUpdate,
     editable,
     isLoading,
 }: PriorityProps) => {
@@ -55,7 +55,7 @@ export const Priority = ({
     return (
         <Button
             className={b({'is-edited': isEdited})}
-            onClick={onClick}
+            onClick={onUpdate}
             loading={isLoading}
             size='middle'
             {...customize}

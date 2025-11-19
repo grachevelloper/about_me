@@ -1,28 +1,21 @@
-import {Flex} from 'antd';
 import {useParams} from 'react-router-dom';
 
-import {useTodoMutation, useTodoQuery} from '@/todos/hooks';
+import {useTodoQuery} from '../../hooks';
 
-import {TodoTitle} from './components/BaseDetails/components/TodoTitle';
+import {BaseDetails} from './components/BaseDetails';
+import {BaseDetailsSkeleton} from './components/BaseDetails/BaseDetailsSkeleton';
 
 export const TodoDetailsPage = () => {
-    const {todoId} = useParams();
+    const {id} = useParams();
+    const {todo, isPending, isError} = useTodoQuery(id!);
 
-    const {mutateAsync} = useTodoMutation();
-
-    const {isPending, isError} = useTodoQuery(todoId!);
-
-    //TODO idk, how fix this eslint happiness
     if (isPending) {
-        return <span>IsLoading</span>;
-    }
-    if (isError) {
-        return <span>is error</span>;
+        return <BaseDetailsSkeleton />;
     }
 
-    return (
-        <Flex vertical align='flex-start' justify='flex-start'>
-            <TodoTitle />
-        </Flex>
-    );
+    if (isError || !todo) {
+        return <div>Some error occurred</div>;
+    }
+
+    return <BaseDetails initialData={todo} />;
 };

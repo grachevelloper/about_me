@@ -45,7 +45,6 @@ export class RefreshTokensService {
 
     async revokeToken(userId: string, token: string): Promise<void> {
         const tokenHash = await bcrypt.hash(token, 10);
-        console.log(userId, token, "134233421423413");
         await this.refreshTokenRepo.update(
             {userId, tokenHash},
             {revoked: true},

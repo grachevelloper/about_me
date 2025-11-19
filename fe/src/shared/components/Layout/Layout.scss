@@ -3,24 +3,14 @@
     height: 100vh;
     position: relative;
 
-    &__header {
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: center;
-    }
+    &__content {
+        padding: 50px 70px;
 
-    &__menu {
-        display: flex;
-        width: fit-content;
-        height: 100%;
-        align-items: center;
-    }
-
-    &__logout-icon {
-        position: relative;
-        z-index: 100;
-        color: red;
-        cursor: pointer;
+        @media (max-width: 1024px) {
+            padding: 30px 50px;
+        }
+        @media (max-width: 768px) {
+            padding: 10px 20px;
+        }
     }
 }

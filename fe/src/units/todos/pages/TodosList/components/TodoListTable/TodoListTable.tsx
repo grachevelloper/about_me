@@ -1,8 +1,8 @@
-import {Table} from 'antd';
+import {Flex, Table, Typography} from 'antd';
 import {type ColumnsType} from 'antd/es/table';
 import block from 'bem-cn-lite';
 import {useTranslation} from 'react-i18next';
-import {useNavigate} from 'react-router-dom';
+import {Navigate} from 'react-router-dom';
 
 import {Todo, TodoPriority, TodoState} from '@/todos/types';
 
@@ -21,8 +21,6 @@ type TodoTableColumns = Pick<Todo, 'title' | 'priority' | 'state' | 'id'>;
 
 export const TodoListTable = ({todos}: TodoListTableProps) => {
     const {t} = useTranslation('todo');
-
-    const navigate = useNavigate();
 
     const columns: ColumnsType<TodoTableColumns> = [
         {
@@ -54,22 +52,29 @@ export const TodoListTable = ({todos}: TodoListTableProps) => {
         },
     ];
 
-    const handleRowClick = (index?: number) => {
-        if (index) {
-            navigate(`/${index}`);
-        }
+    const handleRowClick = (index: string) => {
+        return <Navigate to={`/todos/${index}`} replace />;
     };
 
     return (
-        <Table<TodoTableColumns>
-            columns={columns}
-            dataSource={todos}
-            rowClassName={b('row')}
-            onRow={(_record, rowIndex) => {
-                return {
-                    onClick: () => handleRowClick(rowIndex),
-                };
-            }}
-        />
+        <Flex vertical rootClassName={b()}>
+            <Typography.Title level={3}>
+                {t('todo.table.title')}
+            </Typography.Title>
+            <Table<TodoTableColumns>
+                rootClassName={b('table')}
+                columns={columns}
+                dataSource={todos}
+                size='middle'
+                rowClassName={b('row')}
+                rowHoverable
+                onRow={(record, _rowIndex) => {
+                    return {
+                        onClick: () => handleRowClick(record.id),
+                    };
+                }}
+                scroll={{x: 'max-content', y: 55 * 5}}
+            />
+        </Flex>
     );
 };

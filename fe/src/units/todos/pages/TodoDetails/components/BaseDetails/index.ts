@@ -1,0 +1,1 @@
+export {BaseDetails} from './BaseDetails'
