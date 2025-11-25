@@ -56,7 +56,7 @@ const lightTheme: CustomThemeConfig = {
     },
     components: {
         Layout: {
-            headerBg: '#fefaf6',
+            headerBg: '#faebe1ff',
             bodyBg: '#fefaf6',
             siderBg: '#fdf5f0',
             triggerBg: '#f5d6ba',
@@ -83,6 +83,7 @@ const lightTheme: CustomThemeConfig = {
         },
         Menu: {
             colorBgContainer: '#faebe1ff',
+            itemHoverBg: '#ecc4acff',
             itemBg: '#ecc4acff',
             itemSelectedBg: '#f8bf8dff',
             itemColor: '#5d4037',

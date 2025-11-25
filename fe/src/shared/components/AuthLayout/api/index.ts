@@ -1,4 +1,4 @@
-import {query} from '../configs/api';
+import {query} from '@/shared/configs/api';
 
 export const checkAuth = async () => {
     try {

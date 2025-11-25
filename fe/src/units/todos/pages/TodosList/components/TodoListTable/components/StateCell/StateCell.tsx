@@ -1,7 +1,7 @@
 import {useCallback, useRef} from 'react';
 
 import {State} from '@/todos/components/State';
-import {useTodoMutations, useTodoQuery} from '@/todos/hooks';
+import {useTodoMutations, useTodoQuery} from '@/todos/store';
 import {TodoState} from '@/todos/types';
 
 interface TodoStateCellProps {

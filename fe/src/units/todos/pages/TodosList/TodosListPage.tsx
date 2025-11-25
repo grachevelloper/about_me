@@ -1,6 +1,6 @@
 import {Flex} from 'antd';
 
-import {useTodosQuery} from '@/todos/hooks';
+import {useTodosQuery} from '@/todos/store';
 
 import {HelloTitle} from './components/HelloTitle';
 import {TodoListTable} from './components/TodoListTable';

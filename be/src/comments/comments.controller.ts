@@ -2,6 +2,7 @@ import {
     Body,
     Controller,
     Delete,
+    Get,
     HttpCode,
     HttpStatus,
     Param,
@@ -58,6 +59,21 @@ export class CommentsController {
         const authorId = req.user.id;
 
         return await this.commentsService.create(authorId, createCommentData);
+    }
+
+    @HttpCode(HttpStatus.OK)
+    @Get(":id")
+    async getByid(@Param() id: string) {
+        return await this.commentsService.findOne(id);
+    }
+
+    @HttpCode(HttpStatus.OK)
+    @Get(":entityType/:entityId")
+    async getByEntityId(
+        @Param() entityType: EntityCommentType,
+        @Param() entityId: string,
+    ) {
+        return await this.commentsService.findByEntity(entityType, entityId);
     }
 
     @HttpCode(HttpStatus.OK)

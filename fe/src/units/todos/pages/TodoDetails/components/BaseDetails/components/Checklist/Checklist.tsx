@@ -21,7 +21,7 @@ import {useState} from 'react';
 import {
     useChecklistMutations,
     useChecklistQuery,
-} from '@/todos/hooks/useChecklist';
+} from '@/todos/store/useChecklist';
 
 import './Checklist.scss';
 

@@ -7,7 +7,7 @@ const TerserWebpackPlugin = require('terser-webpack-plugin');
 const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 const Dotenv = require('dotenv-webpack');
 
-const isDev = true;
+const isDev = process.env.NODE_ENV === 'development';
 const FE_PORT = 5173;
 
 const optimization = () => {

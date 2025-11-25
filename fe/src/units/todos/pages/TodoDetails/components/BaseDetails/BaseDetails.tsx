@@ -2,7 +2,7 @@ import {Col, Divider, Row} from 'antd';
 import TextArea from 'antd/es/input/TextArea';
 import block from 'bem-cn-lite';
 
-import {useTodoMutations} from '@/todos/hooks';
+import {useTodoMutations} from '@/todos/store';
 import {type Todo, type TodoPriority, type TodoState} from '@/todos/types';
 
 import {Checklist} from './components/Checklist';
@@ -56,14 +56,10 @@ export const BaseDetails = ({initialData}: BaseDetailsProps) => {
 
     return (
         <div className={b()}>
-            <Divider orientation='start'>
-                <TodoTitle
-                    onEnd={handleEnd}
-                    content={initialData.title}
-                    isPending={isPending}
-                />
+            <Divider orientation='left' orientationMargin={0}>
+                <TodoTitle onEnd={handleEnd} content={initialData.title} />
             </Divider>
-            <Row gutter={32} justify='start'>
+            <Row gutter={32} justify='end'>
                 <Col>
                     {/* <Priority
                         priority={initialData.priority}
@@ -83,13 +79,14 @@ export const BaseDetails = ({initialData}: BaseDetailsProps) => {
                     /> */}
                 </Col>
             </Row>
-            <Row justify='space-between' align='top' gutter={40}>
+            <Row justify='end' align='top'>
                 <Col xs={24} lg={16}>
                     <TextArea
                         className={b('content')}
                         defaultValue={initialData.content}
                         variant='borderless'
                         autoSize={{minRows: 6, maxRows: 24}}
+                        onBlur={(e) => handleContentChange(e.target.value)}
                     />
                 </Col>
                 <Col xs={24} lg={8}>

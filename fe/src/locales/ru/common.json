@@ -9,5 +9,14 @@
 
     "layout.top.main": "Главная",
     "layout.left.suggest": "Предложить ежедневку",
-    "logout": "Выйти из аккаунта"
+    "logout": "Выйти из аккаунта",
+
+    "comment.reply": "Ответить",
+
+    "comment.placeholder": "Напишите ваш комментарий",
+
+    "like": "Поставить лайк",
+    "edit": "Изменить",
+    "create": "Создать",
+    "cancel": "Отменить"
 }

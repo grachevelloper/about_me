@@ -4,7 +4,7 @@ import block from 'bem-cn-lite';
 import {useEffect, useState} from 'react';
 import {Navigate, Outlet} from 'react-router-dom';
 
-import {checkAuth} from '../../api/checkAuth';
+import {checkAuth} from './api';
 
 import './AuthLayout.scss';
 

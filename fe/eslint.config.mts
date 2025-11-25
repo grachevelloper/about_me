@@ -113,7 +113,7 @@ export default defineConfig([
             'react/jsx-uses-react': 'off',
             'react/jsx-key': 'error',
             'react/jsx-no-duplicate-props': 'error',
-            '@/object-curly-spacing': ['warn', 'never'],
+            'object-curly-spacing': ['warn', 'never'],
         },
     },
     {

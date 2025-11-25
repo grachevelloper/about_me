@@ -1,4 +1,3 @@
-// hooks/useChecklist.ts
 import {
     useMutation,
     UseMutationResult,

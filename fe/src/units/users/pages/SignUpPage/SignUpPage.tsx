@@ -4,7 +4,7 @@ import {useCallback, useEffect, useState} from 'react';
 
 import {useLocalStorage} from '@/shared/hooks';
 import {type CardProps, type FormField} from '@/typings/components';
-import {useSignUpMutation} from '@/users/hooks';
+import {useSignUpMutation} from '@/users/store';
 import {AuthEmitter, SIGN_UP_EVENT} from '@/users/utils';
 
 import {SignStep} from './components/SignStep';

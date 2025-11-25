@@ -58,7 +58,7 @@ export class CommentsService {
     async findOne(id: string): Promise<Comment> {
         const comment = await this.commentRepository.findOne({
             where: {id},
-            relations: ["author"], // Добавляем загрузку автора
+            relations: ["author"],
         });
         if (!comment) {
             throw new NotFoundException("Comment not found");

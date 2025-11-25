@@ -4,7 +4,7 @@ import {useTranslation} from 'react-i18next';
 
 import {DtoCreateTodo} from '@/todos/api/types';
 
-import {useCreateTodoMutation} from '../../../units/todos/hooks';
+import {useCreateTodoMutation} from '../../../units/todos/store';
 import {useTodoForm} from '../../context';
 import {useLocalStorage} from '../../hooks';
 import {NEW_TODO_KEY} from '../../utils/constants';

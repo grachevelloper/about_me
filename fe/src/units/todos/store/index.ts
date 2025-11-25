@@ -1,4 +1,5 @@
 import {
+    keepPreviousData,
     useMutation,
     useQuery,
     useQueryClient,
@@ -9,7 +10,7 @@ import {queryClient} from '@/shared/configs/api';
 
 import api from '../api';
 import {DtoCreateTodo, DtoUpdateTodo} from '../api/types';
-import {TodoPriority, TodoState} from '../types';
+import {Todo, TodoPriority, TodoState} from '../types';
 
 export const useTodosQuery = () => {
     const {data} = useSuspenseQuery({
@@ -21,15 +22,16 @@ export const useTodosQuery = () => {
 };
 
 export const useTodoQuery = (todoId: string) => {
-    const {data, isPending, isError} = useQuery(
+    const {data, isPending, isError, isPlaceholderData} = useQuery(
         {
             queryKey: ['todo', todoId],
             queryFn: () => api.getTodoById(todoId),
+            placeholderData: keepPreviousData,
         },
         queryClient
     );
 
-    return {todo: data, isPending, isError};
+    return {todo: data, isPending, isError, isPlaceholderData};
 };
 
 export const useCreateTodoMutation = () => {
@@ -82,35 +84,31 @@ export const useTodoMutations = () => {
                     );
                 }
             },
-            onSettled: (data, error, variables) => {
-                // Инвалидируем кэш после завершения мутации
-                queryClient.invalidateQueries({
-                    queryKey: ['todo', variables.id],
-                });
-                queryClient.invalidateQueries({queryKey: ['todos']});
+            onSuccess: (data, variables) => {
+                queryClient.setQueryData(['todo', variables.id], data);
             },
         },
         queryClient
     );
 
     const updateTitle = (id: string, title: string) => {
-        return baseMutation.mutateAsync({id, title});
+        return baseMutation.mutate({id, title});
     };
 
     const updatePriority = (id: string, priority: TodoPriority) => {
-        return baseMutation.mutateAsync({id, priority});
+        return baseMutation.mutate({id, priority});
     };
 
     const updateState = (id: string, state: TodoState) => {
-        return baseMutation.mutateAsync({id, state});
+        return baseMutation.mutate({id, state});
     };
 
     const updateChecklist = (id: string, checklist: string[]) => {
-        return baseMutation.mutateAsync({id, checklist});
+        return baseMutation.mutate({id, checklist});
     };
 
     const updateContent = (id: string, content: string) => {
-        return baseMutation.mutateAsync({id, content});
+        return baseMutation.mutate({id, content});
     };
 
     return {

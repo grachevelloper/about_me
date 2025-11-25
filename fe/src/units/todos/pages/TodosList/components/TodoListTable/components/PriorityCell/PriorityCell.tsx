@@ -1,7 +1,7 @@
 import {useCallback, useRef} from 'react';
 
 import {Priority} from '@/todos/components/Priority';
-import {useTodoMutations, useTodoQuery} from '@/todos/hooks';
+import {useTodoMutations, useTodoQuery} from '@/todos/store';
 import {TodoPriority} from '@/todos/types';
 
 interface TodoStateCellProps {

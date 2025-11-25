@@ -4,13 +4,12 @@
     "typescript.preferences.importModuleSpecifier": "project-relative",
     "javascript.preferences.importModuleSpecifier": "project-relative",
     "git.ignoreLimitWarning": true,
-    "typescript.preferences.includePackageJsonAutoImports": "auto"
+    "typescript.preferences.includePackageJsonAutoImports": "on",
 
-    "editor.codeActionsOnSave": {
-        "source.fixAll.eslint": "true",
-        "source.organizeImports": "true",
-        "source.addMissingImports": "true"
-    },
+    "editor.codeActionsOnSave": [
+        "source.organizeImports",
+        "source.fixAll"
+    ],
 
     "editor.formatOnSave": true,
     "editor.defaultFormatter": "esbenp.prettier-vscode",

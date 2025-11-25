@@ -1,8 +1,8 @@
 .header {
     display: flex;
     flex-direction: row;
-    justify-content: end;
     gap: 10%;
+    justify-content: end;
     align-items: center;
 
     &__menu {
@@ -17,5 +17,9 @@
         z-index: 100;
         color: red;
         cursor: pointer;
+    }
+
+    &__title {
+        justify-self: flex-start;
     }
 }

@@ -28,7 +28,7 @@
             "@/typings/*": ["./src/typings/*"],
             "@/test/*": ["./src/__test__/*"],
             "@/utils/*": ["./src/utils/*"],
-            "@/locales/*": ["src/locales/*"]
+            "@/locales/*": ["./src/locales/*"]
         }
     },
     "include": ["src/**/*", "/types/**/*", "webpack.config.js"],

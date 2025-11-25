@@ -1,21 +1,32 @@
+import {Flex} from 'antd';
+import block from 'bem-cn-lite';
 import {useParams} from 'react-router-dom';
 
-import {useTodoQuery} from '../../hooks';
+import {useTodoQuery} from '../../store';
 
 import {BaseDetails} from './components/BaseDetails';
-import {BaseDetailsSkeleton} from './components/BaseDetails/BaseDetailsSkeleton';
+import {CommentsContainer} from './components/CommentsContainer';
+
+import './TodoDetailsPage.scss';
+
+const b = block('todo-details-page');
 
 export const TodoDetailsPage = () => {
     const {id} = useParams();
-    const {todo, isPending, isError} = useTodoQuery(id!);
+    const {todo, isError, isPending, isPlaceholderData} = useTodoQuery(id!);
 
-    if (isPending) {
-        return <BaseDetailsSkeleton />;
+    if (isPending || isPlaceholderData) {
+        return <div>Is Pending occurred</div>;
     }
 
-    if (isError || !todo) {
+    if (isError && !todo) {
         return <div>Some error occurred</div>;
     }
 
-    return <BaseDetails initialData={todo} />;
+    return (
+        <Flex vertical align='start' justify='start' className={b()}>
+            <BaseDetails initialData={todo!} />
+            <CommentsContainer todoId={id!}></CommentsContainer>
+        </Flex>
+    );
 };

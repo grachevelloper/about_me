@@ -1,4 +1,4 @@
-import {Skeleton, Typography} from 'antd';
+import {Typography} from 'antd';
 import block from 'bem-cn-lite';
 import {useState} from 'react';
 
@@ -10,10 +10,7 @@ import './TodoTitile.scss';
 
 const b = block('todo-title');
 
-export const TodoTitle = ({content, onEnd, isPending}: BaseDetail<string>) => {
-    if (isPending) {
-        return <Skeleton.Input active size='small' style={{width: 200}} />;
-    }
+export const TodoTitle = ({content, onEnd}: BaseDetail<string>) => {
     const [newTitle, setNewTitle] = useState<string>(content as string);
     return (
         <Typography.Title

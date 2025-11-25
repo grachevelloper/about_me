@@ -11,7 +11,6 @@ const {TextArea} = Input;
 
 export function FormInput({field}: FormInputProps) {
     const {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         name,
         label,
         dependencies,

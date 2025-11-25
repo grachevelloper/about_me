@@ -2,7 +2,7 @@ import {Flex, Table, Typography} from 'antd';
 import {type ColumnsType} from 'antd/es/table';
 import block from 'bem-cn-lite';
 import {useTranslation} from 'react-i18next';
-import {Navigate} from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 
 import {Todo, TodoPriority, TodoState} from '@/todos/types';
 
@@ -21,6 +21,7 @@ type TodoTableColumns = Pick<Todo, 'title' | 'priority' | 'state' | 'id'>;
 
 export const TodoListTable = ({todos}: TodoListTableProps) => {
     const {t} = useTranslation('todo');
+    const navigate = useNavigate();
 
     const columns: ColumnsType<TodoTableColumns> = [
         {
@@ -53,7 +54,7 @@ export const TodoListTable = ({todos}: TodoListTableProps) => {
     ];
 
     const handleRowClick = (index: string) => {
-        return <Navigate to={`/todos/${index}`} replace />;
+        navigate(`/todos/${index}`);
     };
 
     return (

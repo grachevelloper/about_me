@@ -6,7 +6,6 @@
     "scripts": {
         "dev": "cross-env NODE_ENV=development  webpack serve",
         "build": "cross-env NODE_ENV=production  webpack  build ",
-        "build:dev": "webpack --mode development",
         "type-check": "tsc --noEmit",
         "lint": "eslint src --ext .ts,.tsx,.js,.jsx",
         "lint:fix": "eslint src --ext .ts,.tsx,.js,.jsx --fix",

@@ -52,15 +52,19 @@ export const Layout = () => {
                 >
                     <AntLayout rootClassName={b()}>
                         <NewTodoForm />
-                        <Sider breakpoint='lg' collapsedWidth='0' theme='light'>
-                            <Menu
-                                theme='light'
-                                mode='inline'
-                                items={leftItems}
-                            />
-                        </Sider>
+                        <Header />
                         <AntLayout>
-                            <Header />
+                            <Sider
+                                breakpoint='lg'
+                                collapsedWidth='0'
+                                theme='light'
+                            >
+                                <Menu
+                                    theme='light'
+                                    mode='inline'
+                                    items={leftItems}
+                                />
+                            </Sider>
                             <Content className={b('content')}>
                                 <Outlet />
                             </Content>

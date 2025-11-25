@@ -1,11 +1,7 @@
 .base-details {
-    display: flex;
-    flex-direction: column;
-    padding: 0 5%;
-
+    width: 100%;
     &__content {
         max-width: 700px !important;
-        margin: 10px 0;
         // background: linear-gradient(to right, #fbe2c2 1px, transparent 1px),
         //     linear-gradient(to left, #fbe2c2 1px, transparent 1px),
         //     linear-gradient(to bottom, #fbe2c2 3px, transparent 3px);
