@@ -2,9 +2,13 @@ import {
     Column,
     CreateDateColumn,
     Entity,
+    JoinColumn,
+    ManyToOne,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from "typeorm";
+
+import {User} from "../users/users.entity";
 
 export type EntityCommentType = "todo" | "article";
 
@@ -13,8 +17,9 @@ export class Comment {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
-    @Column({type: "uuid"})
-    authorId: string;
+    @ManyToOne(() => User)
+    @JoinColumn()
+    author: User;
 
     @Column()
     content: string;
@@ -35,8 +40,8 @@ export class Comment {
     likesCount: number;
 
     @UpdateDateColumn()
-    updatedAt: string;
+    updatedAt: Date;
 
     @CreateDateColumn()
-    createdAt: string;
+    createdAt: Date;
 }

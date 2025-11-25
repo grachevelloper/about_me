@@ -2,6 +2,7 @@ import {Injectable, NotFoundException} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
 
+import {UsersService} from "../users/users.service";
 import {CreateCommentDto, UpdateCommentDto} from "./comments.controller";
 import {Comment, EntityCommentType} from "./comments.entity";
 
@@ -10,9 +11,16 @@ export class CommentsService {
     constructor(
         @InjectRepository(Comment)
         private commentRepository: Repository<Comment>,
+        private usersService: UsersService,
     ) {}
 
     async create(authorId: string, createCommentData: CreateCommentDto) {
+        // Находим пользователя через UsersService
+        const author = await this.usersService.findById(authorId);
+        if (!author) {
+            throw new NotFoundException("User not found");
+        }
+
         let depth = 0;
         if (createCommentData.parentId) {
             const parentComment = await this.findOne(
@@ -23,7 +31,7 @@ export class CommentsService {
 
         const comment = this.commentRepository.create({
             ...createCommentData,
-            authorId,
+            author,
             depth,
         });
 
@@ -48,18 +56,23 @@ export class CommentsService {
     }
 
     async findOne(id: string): Promise<Comment> {
-        const comment = await this.commentRepository.findOne({where: {id}});
+        const comment = await this.commentRepository.findOne({
+            where: {id},
+            relations: ["author"], // Добавляем загрузку автора
+        });
         if (!comment) {
             throw new NotFoundException("Comment not found");
         }
         return comment;
     }
+
     async findByEntity(
         entityType: EntityCommentType,
         entityId: string,
     ): Promise<Comment[]> {
         return this.commentRepository.find({
             where: {entityType, entityId},
+            relations: ["author"], // Добавляем загрузку автора
         });
     }
 

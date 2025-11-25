@@ -2,6 +2,9 @@ import {
     Body,
     Controller,
     Delete,
+    HttpCode,
+    HttpStatus,
+    Param,
     Patch,
     Post,
     Req,
@@ -20,7 +23,7 @@ export class CreateCommentDto {
 
     @IsOptional()
     @IsUUID()
-    parentId?: string | null;
+    parentId?: string;
 
     @IsString()
     entityId: string;
@@ -37,10 +40,8 @@ export class DeleteCommentDto {
 export class UpdateCommentDto {
     @IsUUID()
     id: string;
-
-    @IsOptional()
     @IsString()
-    content?: string;
+    contents: string;
 }
 
 @UseGuards(AuthGuard)
@@ -48,6 +49,7 @@ export class UpdateCommentDto {
 export class CommentsController {
     constructor(private readonly commentsService: CommentsService) {}
 
+    @HttpCode(HttpStatus.CREATED)
     @Post()
     async create(
         @Req() req: Request,
@@ -58,11 +60,16 @@ export class CommentsController {
         return await this.commentsService.create(authorId, createCommentData);
     }
 
-    @Patch()
-    async update(@Body() updateCommentData: UpdateCommentDto) {
-        return await this.commentsService.update(updateCommentData);
+    @HttpCode(HttpStatus.OK)
+    @Patch(":id")
+    async update(
+        @Param() id: string,
+        @Body() updateCommentData: UpdateCommentDto,
+    ) {
+        return await this.commentsService.update({...updateCommentData, id});
     }
 
+    @HttpCode(HttpStatus.OK)
     @Delete()
     async delete(@Body() deleteCommentData: DeleteCommentDto) {
         return await this.commentsService.delete(deleteCommentData.id);

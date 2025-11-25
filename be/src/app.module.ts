@@ -25,7 +25,6 @@ dotenv.config();
             imports: [ConfigModule],
             useFactory: () => ({
                 ...dataSourceOptions,
-                synchronize: true,
                 autoLoadEntities: true,
                 migrationsRun: true,
                 migrationsTableName: "migrations",

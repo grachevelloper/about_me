@@ -1,6 +1,5 @@
+import {type TodoPriority, type TodoState} from "@/types/todo";
 import {User} from "@/users/users.entity";
-
-import {type TodoPriority, type TodoState} from "../../types/todo";
 
 export interface CreateTodoDto {
     authorId: string;

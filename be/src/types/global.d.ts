@@ -3,20 +3,18 @@ declare global {
     type Undefinable<T> = T | undefined;
 
     type PartialFields<T, K extends keyof T> = Partial<Pick<T, K>> & Omit<T, K>;
+
+    namespace Express {
+        interface Request {
+            user: AuthUser;
+        }
+    }
 }
 
 interface AuthUser {
     id: string;
     iat: number;
     exp: number;
-}
-
-declare global {
-    namespace Express {
-        interface Request {
-            user: AuthUser;
-        }
-    }
 }
 
 export {};

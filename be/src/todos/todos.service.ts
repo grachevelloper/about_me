@@ -2,8 +2,9 @@ import {Injectable, NotFoundException} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
 
+import {TodoState} from "@/types/todo";
+
 import {CommentsService} from "../comments/comments.service";
-import {TodoState} from "../types/todo";
 import {CreateTodoDto, UpdateTodoDto} from "./dto";
 import {Todo} from "./todos.entity";
 

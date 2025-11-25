@@ -7,7 +7,8 @@ import {
     UpdateDateColumn,
 } from "typeorm";
 
-import {TodoPriority, TodoState} from "../types/todo";
+import {TodoPriority, TodoState} from "@/types/todo";
+
 import {CheckList} from "./checklists/checklists.entity";
 
 @Entity("todos")
