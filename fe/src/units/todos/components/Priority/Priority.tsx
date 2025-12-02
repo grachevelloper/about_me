@@ -12,7 +12,7 @@ const b = block('priority');
 interface PriorityProps {
     priority: TodoPriority;
     editable?: {isEdited: boolean};
-    onUpdate?: () => void;
+    onUpdate?: (priority: TodoPriority) => void;
     isLoading?: boolean;
 }
 

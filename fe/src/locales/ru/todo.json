@@ -22,5 +22,8 @@
     "new-todo-form.ok": "Предложить",
     "new-todo-form.close": "Отмена",
     "new-todo-form.your-title.placeholder": "Название...",
-    "new-todo-form.your-content.placeholder": "Твоё описание..."
+    "new-todo-form.your-content.placeholder": "Твоё описание...",
+    "todo.nowadays.book.title": "Сегодня читаю",
+    "todo.nowadays.series.title": "Сегодня смотрю",
+    "todo.nowadays.music.title": "Сегодня слушаю"
 }

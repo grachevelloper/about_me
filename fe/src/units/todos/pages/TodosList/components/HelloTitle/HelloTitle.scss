@@ -1,0 +1,11 @@
+@import 'animate.css';
+
+.hello-title {
+    overflow: visible;
+    &__sticker {
+        display: inline-block;
+        opacity: 0;
+        animation: fadeInDown 1.5s ease-in-out 6s forwards,
+            fadeIn 0.3s ease-in-out 6s forwards;
+    }
+}

@@ -1,6 +1,11 @@
 import {Avatar, Flex, Typography} from 'antd';
+import block from 'bem-cn-lite';
 
-import {type User as UserType} from '@/typings/entities';
+import {type User as UserType} from '@/users/types';
+
+import './User.scss';
+
+const b = block('user');
 
 interface UserProps {
     data: UserType;
@@ -9,9 +14,11 @@ interface UserProps {
 export const User = ({data}: UserProps) => {
     const {avatar, username} = data;
     return (
-        <Flex justify='start'>
+        <Flex justify='start' align='center' gap={6}>
             <Avatar />
-            <Typography.Title level={4}>{username}</Typography.Title>
+            <Typography.Title level={5} rootClassName={b('author')}>
+                {username}
+            </Typography.Title>
         </Flex>
     );
 };

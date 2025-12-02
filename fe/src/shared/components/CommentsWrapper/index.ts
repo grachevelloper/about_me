@@ -1,0 +1,1 @@
+export {CommentsWrapper} from './CommentsWrapper';

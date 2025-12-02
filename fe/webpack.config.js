@@ -125,10 +125,10 @@ module.exports = {
             },
             {
                 test: /\.(png|jpg|jpeg|svg|gif)$/,
+                include: [path.resolve(__dirname, 'public')],
                 type: 'asset/resource',
-                exclude: [path.resolve(__dirname, 'public')],
                 generator: {
-                    filename: 'images/[hash][ext][query]',
+                    filename: '[name][ext][query]',
                 },
             },
             {

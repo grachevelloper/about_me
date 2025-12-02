@@ -1,5 +1,48 @@
 .comment {
+    width: 100%;
+    padding: 10px;
+
+    &__title {
+        width: 100%;
+    }
+
+    &__created-at {
+        font-size: 10px;
+    }
+
+    &__content {
+        min-width: 300px;
+        width: 100%;
+        resize: none !important;
+        overflow-y: none !important;
+    }
+
     &__actions {
-        justify-self: flex-end;
+        width: 100%;
+    }
+
+    &__divider {
+        margin: 10px 0 4px 0;
+    }
+
+    &__reply {
+        cursor: pointer;
+        text-align: center;
+    }
+
+    &__icon {
+        cursor: pointer;
+        svg {
+            path:nth-child(1) {
+                fill: var(--ant-color-bg-container-disabled) !important;
+            }
+            path:nth-child(2) {
+                fill: var(--ant-color-primary) !important;
+            }
+        }
+
+        &_error {
+            color: var(--ant-color-error);
+        }
     }
 }

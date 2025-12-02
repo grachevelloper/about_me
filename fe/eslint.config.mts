@@ -28,15 +28,25 @@ export default defineConfig([
             'import/resolver': {
                 alias: {
                     map: [
-                        ['@/users/*', './src/units/users/*'],
                         ['@/shared/*', './src/shared/*'],
                         ['@/typings/*', './src/typings/*'],
                         ['@/test/*', './src/__test__/*'],
                         ['@/utils/*', './src/utils/*'],
                         ['@/locales/*', './src/locales/*'],
+                        ['@/users/*', './src/units/users/*'],
                         ['@/todos/*', './src/units/todos'],
+                        ['@/public/*', './public'],
                     ],
-                    extensions: ['.ts', '.tsx', '.js', '.jsx'],
+                    extensions: [
+                        '.ts',
+                        '.tsx',
+                        '.js',
+                        '.jsx',
+                        'json',
+                        'png',
+                        'mp4',
+                        'jpg',
+                    ],
                 },
             },
         },

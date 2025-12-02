@@ -14,7 +14,7 @@ const b = block('state');
 interface StateProps {
     state: TodoState;
     editable?: false | {isEdited: boolean};
-    onUpdate?: () => void;
+    onUpdate?: (state: TodoState) => void;
     isLoading?: boolean;
 }
 

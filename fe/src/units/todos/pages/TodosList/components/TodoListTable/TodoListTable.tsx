@@ -75,6 +75,10 @@ export const TodoListTable = ({todos}: TodoListTableProps) => {
                     };
                 }}
                 scroll={{x: 'max-content', y: 55 * 5}}
+                pagination={{pageSize: 5, simple: true}}
+                style={{
+                    overflow: 'hidden',
+                }}
             />
         </Flex>
     );

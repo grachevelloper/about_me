@@ -1,6 +1,6 @@
 import {Dispatch, SetStateAction} from 'react';
 
-import {User} from '@/typings/entities';
+import {User} from '@/users/types';
 
 export interface UserContextType {
     user?: User;

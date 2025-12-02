@@ -2,6 +2,7 @@ import {Flex, Form} from 'antd';
 import block from 'bem-cn-lite';
 import {useCallback, useEffect, useState} from 'react';
 
+import {useAuth} from '@/shared/context';
 import {useLocalStorage} from '@/shared/hooks';
 import {type CardProps, type FormField} from '@/typings/components';
 import {useSignUpMutation} from '@/users/store';
@@ -33,6 +34,7 @@ export const SignUpPage = () => {
     const [signStep, setSignStep] = useLocalStorage(SIGN_UP_STEP_SLUG, 0);
     const [visibleStep, setVisibleStep] = useState(signStep);
     const [form] = Form.useForm<SignUpFormData>();
+    const {setUserData} = useAuth();
     const [localSignUpData, setLocalSignUpData] =
         useLocalStorage<SignUpFormData>('sign-up', initialSignUpData);
 
@@ -45,8 +47,9 @@ export const SignUpPage = () => {
                 'password',
                 'username',
             ]);
-            await mutateAsync(userData);
+            const mutated = await mutateAsync(userData);
             setLocalSignUpData(initialSignUpData);
+            setUserData(mutated);
         })();
     }, [form]);
 

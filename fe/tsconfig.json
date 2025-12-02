@@ -23,6 +23,7 @@
         "skipLibCheck": true,
         "paths": {
             "@/todos/*": ["./src/units/todos/*"],
+            "@/public/*": ["./public/*"],
             "@/users/*": ["./src/units/users/*"],
             "@/shared/*": ["./src/shared/*"],
             "@/typings/*": ["./src/typings/*"],

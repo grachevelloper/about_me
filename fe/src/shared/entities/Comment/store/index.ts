@@ -1,18 +1,13 @@
-import {
-    useMutation,
-    useQuery,
-    useQueryClient,
-    useSuspenseQuery,
-} from '@tanstack/react-query';
+import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 
 import {queryClient} from '@/shared/configs/api';
 
 import api from '../api';
 import {CreateCommentDto, ListComments, UpdateCommentDto} from '../api/types';
-import {Comment} from '../types';
+import {CommentType} from '../types';
 
 export const useCommentsQuery = (listCommentsData: ListComments) => {
-    const {data} = useSuspenseQuery({
+    const {data, isPending, isError} = useQuery({
         queryKey: [
             'comments',
             listCommentsData.entityType,
@@ -21,7 +16,7 @@ export const useCommentsQuery = (listCommentsData: ListComments) => {
         queryFn: () => api.listComments(listCommentsData),
     });
 
-    return {data};
+    return {comments: data, isPending, isError};
 };
 
 export const useCommentQuery = (commentId: string) => {
@@ -62,7 +57,7 @@ export const useCommentMutations = () => {
                     queryKey: ['comment', variables.id],
                 });
 
-                const previousComment = queryClient.getQueryData<Comment>([
+                const previousComment = queryClient.getQueryData<CommentType>([
                     'comment',
                     variables.id,
                 ]);

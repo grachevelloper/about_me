@@ -1,4 +1,7 @@
+import {CommentType} from '../types';
+
 type EntityCommentType = 'todo' | 'article';
+
 export interface CreateCommentDto {
     content: string;
 
@@ -25,13 +28,17 @@ export interface getComment {
 }
 
 export interface CommentsApi {
-    createComment: (createCommentData: CreateCommentDto) => Promise<Comment>;
+    createComment: (
+        createCommentData: CreateCommentDto
+    ) => Promise<CommentType>;
 
     deleteComment: (commentId: string) => Promise<void>;
 
-    updateComment: (updateCommentData: UpdateCommentDto) => Promise<Comment>;
+    updateComment: (
+        updateCommentData: UpdateCommentDto
+    ) => Promise<CommentType>;
 
-    listComments: (ListCommentsData: ListComments) => Promise<Comment[]>;
+    listComments: (ListCommentsData: ListComments) => Promise<CommentType[]>;
 
-    getComment: (commentId: string) => Promise<Comment>;
+    getComment: (commentId: string) => Promise<CommentType>;
 }

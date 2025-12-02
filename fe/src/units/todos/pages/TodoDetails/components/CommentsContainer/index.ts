@@ -1,1 +1,0 @@
-export {CommentsContainer} from './CommentsContainer';

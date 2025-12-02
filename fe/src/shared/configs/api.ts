@@ -15,20 +15,24 @@ apiAxios.interceptors.response.use(
     async (error: CustomAxiosError) => {
         const originalRequest = error.config;
 
+        if (originalRequest.url?.includes('/auth/refresh')) {
+            if (error.response?.status === 401) {
+                console.error('Refresh token expired, redirecting to login');
+                return Promise.reject(error);
+            }
+            throw error;
+        }
+
         if (
             error.response?.status === 401 &&
             originalRequest &&
             !originalRequest._retry
         ) {
-            originalRequest._retry = true;
-
             try {
                 await apiAxios.post('/auth/refresh');
                 return apiAxios(originalRequest);
             } catch (refreshError) {
                 console.error('Token refresh failed:', refreshError);
-                delete originalRequest._retry;
-                throw refreshError;
             }
         }
 

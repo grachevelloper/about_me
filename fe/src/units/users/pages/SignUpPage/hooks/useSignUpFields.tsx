@@ -1,3 +1,5 @@
+import {SubmitData} from '@/users/types';
+import {AuthEmitter, SIGN_UP_EVENT} from '@/users/utils';
 import {Button, Divider, Flex, FormInstance, Image} from 'antd';
 import {useCallback, useEffect} from 'react';
 import {useTranslation} from 'react-i18next';
@@ -6,8 +8,6 @@ import {useNavigate} from 'react-router-dom';
 import {ButtonAccept, ButtonDeny} from '@/shared/components/actions';
 import {useFieldValidation, useLocalStorage} from '@/shared/hooks';
 import {CardProps, FormField} from '@/typings/components';
-import {SubmitData} from '@/users/types';
-import {AuthEmitter, SIGN_UP_EVENT} from '@/users/utils';
 
 import {useSignInFields} from '../../SignInPage/hooks/useSignInFields';
 import {SIGN_UP_STEP_SLUG} from '../constants';

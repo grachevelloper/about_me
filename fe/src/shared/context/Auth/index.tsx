@@ -1,6 +1,6 @@
 import React, {createContext, useContext, useState} from 'react';
 
-import {User} from '@/typings/entities';
+import {type User} from '@/users/types';
 
 import {UserContextType, UserVoid} from './types';
 

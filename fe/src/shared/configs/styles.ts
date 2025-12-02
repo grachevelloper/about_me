@@ -28,71 +28,105 @@ const BUTTON_PADDING = {
 const lightTheme: CustomThemeConfig = {
     name: 'light',
     token: {
-        colorPrimary: '#e8b4a9',
-        colorSuccess: '#a8d5ba',
-        colorWarning: '#f5d6ba',
-        colorError: '#e8a9b4',
-        colorInfo: '#a9b4e8',
+        colorPrimary: '#9ca3af', // Стальной серый
+        colorSuccess: '#10b981', // Изумрудный (для контраста)
+        colorWarning: '#f59e0b', // Янтарный
+        colorError: '#ef4444', // Алый
+        colorInfo: '#3b82f6', // Синий
 
-        colorBgBase: '#fefaf6',
-        colorBgContainer: '#fdf5f0',
-        colorBgElevated: '#fcf0e6',
+        colorBgBase: '#ffffff', // Чистый белый
+        colorBgContainer: '#f9fafb', // Серебристо-белый
+        colorBgElevated: '#ffffff', // Блестящий белый
+        colorBgLayout: '#f8fafc', // Ледяной белый
 
-        colorTextBase: '#5d4037',
-        colorTextSecondary: '#8d6e63',
-        colorTextTertiary: '#a1887f',
-        colorTextQuaternary: '#bcaaa4',
+        colorBgMask: 'rgba(0, 0, 0, 0.1)', // Маска/оверлей
+        colorBgBlur: 'rgba(255, 255, 255, 0.85)', // Размытый фон
+        colorBgSpotlight: 'rgba(222, 223, 223, 0.95)', // Подсветка
 
-        colorBorder: '#d7ccc8',
-        colorBorderSecondary: '#e0e0e0',
+        colorTextBase: '#1f2937', // Темный графит
+        colorTextSecondary: '#4b5563', // Средний графит
+        colorTextTertiary: '#6b7280', // Светлый графит
+        colorTextQuaternary: '#9ca3af', // Серебристый серый
+
+        colorBorder: '#d1d5db', // Светло-серая граница
+        colorBorderSecondary: '#e5e7eb', // Очень светлая серебристая
 
         borderRadius: 8,
         fontSize: 14,
         lineHeight: 1.5715,
 
-        colorPrimaryBg: '#f9f0eb',
-        colorPrimaryBorder: '#e8b4a9',
-        colorBgLayout: '#fefaf6',
+        colorPrimaryBg: '#f3f4f6', // Серебристый фон для primary
+        colorPrimaryBorder: '#d1d5db', // Серебристая граница
     },
     components: {
         Layout: {
-            headerBg: '#faebe1ff',
-            bodyBg: '#fefaf6',
-            siderBg: '#fdf5f0',
-            triggerBg: '#f5d6ba',
-            triggerColor: '#5d4037',
+            headerBg: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
+            bodyBg: 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
+            siderBg: '#f9fafb',
+            triggerBg: '#e5e7eb',
+            triggerColor: '#1f2937',
         },
         Input: {
-            colorBgContainer: 'transparent',
-            hoverBorderColor: '#e8b4a9',
-            activeBorderColor: '#e8b4a9',
-            colorText: '#5d4037',
-            colorTextPlaceholder: '#a1887f',
+            colorBgContainer: '#ffffff',
+            hoverBorderColor: '#9ca3af',
+            activeBorderColor: '#6b7280',
+            colorText: '#1f2937',
+            colorTextPlaceholder: '#9ca3af',
+            activeShadow: '0 0 0 2px rgba(156, 163, 175, 0.2)',
         },
         Button: {
             ...BUTTON_PADDING,
-            colorPrimary: '#e8b4a9',
-            colorPrimaryHover: '#d4a299',
-            colorPrimaryActive: '#c09189',
-            colorText: '#5d4037',
+            colorPrimary: '#ffffff',
+            colorPrimaryHover: '#f9fafb',
+            colorPrimaryActive: '#f3f4f6',
+            colorText: '#1f2937',
+            defaultShadow: '0 2px 0 rgba(0, 0, 0, 0.02)',
+            primaryShadow: '0 2px 0 rgba(0, 0, 0, 0.05)',
+            defaultBg: 'linear-gradient(145deg, #ffffff 0%, #f3f4f6 100%)',
+            defaultBorderColor: '#d1d5db',
+            primaryorderColor: '#9ca3af',
         },
         Card: {
             ...CARD,
-            colorBgContainer: '#fdf5f0',
-            colorBorder: '#d7ccc8',
+            colorBgContainer: '#ffffff',
+            colorBorder: '#e5e7eb',
+            boxShadow:
+                '0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03)',
+            boxShadowSecondary:
+                '0 4px 12px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.03)',
         },
         Menu: {
-            colorBgContainer: '#faebe1ff',
-            itemHoverBg: '#ecc4acff',
-            itemBg: '#ecc4acff',
-            itemSelectedBg: '#f8bf8dff',
-            itemColor: '#5d4037',
-            itemSelectedColor: '#5d4037',
+            colorBgContainer: '#f9fafb',
+            itemHoverBg: '#e5e7eb',
+            itemBg: '#f9fafb',
+            itemSelectedBg: 'linear-gradient(90deg, #f3f4f6 0%, #e5e7eb 100%)',
+            itemColor: '#1f2937',
+            itemSelectedColor: '#1f2937',
+            itemActiveBg: 'linear-gradient(90deg, #e5e7eb 0%, #d1d5db 100%)',
         },
         Table: {
-            colorBgContainer: '#fdf5f0',
-            colorBorderSecondary: '#d7ccc8',
-            colorFillAlter: '#f9f0eb',
+            colorBgContainer: '#ffffff',
+            colorBorderSecondary: '#e5e7eb',
+            colorFillAlter: '#f9fafb',
+            colorFillSecondary: '#f3f4f6',
+            headerBg: '#f9fafb',
+            headerSplitColor: '#e5e7eb',
+            rowHoverBg: '#f3f4f6',
+        },
+        Typography: {
+            colorTextHeading: '#111827',
+            colorText: '#1f2937',
+            colorTextSecondary: '#4b5563',
+            colorTextDescription: '#6b7280',
+        },
+        Divider: {
+            colorSplit: '#e5e7eb',
+        },
+        Tabs: {
+            colorBgContainer: '#ffffff',
+            colorBorderSecondary: '#e5e7eb',
+            itemSelectedColor: '#1f2937',
+            inkBarColor: '#9ca3af',
         },
     },
 };
@@ -100,70 +134,98 @@ const lightTheme: CustomThemeConfig = {
 const darkTheme: CustomThemeConfig = {
     name: 'dark',
     token: {
-        colorPrimary: '#d4a299',
-        colorSuccess: '#8dc4a8',
-        colorWarning: '#d4b8a8',
-        colorError: '#d499a3',
-        colorInfo: '#999fd4',
+        colorPrimary: '#9ca3af', // Серебристый серый
+        colorSuccess: '#10b981',
+        colorWarning: '#f59e0b',
+        colorError: '#ef4444',
+        colorInfo: '#3b82f6',
 
-        colorBgBase: '#2a211c',
-        colorBgContainer: '#352a24',
-        colorBgElevated: '#40332c',
+        colorBgBase: '#111827', // Темный графит
+        colorBgContainer: '#1f2937', // Глубокий графит
+        colorBgElevated: '#374151', // Средний графит
+        colorBgLayout: '#111827',
 
-        colorTextBase: '#e8d5c9',
-        colorTextSecondary: '#d4c0b4',
-        colorTextTertiary: '#c0ab9f',
-        colorTextQuaternary: '#ac968a',
+        colorTextBase: '#f9fafb', // Блестящий белый
+        colorTextSecondary: '#d1d5db', // Светло-серебристый
+        colorTextTertiary: '#9ca3af', // Серебристый
+        colorTextQuaternary: '#6b7280', // Темно-серебристый
 
-        colorBorder: '#5d4a3f',
-        colorBorderSecondary: '#6d5a4f',
+        colorBorder: '#374151', // Темный металл
+        colorBorderSecondary: '#4b5563', // Средний металл
 
         borderRadius: 8,
         fontSize: 14,
         lineHeight: 1.5715,
 
-        colorPrimaryBg: '#3a2d26',
-        colorPrimaryBorder: '#d4a299',
-        colorBgLayout: '#2a211c',
+        colorPrimaryBg: '#1f2937',
+        colorPrimaryBorder: '#4b5563',
     },
     components: {
         Layout: {
-            headerBg: '#2a211c',
-            bodyBg: '#2a211c',
-            siderBg: '#352a24',
-            triggerBg: '#40332c',
-            triggerColor: '#e8d5c9',
+            headerBg: 'linear-gradient(135deg, #111827 0%, #1f2937 100%)',
+            bodyBg: 'linear-gradient(145deg, #111827 0%, #1f2937 100%)',
+            siderBg: '#1f2937',
+            triggerBg: '#374151',
+            triggerColor: '#f9fafb',
         },
         Input: {
-            colorBgContainer: '#352a24',
-            hoverBorderColor: '#d4a299',
-            activeBorderColor: '#d4a299',
-            colorText: '#e8d5c9',
-            colorTextPlaceholder: '#c0ab9f',
+            colorBgContainer: '#1f2937',
+            hoverBorderColor: '#9ca3af',
+            activeBorderColor: '#d1d5db',
+            colorText: '#f9fafb',
+            colorTextPlaceholder: '#6b7280',
+            paddingBlock: 8,
+            paddingBlockLG: 10,
+            paddingBlockSM: 4,
+            activeShadow: '0 0 0 2px rgba(156, 163, 175, 0.3)',
         },
         Button: {
             ...BUTTON_PADDING,
-            colorPrimary: '#d4a299',
-            colorPrimaryHover: '#c09189',
-            colorPrimaryActive: '#ac8079',
-            colorText: '#2a211c',
+            colorPrimary: '#374151',
+            colorPrimaryHover: '#4b5563',
+            colorPrimaryActive: '#6b7280',
+            colorText: '#f9fafb',
+            defaultBg: 'linear-gradient(145deg, #1f2937 0%, #374151 100%)',
+            defaultBorderColor: '#4b5563',
         },
         Card: {
             ...CARD,
-            colorBgContainer: '#352a24',
-            colorBorder: '#5d4a3f',
+            colorBgContainer: '#1f2937',
+            colorBorder: '#374151',
+            boxShadow:
+                '0 1px 3px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.12)',
         },
         Menu: {
-            colorBgContainer: '#352a24',
-            itemBg: '#352a24',
-            itemSelectedBg: '#d4a299',
-            itemColor: '#ffd5baff',
-            itemSelectedColor: '#2a211c',
+            colorBgContainer: '#1f2937',
+            itemBg: '#1f2937',
+            itemSelectedBg: 'linear-gradient(90deg, #374151 0%, #4b5563 100%)',
+            itemColor: '#d1d5db',
+            itemSelectedColor: '#f9fafb',
+            itemHoverBg: '#374151',
+            itemActiveBg: 'linear-gradient(90deg, #4b5563 0%, #6b7280 100%)',
         },
         Table: {
-            colorBgContainer: '#352a24',
-            colorBorderSecondary: '#5d4a3f',
-            colorFillAlter: '#3a2d26',
+            colorBgContainer: '#1f2937',
+            colorBorderSecondary: '#374151',
+            colorFillAlter: '#111827',
+            headerBg: '#374151',
+            headerSplitColor: '#4b5563',
+            rowHoverBg: '#374151',
+        },
+        Typography: {
+            colorTextHeading: '#f9fafb',
+            colorText: '#d1d5db',
+            colorTextSecondary: '#9ca3af',
+            colorTextDescription: '#6b7280',
+        },
+        Divider: {
+            colorSplit: '#374151',
+        },
+        Tabs: {
+            colorBgContainer: '#1f2937',
+            colorBorderSecondary: '#374151',
+            itemSelectedColor: '#f9fafb',
+            inkBarColor: '#9ca3af',
         },
     },
 };

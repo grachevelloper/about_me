@@ -20,7 +20,8 @@ const Api: UserApi = {
     },
 
     signUp: async (signUpData: DtoSignUpUser) => {
-        await query.post(`/auth/signup`, signUpData);
+        const result = await query.post<User>(`/auth/signup`, signUpData);
+        return result;
     },
 
     logout: async () => {

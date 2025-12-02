@@ -1,8 +1,8 @@
-import {User} from '@/typings/entities';
+import {User} from '@/users/types';
 
 export type EntityCommentType = 'todo' | 'article';
 
-export interface Comment {
+export interface CommentType {
     id?: string;
 
     author: User;

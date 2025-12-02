@@ -5,7 +5,6 @@ import {useParams} from 'react-router-dom';
 import {useTodoQuery} from '../../store';
 
 import {BaseDetails} from './components/BaseDetails';
-import {CommentsContainer} from './components/CommentsContainer';
 
 import './TodoDetailsPage.scss';
 
@@ -26,7 +25,6 @@ export const TodoDetailsPage = () => {
     return (
         <Flex vertical align='start' justify='start' className={b()}>
             <BaseDetails initialData={todo!} />
-            <CommentsContainer todoId={id!}></CommentsContainer>
         </Flex>
     );
 };

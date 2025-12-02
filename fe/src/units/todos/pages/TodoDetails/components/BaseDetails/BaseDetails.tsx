@@ -1,7 +1,11 @@
-import {Col, Divider, Row} from 'antd';
+import {Col, Divider, Row, theme} from 'antd';
 import TextArea from 'antd/es/input/TextArea';
 import block from 'bem-cn-lite';
 
+import {CommentsWrapper} from '@/shared/components/CommentsWrapper';
+
+import {Priority} from '@/todos/components/Priority';
+import {State} from '@/todos/components/State';
 import {useTodoMutations} from '@/todos/store';
 import {type Todo, type TodoPriority, type TodoState} from '@/todos/types';
 
@@ -18,6 +22,9 @@ interface BaseDetailsProps {
 }
 
 export const BaseDetails = ({initialData}: BaseDetailsProps) => {
+    const {
+        token: {borderRadius, colorBorder},
+    } = theme.useToken();
     const {
         updateTitle,
         updatePriority,
@@ -53,33 +60,34 @@ export const BaseDetails = ({initialData}: BaseDetailsProps) => {
     const handleContentChange = (value: string) => {
         handleEnd('content', value);
     };
+    console.log(`${borderRadius}px solid ${colorBorder}`);
 
     return (
         <div className={b()}>
             <Divider orientation='left' orientationMargin={0}>
                 <TodoTitle onEnd={handleEnd} content={initialData.title} />
             </Divider>
-            <Row gutter={32} justify='end'>
+            <Row gutter={32} justify='start'>
                 <Col>
-                    {/* <Priority
+                    <Priority
                         priority={initialData.priority}
                         onUpdate={(priority: TodoPriority) =>
                             handleEnd('priority', priority)
                         }
-                        isPending={isPending}
-                    /> */}
+                        isLoading={isPending}
+                    />
                 </Col>
                 <Col>
-                    {/* <State
+                    <State
                         state={initialData.state}
                         onUpdate={(state: TodoState) =>
                             handleEnd('state', state)
                         }
-                        isPending={isPending}
-                    /> */}
+                        isLoading={isPending}
+                    />
                 </Col>
             </Row>
-            <Row justify='end' align='top'>
+            <Row justify='end' align='top' gutter={32}>
                 <Col xs={24} lg={16}>
                     <TextArea
                         className={b('content')}
@@ -87,10 +95,21 @@ export const BaseDetails = ({initialData}: BaseDetailsProps) => {
                         variant='borderless'
                         autoSize={{minRows: 6, maxRows: 24}}
                         onBlur={(e) => handleContentChange(e.target.value)}
+                        style={{
+                            border: `2px solid ${colorBorder}`,
+                        }}
                     />
                 </Col>
                 <Col xs={24} lg={8}>
                     <Checklist todoId={initialData.id} />
+                </Col>
+            </Row>
+            <Row>
+                <Col xs={24} lg={16}>
+                    <CommentsWrapper
+                        entityId={initialData.id}
+                        entityType='todo'
+                    />
                 </Col>
             </Row>
         </div>

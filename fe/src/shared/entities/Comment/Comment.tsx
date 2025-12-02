@@ -1,32 +1,33 @@
-import {EditTwoTone} from '@ant-design/icons';
-import {Divider, Flex, Form, Typography} from 'antd';
+import {CloseOutlined, EditTwoTone} from '@ant-design/icons';
+import {Divider, Flex, Spin, Typography} from 'antd';
 import block from 'bem-cn-lite';
-import {useEffect, useState} from 'react';
+import {Fragment, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 
-import {ButtonAccept, ButtonDeny} from '../../components/actions';
-import {FormInput} from '../../components/FormInput';
 import {User} from '../../components/User';
 import {useAuth} from '../../context';
 import {useLocalStorage} from '../../hooks';
 import {formatDate} from '../../utils/date';
 
+import {CommentForm} from './components/CommentForm';
 import {useCommentMutations, useCreateCommentMutation} from './store';
-import {type Comment as CommentType} from './types';
+import {type CommentType} from './types';
 
 import './Comment.scss';
 
 const b = block('comment');
 
 interface CommentProps {
-    isNew: boolean;
     comment: CommentType;
+    isNew?: boolean;
+    className?: string;
 }
 
-export const Comment = ({comment, isNew = false}: CommentProps) => {
+export const Comment = ({comment, className, isNew = false}: CommentProps) => {
     const {user} = useAuth();
     const {
         createdAt,
+        updatedAt,
         likesCount,
         depth,
         parentId,
@@ -39,14 +40,22 @@ export const Comment = ({comment, isNew = false}: CommentProps) => {
         parentId: null,
     };
 
+    const [isReplyVisible, setReplyVisible] = useState<boolean>(false);
     const {t} = useTranslation('common');
-    const [form] = Form.useForm();
-    const {updateMutation} = useCommentMutations();
+    const {updateMutation, deleteMutation} = useCommentMutations();
     const [isEditing, setIsEditing] = useState<boolean>(false);
+    const [isActionIconsVisible, setActionIconsVisible] =
+        useState<boolean>(false);
     const [localContent, setLocalContent] = useLocalStorage<string>(
         `comment-${id}`,
         content
     );
+
+    const {
+        mutate: mutateDelete,
+        isPending: isPendindDelete,
+        isError: isErrorDelete,
+    } = deleteMutation;
 
     const {
         mutate: mutateUpdate,
@@ -62,19 +71,27 @@ export const Comment = ({comment, isNew = false}: CommentProps) => {
 
     const isEditable = user?.id === author?.id;
 
-    const handleOk = () => {
-        if (isNew) {
-            mutateCreate({
-                entityId,
-                entityType,
-                parentId,
-                content: localContent,
-            });
-        } else {
-            mutateUpdate({
-                id: id!,
-                content: localContent,
-            });
+    const handleCreate = (content: string, isResponse = false) => {
+        mutateCreate({
+            entityId,
+            entityType,
+            parentId: isResponse ? id! : parentId,
+            content,
+        });
+        setLocalContent('');
+        setReplyVisible(false);
+    };
+
+    const handleUpdate = (content: string) => {
+        mutateUpdate({
+            id: id!,
+            content,
+        });
+    };
+
+    const handleRemove = () => {
+        if (id) {
+            mutateDelete(id);
         }
     };
 
@@ -82,57 +99,103 @@ export const Comment = ({comment, isNew = false}: CommentProps) => {
         setIsEditing(true);
     };
 
-    const handleValuesChange = (changedContent: string) => {
-        setLocalContent(changedContent);
+    const handleReply = () => {
+        setReplyVisible(true);
     };
-
-    useEffect(() => {
-        if (localContent) {
-            form.setFieldsValue(localContent);
-        }
-    }, [localContent, form]);
 
     if (isNew || isEditing) {
         return (
-            <Form
-                form={form}
-                layout='vertical'
-                onFinish={handleOk}
-                onValuesChange={handleValuesChange}
-            >
-                <Flex justify='start' vertical align='start' className={b()}>
-                    <FormInput
-                        field={{
-                            label: `comment-${id}`,
-                            name: `comment-${id}`,
-                            type: 'text',
-                            placeholder: t('comment.placeholder'),
-                        }}
-                    />
-                </Flex>
-                <Flex
-                    justify='space-between'
-                    align='start'
-                    className={b('actions')}
-                >
-                    <ButtonDeny text={t('cancel')} />
-                    <ButtonAccept text={isNew ? t('create') : t('edit')} />
-                </Flex>
-            </Form>
+            <CommentForm
+                isCompletePending={
+                    isEditing ? isPendindUpdate : isPendingCreate
+                }
+                depth={depth}
+                onCancel={isEditing ? () => setIsEditing(false) : undefined}
+                onComplete={isEditing ? handleUpdate : handleCreate}
+                content={localContent}
+            />
         );
     }
 
     return (
-        <Flex justify='start' vertical align='start'>
-            <Flex justify='space-between' align='start'>
-                <Flex align='start' gap={3} justify='start'>
-                    <User data={author} />
-                    <Typography.Text>{formatDate(createdAt!)}</Typography.Text>
+        <Fragment>
+            <Flex
+                onMouseEnter={() => {
+                    setActionIconsVisible(true);
+                }}
+                onMouseLeave={() => {
+                    setActionIconsVisible(false);
+                }}
+                justify='start'
+                vertical
+                align='start'
+                className={b(null, className)}
+                style={{
+                    paddingLeft: `${20 * depth}px`,
+                }}
+            >
+                <Flex
+                    justify='space-between'
+                    align='center'
+                    className={b('title')}
+                >
+                    <Flex align='start' justify='start' gap={8}>
+                        <User data={author} />
+                        {createdAt && (
+                            <Typography.Text rootClassName={b('created-at')}>
+                                {formatDate(createdAt)}
+                            </Typography.Text>
+                        )}
+                    </Flex>
+                    <Flex>
+                        {updatedAt && updatedAt !== createdAt && (
+                            <Typography.Text rootClassName={b('created-at')}>
+                                {t('updated-at')}
+                                {formatDate(updatedAt)}
+                            </Typography.Text>
+                        )}
+                        {isEditable ? (
+                            <span>
+                                {isActionIconsVisible && (
+                                    <Flex gap={6}>
+                                        <EditTwoTone
+                                            onClick={handleSetEditing}
+                                            className={b('icon')}
+                                        />
+
+                                        {isPendindDelete ? (
+                                            <Spin size='small' />
+                                        ) : (
+                                            <CloseOutlined
+                                                className={b('icon', {
+                                                    error: true,
+                                                })}
+                                                onClick={handleRemove}
+                                            />
+                                        )}
+                                    </Flex>
+                                )}
+                            </span>
+                        ) : (
+                            <span className={b('reply')} onClick={handleReply}>
+                                {t('comment.reply')}
+                            </span>
+                        )}
+                    </Flex>
                 </Flex>
-                {isEditable && <EditTwoTone onClick={handleSetEditing} />}
+                <Typography.Text className={b('content')}>
+                    {content}
+                </Typography.Text>
+                <Divider rootClassName={b('divider')} />
             </Flex>
-            <Divider />
-            <Typography.Text>{content}</Typography.Text>
-        </Flex>
+            {isReplyVisible ? (
+                <CommentForm
+                    depth={depth}
+                    onCancel={() => setReplyVisible(false)}
+                    onComplete={handleCreate}
+                    isCompletePending={isPendingCreate}
+                />
+            ) : null}
+        </Fragment>
     );
 };

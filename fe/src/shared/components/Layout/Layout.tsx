@@ -1,40 +1,37 @@
-import {BulbOutlined} from '@ant-design/icons';
 import {QueryErrorResetBoundary} from '@tanstack/react-query';
-import {Layout as AntLayout, Button, Menu, theme} from 'antd';
-import {MenuItemType} from 'antd/es/menu/interface';
+import {Layout as AntLayout, Button, theme} from 'antd';
 import block from 'bem-cn-lite';
+import {useEffect} from 'react';
 import {ErrorBoundary} from 'react-error-boundary';
-import {useTranslation} from 'react-i18next';
 import {Outlet} from 'react-router-dom';
 
-import {useTodoForm} from '../../context';
+import {useAuth} from '../../context';
 import {NewTodoForm} from '../NewTodoForm';
 
+import {isMe} from './api';
+import {Animation} from './components/Animation';
+import {Sider} from './components/Sider';
+
 import './Layout.scss';
-import {Header} from './components/Header';
 
 const b = block('layout');
 
-const {Content, Sider} = AntLayout;
+const {Content} = AntLayout;
 
 export const Layout = () => {
-    const {t} = useTranslation('common');
-    const {setIsOpen} = useTodoForm();
+    const {setUserData} = useAuth();
 
     const {
         token: {colorBgContainer, borderRadiusLG},
     } = theme.useToken();
 
-    const leftItems: MenuItemType[] = [
-        {
-            icon: <BulbOutlined />,
-            label: t('layout.left.suggest'),
-            key: 'action-0',
-            onClick: () => {
-                setIsOpen(true);
-            },
-        },
-    ];
+    useEffect(() => {
+        const getUser = async () => {
+            const user = await isMe();
+            setUserData(user);
+        };
+        getUser();
+    }, []);
 
     return (
         <QueryErrorResetBoundary>
@@ -50,25 +47,26 @@ export const Layout = () => {
                         </div>
                     )}
                 >
-                    <AntLayout rootClassName={b()}>
+                    <Animation />
+                    <AntLayout rootClassName={b()} hasSider>
                         <NewTodoForm />
-                        <Header />
-                        <AntLayout>
-                            <Sider
-                                breakpoint='lg'
-                                collapsedWidth='0'
-                                theme='light'
-                            >
-                                <Menu
-                                    theme='light'
-                                    mode='inline'
-                                    items={leftItems}
-                                />
-                            </Sider>
-                            <Content className={b('content')}>
-                                <Outlet />
-                            </Content>
-                        </AntLayout>
+                        {/* <Image
+                            src='/assets/title.png'
+                            height={90}
+                            style={{objectFit: 'contain'}}
+                            rootClassName={b('title')}
+                            preview={false}
+                        /> */}
+                        {/* <Tooltip title={t('logout')}>
+                <LogoutOutlined
+                    onClick={handleLogout}
+                    className={b('logout-icon')}
+                />
+            </Tooltip> */}
+                        <Sider />
+                        <Content className={b('content')}>
+                            <Outlet />
+                        </Content>
                     </AntLayout>
                 </ErrorBoundary>
             )}
