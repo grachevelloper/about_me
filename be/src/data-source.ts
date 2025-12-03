@@ -13,7 +13,7 @@ const dataSource: DataSourceOptions = {
     database: process.env.DB_NAME,
     entities: ["dist/**/*.entity.ts"],
     migrations: ["dist/migrations/**/*.js"],
-    synchronize: true,
+    synchronize: false,
     namingStrategy: new SnakeNamingStrategy(),
     logging: true,
 };

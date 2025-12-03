@@ -1,22 +1,12 @@
-import {
-    Column,
-    CreateDateColumn,
-    Entity,
-    JoinColumn,
-    ManyToOne,
-    PrimaryGeneratedColumn,
-    UpdateDateColumn,
-} from "typeorm";
+import {Column, Entity, JoinColumn, ManyToOne} from "typeorm";
 
+import {BaseEntity} from "../base/entity";
 import {User} from "../users/users.entity";
 
 export type EntityCommentType = "todo" | "article";
 
 @Entity("comments")
-export class Comment {
-    @PrimaryGeneratedColumn("uuid")
-    id: string;
-
+export class Comment extends BaseEntity {
     @ManyToOne(() => User)
     @JoinColumn()
     author: User;
@@ -38,10 +28,4 @@ export class Comment {
 
     @Column({default: 0})
     likesCount: number;
-
-    @UpdateDateColumn()
-    updatedAt: Date;
-
-    @CreateDateColumn()
-    createdAt: Date;
 }

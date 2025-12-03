@@ -4,6 +4,7 @@ import {
     UnauthorizedException,
 } from "@nestjs/common";
 
+import {Role} from "../types";
 import {User} from "../users/users.entity";
 import {UsersService} from "../users/users.service";
 
@@ -17,11 +18,17 @@ export class AuthService {
         password: string,
     ): Promise<User> {
         const existingUser = await this.usersService.findByEmail(email);
+
         if (existingUser) {
             throw new ConflictException("User with this email already exists");
         }
 
-        const user = await this.usersService.create(email, password, username);
+        const user = await this.usersService.create(
+            email,
+            password,
+            Role.USER,
+            username,
+        );
 
         return user;
     }
@@ -31,6 +38,12 @@ export class AuthService {
         if (user?.password !== pass) {
             throw new UnauthorizedException();
         }
+        return user;
+    }
+
+    async isMe(id: string) {
+        const user = await this.usersService.findById(id);
+
         return user;
     }
 }

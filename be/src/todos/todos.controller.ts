@@ -9,9 +9,10 @@ import {
     UseGuards,
 } from "@nestjs/common";
 import {Request} from "express";
-import {AuthGuard} from "src/guards/auth.guard";
 
-import type {CreateTodoDto, UpdateTodoDto} from "./dto";
+import {AuthGuard} from "@/auth/guards/auth.guard";
+
+import type {CreateTodoDto, UpdateTodoDto} from "./todo.dto";
 import {TodosService} from "./todos.service";
 
 @UseGuards(AuthGuard)
@@ -20,10 +21,7 @@ export class TodosController {
     constructor(private readonly todosService: TodosService) {}
 
     @Post()
-    async create(
-        @Body() createTodoData: Omit<CreateTodoDto, "userId">,
-        @Req() req: Request,
-    ) {
+    async create(@Body() createTodoData: CreateTodoDto, @Req() req: Request) {
         const createTodoDataWithUserId: CreateTodoDto = {
             ...createTodoData,
             authorId: req.user.id,

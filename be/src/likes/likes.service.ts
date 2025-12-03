@@ -10,7 +10,7 @@ import {DeleteResult, Repository} from "typeorm";
 import {CommentsService} from "../comments/comments.service";
 import {TodosService} from "../todos/todos.service";
 import {UsersService} from "../users/users.service";
-import {CreateLikeDto, DeleteLikeDto} from "./likes.controller";
+import {CreateLikeDto, DeleteLikeDto} from "./likes.dto";
 import {Like} from "./likes.entity";
 
 @Injectable()

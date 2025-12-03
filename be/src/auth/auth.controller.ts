@@ -15,10 +15,10 @@ import {Request, Response} from "express";
 
 import {SignInDto, SignUpDto} from "@/users/dto/auth";
 
-import {AuthGuard} from "../guards/auth.guard";
-import {Public} from "../utils/auth";
+import {Public} from "../decorators/auth.decorator";
 import {AuthService} from "./auth.service";
 import {ACCESS_TOKEN_TTL_IN_MS, REFRESH_TOKEN_TTL_IN_MS} from "./constants";
+import {AuthGuard} from "./guards/auth.guard";
 import {RefreshTokensService} from "./refresh-token/refresh-token.service";
 import {hashToken, tokenConfig} from "./utils";
 
@@ -39,6 +39,7 @@ export class AuthController {
     ) {
         const result = await this.authService.signUp(
             signUpDto.username,
+
             signUpDto.email,
             signUpDto.password,
         );
@@ -169,7 +170,14 @@ export class AuthController {
     @HttpCode(HttpStatus.OK)
     @Get("check")
     @UseGuards(AuthGuard)
-    getMe(@Req() req: Request) {
+    check(@Req() req: Request) {
         return !!req.user;
+    }
+
+    @HttpCode(HttpStatus.OK)
+    @Get("me")
+    @UseGuards(AuthGuard)
+    getMe(@Req() req: Request) {
+        return this.authService.isMe(req.user.id);
     }
 }

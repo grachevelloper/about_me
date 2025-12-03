@@ -10,9 +10,11 @@ import {Request} from "express";
 
 import {JWT_SECRET} from "@/auth/constants";
 
-import {IS_PUBLIC_KEY} from "../utils/auth";
+import {IS_PUBLIC_KEY} from "../../decorators/auth.decorator";
+import {Role} from "../../types";
 
 interface JwtPayload {
+    role: Role;
     sub: string;
     iat: number;
     exp: number;
@@ -53,6 +55,7 @@ export class AuthGuard implements CanActivate {
             const user = {
                 id: payload.sub,
                 iat: payload.iat,
+                role: payload.role,
                 exp: payload.exp,
             };
 

@@ -1,17 +1,11 @@
-import {
-    Column,
-    CreateDateColumn,
-    Entity,
-    PrimaryGeneratedColumn,
-} from "typeorm";
+import {Column, Entity} from "typeorm";
+
+import {UnUpdatableBaseEntity} from "../base/entity";
 
 export type EntityLikeType = "comment" | "todo" | "article";
 
 @Entity("likes")
-export class Like {
-    @PrimaryGeneratedColumn("uuid")
-    id: string;
-
+export class Like extends UnUpdatableBaseEntity {
     @Column("uuid")
     authorId: string;
 
@@ -20,7 +14,4 @@ export class Like {
 
     @Column("uuid")
     entityId: string;
-
-    @CreateDateColumn()
-    createdAt: string;
 }

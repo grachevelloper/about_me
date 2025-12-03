@@ -2,8 +2,9 @@ import {Injectable, NotFoundException} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
 
+import {Order} from "../types";
 import {UsersService} from "../users/users.service";
-import {CreateCommentDto, UpdateCommentDto} from "./comments.controller";
+import {CreateCommentDto, UpdateCommentDto} from "./comemnts.dto";
 import {Comment, EntityCommentType} from "./comments.entity";
 
 @Injectable()
@@ -15,7 +16,6 @@ export class CommentsService {
     ) {}
 
     async create(authorId: string, createCommentData: CreateCommentDto) {
-        // Находим пользователя через UsersService
         const author = await this.usersService.findById(authorId);
         if (!author) {
             throw new NotFoundException("User not found");
@@ -69,11 +69,27 @@ export class CommentsService {
     async findByEntity(
         entityType: EntityCommentType,
         entityId: string,
+        order = Order.DESC,
     ): Promise<Comment[]> {
-        return this.commentRepository.find({
+        const comments = await this.commentRepository.find({
             where: {entityType, entityId},
-            relations: ["author"], // Добавляем загрузку автора
+            relations: ["author"],
         });
+
+        if (order === Order.DESC)
+            comments.sort((a, b) => {
+                if (a.parentId === b.id) return 1;
+                if (b.parentId === a.id) return -1;
+
+                const timeA = new Date(a.createdAt).getTime();
+                const timeB = new Date(b.createdAt).getTime();
+
+                if (timeA < timeB) return -1;
+                if (timeA > timeB) return 1;
+                return 0;
+            });
+
+        return comments;
     }
 
     async incrementLikesCount(commentId: string): Promise<void> {

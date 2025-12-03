@@ -1,21 +1,12 @@
-import {
-    Column,
-    CreateDateColumn,
-    Entity,
-    OneToOne,
-    PrimaryGeneratedColumn,
-    UpdateDateColumn,
-} from "typeorm";
+import {Column, Entity, OneToOne} from "typeorm";
 
 import {TodoPriority, TodoState} from "@/types/todo";
 
+import {BaseEntity} from "../base/entity";
 import {CheckList} from "./checklists/checklists.entity";
 
 @Entity("todos")
-export class Todo {
-    @PrimaryGeneratedColumn("uuid")
-    id: string;
-
+export class Todo extends BaseEntity {
     @Column()
     title: string;
 
@@ -26,23 +17,17 @@ export class Todo {
     authorId: string;
 
     @Column({default: TodoPriority.MEDIUM})
-    priority: TodoPriority;
+    priority?: TodoPriority;
 
     @Column({default: TodoState.PLANNING})
-    state: TodoState;
+    state?: TodoState;
 
     @OneToOne(() => CheckList, (item) => item.todo, {
         cascade: true,
         nullable: true,
     })
-    checklist: CheckList;
+    checklist?: CheckList;
 
     @Column({default: 0})
-    likesCount: number;
-
-    @UpdateDateColumn()
-    updatedAt: string;
-
-    @CreateDateColumn()
-    createdAt: string;
+    likesCount?: number;
 }

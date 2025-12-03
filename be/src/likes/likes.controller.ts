@@ -1,32 +1,10 @@
 import {Body, Controller, Req, UseGuards} from "@nestjs/common";
-import {IsEnum, IsString, IsUUID} from "class-validator";
 import {Request} from "express";
 
-import {AuthGuard} from "../guards/auth.guard";
-import {EntityLikeType} from "./likes.entity";
+import {AuthGuard} from "../auth/guards/auth.guard";
+import {CreateLikeDto, DeleteLikeDto} from "./likes.dto";
 import {LikesService} from "./likes.service";
 
-export class CreateLikeDto {
-    @IsUUID()
-    authorId: string;
-
-    @IsUUID()
-    entityId: string;
-
-    @IsEnum(["todo", "article", "comment"])
-    entityType: EntityLikeType;
-}
-
-export class DeleteLikeDto {
-    @IsUUID()
-    entityId: string;
-
-    @IsUUID()
-    authorId: string;
-
-    @IsString()
-    entityType: EntityLikeType;
-}
 @UseGuards(AuthGuard)
 @Controller("likes")
 export class LikesController {

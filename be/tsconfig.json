@@ -25,7 +25,7 @@
             "@/todos/*": ["./src/todos/*"],
             "@/auth/*": ["./src/auth/*"],
             "@/users/*": ["./src/users/*"],
-            "@/guards/*": ["src/guards/*"],
+            "@/decorators/*": ["src/decorators/*"],
             "@/base/*": ["src/base/*"],
             "@/types/*": ["src/types/*"]
         }

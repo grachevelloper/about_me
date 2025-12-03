@@ -5,7 +5,7 @@ import {Repository} from "typeorm";
 import {TodoState} from "@/types/todo";
 
 import {CommentsService} from "../comments/comments.service";
-import {CreateTodoDto, UpdateTodoDto} from "./dto";
+import {CreateTodoDto, UpdateTodoDto} from "./todo.dto";
 import {Todo} from "./todos.entity";
 
 @Injectable()

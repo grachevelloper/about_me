@@ -7,8 +7,8 @@ export interface CreateTodoDto {
     title: string;
     priority?: TodoPriority;
     state?: TodoState;
-    likedBy: User[];
-    likesCount: number;
+    likedBy?: User[];
+    likesCount?: number;
 }
 export type UpdateTodoDto = Partial<CreateTodoDto> & {
     isActive?: boolean;

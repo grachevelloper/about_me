@@ -1,16 +1,14 @@
-import {
-    Column,
-    CreateDateColumn,
-    Entity,
-    PrimaryGeneratedColumn,
-} from "typeorm";
+import {Length} from "class-validator";
+import {Column, Entity} from "typeorm";
+
+import {BaseEntity} from "../base/entity";
+import {Role} from "../types";
+import {UserStatus} from "../types/user";
 
 @Entity("users")
-export class User {
-    @PrimaryGeneratedColumn("uuid")
-    id: string;
-
+export class User extends BaseEntity {
     @Column()
+    @Length(1, 50)
     username: string;
 
     @Column()
@@ -19,9 +17,12 @@ export class User {
     @Column()
     password: string;
 
-    @CreateDateColumn()
-    createdAt: Date;
+    @Column()
+    role: Role;
 
-    @CreateDateColumn()
-    updatedAt: Date;
+    @Column()
+    avatar?: string;
+
+    @Column()
+    status?: UserStatus;
 }

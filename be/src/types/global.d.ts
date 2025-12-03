@@ -1,3 +1,5 @@
+import {Role} from ".";
+
 declare global {
     type Nullable<T> = T | null;
     type Undefinable<T> = T | undefined;
@@ -13,6 +15,7 @@ declare global {
 
 interface AuthUser {
     id: string;
+    role: Role;
     iat: number;
     exp: number;
 }

@@ -3,6 +3,7 @@ import {InjectRepository} from "@nestjs/typeorm";
 import * as bcrypt from "bcrypt";
 import {Repository} from "typeorm";
 
+import {Role} from "../types";
 import {UpdateUserDto} from "./dto";
 import {User} from "./users.entity";
 
@@ -29,6 +30,7 @@ export class UsersService {
     async create(
         email: string,
         password: string,
+        role: Role,
         username?: string,
     ): Promise<User> {
         const emailExists = await this.usersRepository.findOneBy({email});
@@ -41,6 +43,7 @@ export class UsersService {
             email,
             username,
             password: hashedPassword,
+            role,
         });
         return this.usersRepository.save(user);
     }
@@ -50,9 +53,17 @@ export class UsersService {
         await this.usersRepository.delete(id);
     }
 
-    async changePassword(id: string, updateData: UpdateUserDto): Promise<void> {
+    async update(id: string, updateData: UpdateUserDto) {
+        const user = await this.findById(id);
+
+        Object.assign(user, updateData);
+
+        return this.usersRepository.save(user);
+    }
+
+    async changePassword(id: string, password: string): Promise<void> {
         await this.findById(id);
-        const hashedPassword = await bcrypt.hash(updateData.password, 10);
+        const hashedPassword = await bcrypt.hash(password, 10);
         await this.usersRepository.update(id, {password: hashedPassword});
     }
 }

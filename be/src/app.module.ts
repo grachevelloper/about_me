@@ -6,10 +6,11 @@ import * as dotenv from "dotenv";
 
 import {AppController} from "./app.controller";
 import {AppService} from "./app.service";
+import {ArticlesModule} from "./articles/articles.module";
 import {AuthModule} from "./auth/auth.module";
+import {AuthGuard} from "./auth/guards/auth.guard";
 import {CommentsModule} from "./comments/comments.module";
 import dataSourceOptions from "./data-source";
-import {AuthGuard} from "./guards/auth.guard";
 import {LikesModule} from "./likes/likes.module";
 import {TodosModule} from "./todos/todos.module";
 import {UsersModule} from "./users/users.module";
@@ -36,6 +37,7 @@ dotenv.config();
         UsersModule,
         LikesModule,
         CommentsModule,
+        ArticlesModule,
     ],
     controllers: [AppController],
     providers: [

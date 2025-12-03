@@ -1,15 +1,9 @@
-import {
-    Column,
-    CreateDateColumn,
-    Entity,
-    PrimaryGeneratedColumn,
-} from "typeorm";
+import {Column, Entity} from "typeorm";
+
+import {UnUpdatableBaseEntity} from "../../base/entity";
 
 @Entity("refresh_tokens")
-export class RefreshToken {
-    @PrimaryGeneratedColumn("uuid")
-    id: string;
-
+export class RefreshToken extends UnUpdatableBaseEntity {
     @Column("uuid")
     userId: string;
 
@@ -21,7 +15,4 @@ export class RefreshToken {
 
     @Column({default: false})
     revoked: boolean;
-
-    @CreateDateColumn()
-    createdAt: Date;
 }

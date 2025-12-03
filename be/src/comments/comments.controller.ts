@@ -11,39 +11,13 @@ import {
     Req,
     UseGuards,
 } from "@nestjs/common";
-import {IsEnum, IsOptional, IsString, IsUUID} from "class-validator";
 import {Request} from "express";
 
-import {AuthGuard} from "../guards/auth.guard";
+import {AuthGuard} from "../auth/guards/auth.guard";
+import {Order} from "../types";
+import {CreateCommentDto, UpdateCommentDto} from "./comemnts.dto";
 import {EntityCommentType} from "./comments.entity";
 import {CommentsService} from "./comments.service";
-
-export class CreateCommentDto {
-    @IsString()
-    content: string;
-
-    @IsOptional()
-    @IsUUID()
-    parentId?: string;
-
-    @IsString()
-    entityId: string;
-
-    @IsEnum(["todo", "article"])
-    entityType: EntityCommentType;
-}
-
-export class DeleteCommentDto {
-    @IsUUID()
-    id: string;
-}
-
-export class UpdateCommentDto {
-    @IsUUID()
-    id: string;
-    @IsString()
-    contents: string;
-}
 
 @UseGuards(AuthGuard)
 @Controller("comments")
@@ -70,10 +44,15 @@ export class CommentsController {
     @HttpCode(HttpStatus.OK)
     @Get(":entityType/:entityId")
     async getByEntityId(
-        @Param() entityType: EntityCommentType,
-        @Param() entityId: string,
+        @Param("entityType") entityType: EntityCommentType,
+        @Param("entityId") entityId: string,
+        @Body() order: Order,
     ) {
-        return await this.commentsService.findByEntity(entityType, entityId);
+        return await this.commentsService.findByEntity(
+            entityType,
+            entityId,
+            order,
+        );
     }
 
     @HttpCode(HttpStatus.OK)
@@ -86,8 +65,8 @@ export class CommentsController {
     }
 
     @HttpCode(HttpStatus.OK)
-    @Delete()
-    async delete(@Body() deleteCommentData: DeleteCommentDto) {
-        return await this.commentsService.delete(deleteCommentData.id);
+    @Delete(":id")
+    async delete(@Param() id: string) {
+        return await this.commentsService.delete(id);
     }
 }
