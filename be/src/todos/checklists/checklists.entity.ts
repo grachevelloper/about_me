@@ -1,18 +1,11 @@
-import {
-    Column,
-    Entity,
-    JoinColumn,
-    OneToOne,
-    PrimaryGeneratedColumn,
-} from "typeorm";
+import {Column, Entity, JoinColumn, OneToOne} from "typeorm";
+
+import {BaseEntity} from "@/base/entity";
 
 import {Todo} from "../todos.entity";
 
 @Entity("checklists")
-export class CheckList {
-    @PrimaryGeneratedColumn("uuid")
-    id: string;
-
+export class CheckList extends BaseEntity {
     @Column({type: "simple-array"})
     text: string[];
 

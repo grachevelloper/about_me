@@ -94,10 +94,21 @@ export class UpdateUserDto {
     @ApiPropertyOptional({
         enum: UserStatus,
         enumName: "UserStatus",
-        // example: UserStatus.INACTIVE,
         description: "Статус пользователя",
     })
     @IsEnum(UserStatus)
     @IsOptional()
     status?: UserStatus;
+
+    @IsString()
+    @IsOptional()
+    nowReading?: string;
+
+    @IsString()
+    @IsOptional()
+    nowWaitch?: string;
+
+    @IsString()
+    @IsOptional()
+    nowListening: string;
 }

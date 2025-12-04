@@ -1,4 +1,4 @@
-import {Length} from "class-validator";
+import {IsOptional, Length} from "class-validator";
 import {Column, Entity} from "typeorm";
 
 import {BaseEntity} from "../base/entity";
@@ -20,9 +20,23 @@ export class User extends BaseEntity {
     @Column()
     role: Role;
 
-    @Column()
+    @IsOptional()
+    @Column({nullable: true})
     avatar?: string;
 
-    @Column()
+    @IsOptional()
+    @Column({nullable: true})
+    nowReading?: string;
+
+    @IsOptional()
+    @Column({nullable: true})
+    nowWaitch?: string;
+
+    @IsOptional()
+    @Column({nullable: true})
+    nowListening?: string;
+
+    @IsOptional()
+    @Column({nullable: true})
     status?: UserStatus;
 }

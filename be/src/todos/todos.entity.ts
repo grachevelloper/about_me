@@ -1,8 +1,8 @@
 import {Column, Entity, OneToOne} from "typeorm";
 
+import {BaseEntity} from "@/base/entity";
 import {TodoPriority, TodoState} from "@/types/todo";
 
-import {BaseEntity} from "../base/entity";
 import {CheckList} from "./checklists/checklists.entity";
 
 @Entity("todos")
