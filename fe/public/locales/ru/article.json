@@ -1,0 +1,98 @@
+{
+    "page.title": "Статьи",
+    "page.subtitle": "Советы, руководства и новости из мира разработки",
+
+    "search.placeholder": "Поиск статей...",
+    "search.button": "Найти",
+
+    "article.search.placeholder": "Схоластика папы Иоанна XII...",
+
+    "actions.writeArticle": "Написать статью",
+    "actions.filters": "Фильтры",
+    "actions.readMore": "Читать далее",
+    "actions.edit": "Редактировать",
+    "actions.delete": "Удалить",
+    "actions.save": "Сохранить",
+    "actions.publish": "Опубликовать",
+    "actions.share": "Поделиться",
+
+    "categories.title": "Категории",
+    "categories.all": "Все",
+    "categories.frontend": "Frontend",
+    "categories.backend": "Backend",
+    "categories.mobile": "Мобильная разработка",
+    "categories.design": "Дизайн",
+    "categories.devops": "DevOps",
+    "categories.database": "Базы данных",
+    "categories.ai": "Искусственный интеллект",
+    "categories.security": "Безопасность",
+    "categories.testing": "Тестирование",
+
+    "statistics.totalArticles": "Всего статей",
+    "statistics.totalAuthors": "Авторов",
+    "statistics.monthlyViews": "Просмотров в месяц",
+    "statistics.engagement": "Вовлеченность",
+    "statistics.averageReadTime": "Среднее время чтения",
+    "statistics.topCategory": "Популярная категория",
+
+    "articles.recent": "Недавние статьи",
+    "articles.popular": "Популярные",
+    "articles.featured": "Рекомендуемые",
+    "articles.trending": "В тренде",
+
+    "articles.article.read_time": "{{minutes}} мин. чтения",
+
+    "articles.form.title.label": "Заголовок статьи",
+    "articles.form.title.placeholder": "Введите заголовок",
+    "articles.form.content.label": "Содержание",
+    "articles.form.content.placeholder": "Начните писать статью...",
+    "articles.form.category.label": "Категория",
+    "articles.form.category.placeholder": "Выберите категорию",
+    "articles.form.tags.label": "Теги",
+    "articles.form.tags.placeholder": "Добавьте теги через запятую",
+    "articles.form.preview": "Предпросмотр",
+    "articles.form.saveDraft": "Сохранить черновик",
+
+    "articles.status.draft": "Черновик",
+    "articles.status.published": "Опубликовано",
+    "articles.status.archived": "В архиве",
+    "articles.status.pending": "На модерации",
+
+    "pagination.previous": "Назад",
+    "pagination.next": "Далее",
+    "pagination.page": "Страница",
+    "pagination.of": "из",
+    "pagination.show": "Показать",
+    "pagination.items": "элементов",
+
+    "empty.title": "Статьи не найдены",
+    "empty.description": "Попробуйте изменить критерии поиска или создать новую статью",
+    "empty.button": "Написать первую статью",
+
+    "validation.titleRequired": "Заголовок обязателен",
+    "validation.contentRequired": "Содержание обязательно",
+    "validation.categoryRequired": "Выберите категорию",
+    "validation.minTags": "Добавьте хотя бы один тег",
+
+    "comments.title": "Комментарии",
+    "comments.placeholder": "Оставьте комментарий...",
+    "comments.submit": "Отправить",
+    "comments.reply": "Ответить",
+    "comments.edit": "Редактировать",
+    "comments.delete": "Удалить",
+    "comments.noComments": "Комментариев пока нет",
+    "comments.beFirst": "Будьте первым!",
+
+    "author.profile": "Профиль автора",
+    "author.articlesCount": "{{count}} статей",
+    "author.follow": "Подписаться",
+    "author.following": "Вы подписаны",
+    "author.expertise": "Специализация",
+    "author.bio": "Об авторе",
+
+    "notifications.articlePublished": "Статья успешно опубликована!",
+    "notifications.articleSaved": "Статья сохранена в черновиках",
+    "notifications.articleDeleted": "Статья удалена",
+    "notifications.commentAdded": "Комментарий добавлен",
+    "notifications.commentDeleted": "Комментарий удален"
+}

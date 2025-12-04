@@ -4,7 +4,7 @@
         "composite": true,
         "target": "ES2020",
         "module": "ESNext",
-        "moduleResolution": "node",
+        "moduleResolutio50861n": "node",
         "resolveJsonModule": true,
         "baseUrl": "./",
         "removeComments": true,
@@ -25,13 +25,20 @@
             "@/todos/*": ["./src/units/todos/*"],
             "@/public/*": ["./public/*"],
             "@/users/*": ["./src/units/users/*"],
+            "@/articles/*": ["./src/units/articles/*"],
             "@/shared/*": ["./src/shared/*"],
             "@/typings/*": ["./src/typings/*"],
             "@/test/*": ["./src/__test__/*"],
             "@/utils/*": ["./src/utils/*"],
-            "@/locales/*": ["./src/locales/*"]
+            "@/locales/*": ["./public/locales/*"]
         }
     },
-    "include": ["src/**/*", "/types/**/*", "webpack.config.js"],
+    "ignoreDeprecations": true,
+    "include": [
+        "src/**/*",
+        "/types/**/*",
+        "webpack.config.js",
+        "public/locales"
+    ],
     "exclude": ["node_modules", "dist"]
 }

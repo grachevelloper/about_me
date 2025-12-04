@@ -8,7 +8,10 @@
     "button.back": "Назад",
 
     "layout.top.main": "Главная",
+    "layout.top.user": "Моя страница",
+    "layout.top.articles": "Статьи",
     "layout.left.suggest": "Предложить ежедневку",
+    "layout.cookie.accept": "Мы используем куки 😊 Используя сайт, вы соглашаетесь с использованием cookie",
     "logout": "Выйти из аккаунта",
 
     "comment.reply": "Ответить",
@@ -19,5 +22,6 @@
     "edit": "Изменить",
     "create": "Создать",
     "cancel": "Отменить",
+    "accept": "Принять",
     "updated-at": "Изменено: "
 }

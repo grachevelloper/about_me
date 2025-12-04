@@ -18,6 +18,9 @@ apiAxios.interceptors.response.use(
         if (originalRequest.url?.includes('/auth/refresh')) {
             if (error.response?.status === 401) {
                 console.error('Refresh token expired, redirecting to login');
+                if (!window.location.pathname.startsWith('/auth')) {
+                    window.location.pathname = 'auth/signin';
+                }
                 return Promise.reject(error);
             }
             throw error;

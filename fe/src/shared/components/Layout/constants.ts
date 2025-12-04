@@ -1,0 +1,1 @@
+export const ANIMATION__DURATION_IN_MS = 6500;

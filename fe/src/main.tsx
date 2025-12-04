@@ -1,4 +1,4 @@
-import '@/locales/index';
+import '@/shared/configs/i18n';
 import 'antd/dist/reset.css';
 
 import {createRoot} from 'react-dom/client';
@@ -13,7 +13,7 @@ const enableMocking = async () => {
     if (process.env.REACT_APP_ENABLE_MOCKS !== 'true') {
         return;
     }
-    return worker.start();
+    return await worker.start();
 };
 enableMocking().then(() => {
     root.render(<App />);

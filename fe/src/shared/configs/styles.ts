@@ -28,35 +28,35 @@ const BUTTON_PADDING = {
 const lightTheme: CustomThemeConfig = {
     name: 'light',
     token: {
-        colorPrimary: '#9ca3af', // Стальной серый
-        colorSuccess: '#10b981', // Изумрудный (для контраста)
-        colorWarning: '#f59e0b', // Янтарный
-        colorError: '#ef4444', // Алый
-        colorInfo: '#3b82f6', // Синий
+        colorPrimary: '#4f46e5',
+        colorSuccess: '#10b981',
+        colorWarning: '#f59e0b',
+        colorError: '#ef4444',
+        colorInfo: '#3b82f6',
 
-        colorBgBase: '#ffffff', // Чистый белый
-        colorBgContainer: '#f9fafb', // Серебристо-белый
-        colorBgElevated: '#ffffff', // Блестящий белый
-        colorBgLayout: '#f8fafc', // Ледяной белый
+        colorBgBase: '#ffffff',
+        colorBgContainer: '#f9fafb',
+        colorBgElevated: '#ffffff',
+        colorBgLayout: '#f8fafc',
 
-        colorBgMask: 'rgba(0, 0, 0, 0.1)', // Маска/оверлей
-        colorBgBlur: 'rgba(255, 255, 255, 0.85)', // Размытый фон
-        colorBgSpotlight: 'rgba(222, 223, 223, 0.95)', // Подсветка
+        colorBgMask: 'rgba(0, 0, 0, 0.1)',
+        colorBgBlur: 'rgba(255, 255, 255, 0.85)',
+        colorBgSpotlight: 'rgba(222, 223, 223, 0.95)',
 
-        colorTextBase: '#1f2937', // Темный графит
-        colorTextSecondary: '#4b5563', // Средний графит
-        colorTextTertiary: '#6b7280', // Светлый графит
-        colorTextQuaternary: '#9ca3af', // Серебристый серый
+        colorTextBase: '#1f2937',
+        colorTextSecondary: '#4b5563',
+        colorTextTertiary: '#6b7280',
+        colorTextQuaternary: '#9ca3af',
 
-        colorBorder: '#d1d5db', // Светло-серая граница
-        colorBorderSecondary: '#e5e7eb', // Очень светлая серебристая
+        colorBorder: '#d1d5db',
+        colorBorderSecondary: '#e5e7eb',
 
         borderRadius: 8,
         fontSize: 14,
         lineHeight: 1.5715,
 
-        colorPrimaryBg: '#f3f4f6', // Серебристый фон для primary
-        colorPrimaryBorder: '#d1d5db', // Серебристая граница
+        colorPrimaryBg: '#eef2ff',
+        colorPrimaryBorder: '#c7d2fe',
     },
     components: {
         Layout: {
@@ -68,23 +68,24 @@ const lightTheme: CustomThemeConfig = {
         },
         Input: {
             colorBgContainer: '#ffffff',
-            hoverBorderColor: '#9ca3af',
-            activeBorderColor: '#6b7280',
+            hoverBorderColor: '#4f46e5',
+            activeBorderColor: '#4338ca',
             colorText: '#1f2937',
             colorTextPlaceholder: '#9ca3af',
-            activeShadow: '0 0 0 2px rgba(156, 163, 175, 0.2)',
+            activeShadow: '0 0 0 2px rgba(79, 70, 229, 0.2)',
         },
         Button: {
             ...BUTTON_PADDING,
-            colorPrimary: '#ffffff',
-            colorPrimaryHover: '#f9fafb',
-            colorPrimaryActive: '#f3f4f6',
-            colorText: '#1f2937',
+            colorPrimary: '#4f46e5',
+            colorPrimaryHover: '#4338ca',
+            colorPrimaryActive: '#3730a3',
+            colorText: '#ffffff',
             defaultShadow: '0 2px 0 rgba(0, 0, 0, 0.02)',
-            primaryShadow: '0 2px 0 rgba(0, 0, 0, 0.05)',
-            defaultBg: 'linear-gradient(145deg, #ffffff 0%, #f3f4f6 100%)',
+            primaryShadow: '0 2px 0 rgba(0, 0, 0, 0.1)',
+            defaultBg: '#ffffff',
             defaultBorderColor: '#d1d5db',
-            primaryorderColor: '#9ca3af',
+            defaultColor: '#374151',
+            primaryBorderColor: '#4f46e5',
         },
         Card: {
             ...CARD,
@@ -99,10 +100,10 @@ const lightTheme: CustomThemeConfig = {
             colorBgContainer: '#f9fafb',
             itemHoverBg: '#e5e7eb',
             itemBg: '#f9fafb',
-            itemSelectedBg: 'linear-gradient(90deg, #f3f4f6 0%, #e5e7eb 100%)',
+            itemSelectedBg: 'linear-gradient(90deg, #eef2ff 0%, #e0e7ff 100%)',
             itemColor: '#1f2937',
-            itemSelectedColor: '#1f2937',
-            itemActiveBg: 'linear-gradient(90deg, #e5e7eb 0%, #d1d5db 100%)',
+            itemSelectedColor: '#4f46e5',
+            itemActiveBg: 'linear-gradient(90deg, #e0e7ff 0%, #c7d2fe 100%)',
         },
         Table: {
             colorBgContainer: '#ffffff',
@@ -125,8 +126,8 @@ const lightTheme: CustomThemeConfig = {
         Tabs: {
             colorBgContainer: '#ffffff',
             colorBorderSecondary: '#e5e7eb',
-            itemSelectedColor: '#1f2937',
-            inkBarColor: '#9ca3af',
+            itemSelectedColor: '#4f46e5',
+            inkBarColor: '#4f46e5',
         },
     },
 };
@@ -134,31 +135,31 @@ const lightTheme: CustomThemeConfig = {
 const darkTheme: CustomThemeConfig = {
     name: 'dark',
     token: {
-        colorPrimary: '#9ca3af', // Серебристый серый
-        colorSuccess: '#10b981',
-        colorWarning: '#f59e0b',
-        colorError: '#ef4444',
-        colorInfo: '#3b82f6',
+        colorPrimary: '#818cf8',
+        colorSuccess: '#34d399',
+        colorWarning: '#fbbf24',
+        colorError: '#f87171',
+        colorInfo: '#60a5fa',
 
-        colorBgBase: '#111827', // Темный графит
-        colorBgContainer: '#1f2937', // Глубокий графит
-        colorBgElevated: '#374151', // Средний графит
+        colorBgBase: '#111827',
+        colorBgContainer: '#1f2937',
+        colorBgElevated: '#374151',
         colorBgLayout: '#111827',
 
-        colorTextBase: '#f9fafb', // Блестящий белый
-        colorTextSecondary: '#d1d5db', // Светло-серебристый
-        colorTextTertiary: '#9ca3af', // Серебристый
-        colorTextQuaternary: '#6b7280', // Темно-серебристый
+        colorTextBase: '#f9fafb',
+        colorTextSecondary: '#d1d5db',
+        colorTextTertiary: '#9ca3af',
+        colorTextQuaternary: '#6b7280',
 
-        colorBorder: '#374151', // Темный металл
-        colorBorderSecondary: '#4b5563', // Средний металл
+        colorBorder: '#374151',
+        colorBorderSecondary: '#4b5563',
 
         borderRadius: 8,
         fontSize: 14,
         lineHeight: 1.5715,
 
-        colorPrimaryBg: '#1f2937',
-        colorPrimaryBorder: '#4b5563',
+        colorPrimaryBg: '#1e1b4b',
+        colorPrimaryBorder: '#4338ca',
     },
     components: {
         Layout: {
@@ -170,23 +171,24 @@ const darkTheme: CustomThemeConfig = {
         },
         Input: {
             colorBgContainer: '#1f2937',
-            hoverBorderColor: '#9ca3af',
-            activeBorderColor: '#d1d5db',
+            hoverBorderColor: '#818cf8',
+            activeBorderColor: '#a5b4fc',
             colorText: '#f9fafb',
             colorTextPlaceholder: '#6b7280',
             paddingBlock: 8,
             paddingBlockLG: 10,
             paddingBlockSM: 4,
-            activeShadow: '0 0 0 2px rgba(156, 163, 175, 0.3)',
+            activeShadow: '0 0 0 2px rgba(129, 140, 248, 0.3)',
         },
         Button: {
             ...BUTTON_PADDING,
-            colorPrimary: '#374151',
-            colorPrimaryHover: '#4b5563',
-            colorPrimaryActive: '#6b7280',
-            colorText: '#f9fafb',
-            defaultBg: 'linear-gradient(145deg, #1f2937 0%, #374151 100%)',
+            colorPrimary: '#818cf8',
+            colorPrimaryHover: '#6366f1',
+            colorPrimaryActive: '#4f46e5',
+            colorText: '#ffffff',
+            defaultBg: '#1f2937',
             defaultBorderColor: '#4b5563',
+            defaultColor: '#d1d5db',
         },
         Card: {
             ...CARD,
@@ -198,11 +200,11 @@ const darkTheme: CustomThemeConfig = {
         Menu: {
             colorBgContainer: '#1f2937',
             itemBg: '#1f2937',
-            itemSelectedBg: 'linear-gradient(90deg, #374151 0%, #4b5563 100%)',
+            itemSelectedBg: 'linear-gradient(90deg, #3730a3 0%, #312e81 100%)',
             itemColor: '#d1d5db',
-            itemSelectedColor: '#f9fafb',
+            itemSelectedColor: '#818cf8',
             itemHoverBg: '#374151',
-            itemActiveBg: 'linear-gradient(90deg, #4b5563 0%, #6b7280 100%)',
+            itemActiveBg: 'linear-gradient(90deg, #312e81 0%, #1e1b4b 100%)',
         },
         Table: {
             colorBgContainer: '#1f2937',
@@ -224,8 +226,8 @@ const darkTheme: CustomThemeConfig = {
         Tabs: {
             colorBgContainer: '#1f2937',
             colorBorderSecondary: '#374151',
-            itemSelectedColor: '#f9fafb',
-            inkBarColor: '#9ca3af',
+            itemSelectedColor: '#818cf8',
+            inkBarColor: '#818cf8',
         },
     },
 };

@@ -1,11 +1,11 @@
 .sider {
-    overflow: auto;
+    scrollbar-width: thin;
+    scrollbar-gutter: stable;
     position: sticky;
     inset-inline-start: 0;
     top: 0;
     bottom: 0;
-    scrollbar-width: 'thin';
-    scrollbar-gutter: 'stable';
+    overflow: auto;
     height: 100vh;
 
     &__container {
@@ -14,9 +14,7 @@
     }
 
     &__menu {
-        display: flex;
         width: 100%;
-        align-items: center;
     }
 
     &__logout-icon {

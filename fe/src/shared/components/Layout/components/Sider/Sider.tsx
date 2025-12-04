@@ -1,9 +1,10 @@
-import {BulbOutlined, HomeOutlined} from '@ant-design/icons';
+import {BulbOutlined, HomeOutlined, UserOutlined} from '@ant-design/icons';
 import {Flex, Layout, Menu} from 'antd';
 import {MenuItemType} from 'antd/es/menu/interface';
 import block from 'bem-cn-lite';
 import {useCallback} from 'react';
 import {useTranslation} from 'react-i18next';
+import {PiArticleNyTimesThin} from 'react-icons/pi';
 import {useNavigate} from 'react-router-dom';
 
 import {useTodoForm} from '@/shared/context';
@@ -34,6 +35,22 @@ export const Sider = () => {
                 navigate('/todos');
             },
         },
+        {
+            icon: <UserOutlined />,
+            label: t('layout.top.user'),
+            key: 'nav-2',
+            onClick: () => {
+                navigate('/user');
+            },
+        },
+        {
+            icon: <PiArticleNyTimesThin />,
+            label: t('layout.top.articles'),
+            key: 'nav-3',
+            onClick: () => {
+                navigate('/articles');
+            },
+        },
     ];
 
     const actionItems: MenuItemType[] = [
@@ -52,7 +69,6 @@ export const Sider = () => {
             className={b()}
             breakpoint='lg'
             collapsedWidth='0'
-            collapsible
             theme='light'
         >
             <Flex vertical justify='space-between' className={b('container')}>

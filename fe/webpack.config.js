@@ -72,11 +72,12 @@ module.exports = {
         alias: {
             '@/pages': path.resolve(__dirname, './src/pages'),
             '@/todos': path.resolve(__dirname, './src/units/todos'),
+            '@/articles': path.resolve(__dirname, './src/units/articles'),
             '@/users': path.resolve(__dirname, './src/units/users'),
             '@/tests': path.resolve(__dirname, './src/__test__'),
             '@/utils': path.resolve(__dirname, './src/utils'),
             '@/shared': path.resolve(__dirname, './src/shared'),
-            '@/locales': path.resolve(__dirname, './src/locales'),
+            '@/locales': path.resolve(__dirname, './public/locales'),
             '@/public': path.resolve(__dirname, './public'),
         },
     },

@@ -2,12 +2,17 @@ import {BrowserRouter, Route, RouteProps, Routes} from 'react-router-dom';
 
 import {usersRoutes} from '@/users/pages';
 
+import {articlesRoutes} from '@/articles/pages';
 import {todosRoutes} from '@/todos/pages';
 
 import {AuthLayout} from '../components/AuthLayout';
 import {Layout} from '../components/Layout';
 
-const routes: RouteProps[] = [...todosRoutes];
+const routes: RouteProps[] = [
+    ...todosRoutes,
+    ...usersRoutes.slice(2),
+    ...articlesRoutes,
+];
 
 const authRoutes: RouteProps[] = [...usersRoutes.slice(0, 2)];
 

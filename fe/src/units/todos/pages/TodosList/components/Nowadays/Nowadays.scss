@@ -21,5 +21,12 @@
         justify-self: end;
         padding-right: 70px;
         z-index: 1;
+
+        @media (max-width: 1200px) and (min-width: 1024px) {
+            padding-right: 0px;
+        }
+        @media (max-width: 450px) {
+            padding-right: 0px;
+        }
     }
 }

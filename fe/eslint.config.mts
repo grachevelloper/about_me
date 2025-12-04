@@ -1,4 +1,5 @@
 import js from '@eslint/js';
+import i18nextPlugin from 'eslint-plugin-i18next';
 import importPlugin from 'eslint-plugin-import';
 import prettierPlugin from 'eslint-plugin-prettier';
 import reactPlugin from 'eslint-plugin-react';
@@ -8,6 +9,8 @@ import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
 const reactHooks = require('eslint-plugin-react-hooks');
+
+const i18next = i18nextPlugin as any;
 
 export default defineConfig([
     {
@@ -19,6 +22,7 @@ export default defineConfig([
             prettier: prettierPlugin,
             'react-hooks': reactHooks,
             react: reactPlugin,
+            i18next,
         },
         extends: [js.configs.recommended],
         settings: {
@@ -32,9 +36,10 @@ export default defineConfig([
                         ['@/typings/*', './src/typings/*'],
                         ['@/test/*', './src/__test__/*'],
                         ['@/utils/*', './src/utils/*'],
-                        ['@/locales/*', './src/locales/*'],
+                        ['@/locales/*', './public/locales/*'],
                         ['@/users/*', './src/units/users/*'],
                         ['@/todos/*', './src/units/todos'],
+                        ['@/articles/*', './src/units/articles'],
                         ['@/public/*', './public'],
                     ],
                     extensions: [
@@ -72,11 +77,14 @@ export default defineConfig([
     reactPlugin.configs.flat.recommended,
     {
         rules: {
+            '@typescript-eslint/no-unsafe-call': 'off',
             'no-case-declarations': 'off',
             '@typescript-eslint/only-throw-error': 'off',
             '@typescript-eslint/no-unused-vars': 'warn',
             'react/display-name': 'off',
             'react/jsx-key': 'off',
+            '@typescript-eslint/no-unsafe-assignment': 'off',
+            '@typescript-eslint/no-unsafe-member-access': 'off',
             '@typescript-eslint/explicit-function-return-type': 'off',
             '@typescript-eslint/no-explicit-any': 'off',
             '@typescript-eslint/no-floating-promises': 'off',

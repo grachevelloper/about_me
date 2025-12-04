@@ -1,0 +1,74 @@
+{
+    "page.title": "article",
+    "page.subtitle": "Tips, guides and news from the world of development",
+
+    "actions.filters": "Filters",
+    "actions.readMore": "Read more",
+    "actions.edit": "Edit",
+    "actions.delete": "Delete",
+    "actions.save": "Save",
+    "actions.publish": "Publish",
+    "actions.share": "Share",
+
+    "article.search.placeholder": "Схоластика папы Иоанна XII...",
+
+    "article.recent": "Recent article",
+    "article.popular": "Popular",
+    "article.featured": "Featured",
+    "article.trending": "Trending",
+
+    "article.read_time": "{{minutes}} min read",
+
+    "article.form.title.placeholder": "Enter title",
+    "article.form.content.label": "Content",
+    "article.form.content.placeholder": "Start writing article...",
+    "article.form.category.label": "Category",
+    "article.form.category.placeholder": "Select category",
+    "article.form.tags.label": "Tags",
+    "article.form.tags.placeholder": "Add tags separated by commas",
+    "article.form.preview": "Preview",
+    "article.form.saveDraft": "Save draft",
+
+    "article.status.draft": "Draft",
+    "article.status.published": "Published",
+    "article.status.archived": "Archived",
+    "article.status.pending": "Under moderation",
+
+    "pagination.previous": "Previous",
+    "pagination.next": "Next",
+    "pagination.page": "Page",
+    "pagination.of": "of",
+    "pagination.show": "Show",
+    "pagination.items": "items",
+
+    "empty.title": "No article found",
+    "empty.description": "Try changing search criteria or create new article",
+    "empty.button": "Write first article",
+
+    "validation.titleRequired": "Title is required",
+    "validation.contentRequired": "Content is required",
+    "validation.categoryRequired": "Select category",
+    "validation.minTags": "Add at least one tag",
+
+    "comments.title": "Comments",
+    "comments.placeholder": "Leave a comment...",
+    "comments.submit": "Submit",
+    "comments.reply": "Reply",
+    "comments.edit": "Edit",
+    "comments.delete": "Delete",
+    "comments.noComments": "No comments yet",
+    "comments.beFirst": "Be the first!",
+
+    "author.profile": "Author profile",
+    "author.articleCount": "{{count}} article",
+    "author.follow": "Follow",
+    "author.following": "Following",
+    "author.expertise": "Expertise",
+    "author.bio": "About author",
+
+    "notifications.articlePublished": "Article published successfully!",
+    "notifications.articleaved": "Article saved to drafts",
+    "notifications.articleDeleted": "Article deleted",
+    "notifications.commentAdded": "Comment added",
+    "notifications.commentDeleted": "Comment deleted"
+}

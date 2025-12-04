@@ -6,10 +6,12 @@ import {ErrorBoundary} from 'react-error-boundary';
 import {Outlet} from 'react-router-dom';
 
 import {useAuth} from '../../context';
+import {useCookie} from '../../hooks/useCookie';
 import {NewTodoForm} from '../NewTodoForm';
 
 import {isMe} from './api';
 import {Animation} from './components/Animation';
+import {CookieMessage} from './components/CookieMessage';
 import {Sider} from './components/Sider';
 
 import './Layout.scss';
@@ -20,6 +22,8 @@ const {Content} = AntLayout;
 
 export const Layout = () => {
     const {setUserData} = useAuth();
+
+    const {value} = useCookie('cookie-accept');
 
     const {
         token: {colorBgContainer, borderRadiusLG},
@@ -50,6 +54,7 @@ export const Layout = () => {
                     <Animation />
                     <AntLayout rootClassName={b()} hasSider>
                         <NewTodoForm />
+                        {!value && <CookieMessage />}
                         {/* <Image
                             src='/assets/title.png'
                             height={90}

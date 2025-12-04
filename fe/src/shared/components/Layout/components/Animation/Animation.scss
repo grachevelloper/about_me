@@ -9,11 +9,11 @@
     overflow: hidden;
 
     &_night {
-        animation: dark-in-out 6.5s ease-in-out forwards;
+        animation: dark-in-out 6s ease-in-out forwards; // ANIMATION__DURATION_IN_MS
     }
 
     &_day {
-        animation: sky-bright-in-out 6s ease-in-out forwards;
+        animation: sky-bright-in-out 6s ease-in-out forwards; // ANIMATION__DURATION_IN_MS
     }
 
     @media (max-width: 767px) {
