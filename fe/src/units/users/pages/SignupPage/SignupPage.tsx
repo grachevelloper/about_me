@@ -5,14 +5,14 @@ import {useCallback, useEffect, useState} from 'react';
 import {useAuth} from '@/shared/context';
 import {useLocalStorage} from '@/shared/hooks';
 import {type CardProps, type FormField} from '@/typings/components';
-import {useSignUpMutation} from '@/users/store';
+import {useSignupMutation} from '@/users/store';
 import {AuthEmitter, SIGN_UP_EVENT} from '@/users/utils';
 
 import {SignStep} from './components/SignStep';
 import {ANIMATION_FADE_OUT_IN_S, SIGN_UP_STEP_SLUG} from './constants';
 import {useSignUpFields} from './hooks/useSignUpFields';
 
-import './SignUpPage.scss';
+import './SignupPage.scss';
 
 const b = block('sign-up-page');
 
@@ -30,7 +30,7 @@ const initialSignUpData: SignUpFormData = {
     confirmPassword: '',
 };
 
-export const SignUpPage = () => {
+export const SignupPage = () => {
     const [signStep, setSignStep] = useLocalStorage(SIGN_UP_STEP_SLUG, 0);
     const [visibleStep, setVisibleStep] = useState(signStep);
     const [form] = Form.useForm<SignUpFormData>();
@@ -38,7 +38,7 @@ export const SignUpPage = () => {
     const [localSignUpData, setLocalSignUpData] =
         useLocalStorage<SignUpFormData>('sign-up', initialSignUpData);
 
-    const {isPending, isError, mutateAsync} = useSignUpMutation();
+    const {isPending, isError, mutateAsync} = useSignupMutation();
 
     const handleSubmit = useCallback(() => {
         (async () => {

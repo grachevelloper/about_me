@@ -7,16 +7,16 @@ import {useFieldValidation, useLocalStorage} from '@/shared/hooks';
 import {FormField} from '@/typings/components';
 
 import {AuthEmitter, SIGN_UP_EVENT} from '../../../utils';
-import {SIGN_UP_STEP_SLUG} from '../../SignUpPage/constants';
+import {SIGN_UP_STEP_SLUG} from '../../SignupPage/constants';
 
 export const useSignInFields = (
     form: FormInstance,
-    // sumbitData?: {
     //     isError: boolean;
     //     isLoading: boolean;
     //     handleSumbit: () => void;
     // },
-    startsWith = 0
+    startsWith = 0,
+    withActions = true
 ): FormField[] => {
     const {t} = useTranslation('auth');
     const [signStep, setSignStep] = useLocalStorage(SIGN_UP_STEP_SLUG, 0);
@@ -62,16 +62,21 @@ export const useSignInFields = (
                 {type: 'email', message: t('auth.email.invalid')},
             ],
             index: startsWith,
-            actions: [
-                startsWith > 0 ? (
-                    <ButtonDeny onClick={handlePrevStep} key='email-prev' />
-                ) : null,
-                <ButtonAccept
-                    key='email-next'
-                    onClick={handleNextStep}
-                    disabled={!isEmailValid}
-                />,
-            ],
+            actions: withActions
+                ? [
+                      startsWith > 0 ? (
+                          <ButtonDeny
+                              onClick={handlePrevStep}
+                              key='email-prev'
+                          />
+                      ) : null,
+                      <ButtonAccept
+                          key='email-next'
+                          onClick={handleNextStep}
+                          disabled={!isEmailValid}
+                      />,
+                  ]
+                : undefined,
         },
         {
             name: 'password',
@@ -80,14 +85,19 @@ export const useSignInFields = (
             placeholder: t('auth.password.placeholder'),
             rules: [{required: true, message: t('auth.password.required')}],
             index: startsWith + 1,
-            actions: [
-                <ButtonDeny onClick={handlePrevStep} key='password-prev' />,
-                <ButtonAccept
-                    key='password-next'
-                    onClick={handleNextStep}
-                    disabled={!isPasswordValid}
-                />,
-            ],
+            actions: withActions
+                ? [
+                      <ButtonDeny
+                          onClick={handlePrevStep}
+                          key='password-prev'
+                      />,
+                      <ButtonAccept
+                          key='password-next'
+                          onClick={handleNextStep}
+                          disabled={!isPasswordValid}
+                      />,
+                  ]
+                : undefined,
         },
     ];
 };

@@ -17,7 +17,7 @@ apiAxios.interceptors.response.use(
 
         if (originalRequest.url?.includes('/auth/refresh')) {
             if (error.response?.status === 401) {
-                console.error('Refresh token expired, redirecting to login');
+                console.error('Refresh token expired');
                 if (!window.location.pathname.startsWith('/auth')) {
                     window.location.pathname = 'auth/signin';
                 }
@@ -64,6 +64,8 @@ export const queryClient = new QueryClient({
         queries: {
             staleTime: Infinity,
             retry: 3,
+            refetchOnReconnect: true,
+            refetchOnMount: true,
         },
     },
 });

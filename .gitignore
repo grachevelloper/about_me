@@ -56,6 +56,7 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 /be/*.log
 
 /fe/dist
+/fesrc/typings/i18next.d.ts
 /fe/node_modules
 /fe/.tmp
 /fe/.temp

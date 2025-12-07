@@ -1,0 +1,8 @@
+.log-out-dialog {
+    padding: 30px;
+    &__cancel-button {
+        @media (max-width: 370px) {
+            margin: 5px 0;
+        }
+    }
+}

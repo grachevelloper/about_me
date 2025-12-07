@@ -13,7 +13,7 @@ import {
 import {JwtService} from "@nestjs/jwt";
 import {Request, Response} from "express";
 
-import {SignInDto, SignUpDto} from "@/users/dto/auth";
+import {SigninUserDto, SignupUserDto} from "@/users/dto";
 
 import {Public} from "../decorators/auth.decorator";
 import {AuthService} from "./auth.service";
@@ -34,7 +34,7 @@ export class AuthController {
     @HttpCode(HttpStatus.CREATED)
     @Post("/signup")
     async signUp(
-        @Body() signUpDto: SignUpDto,
+        @Body() signUpDto: SignupUserDto,
         @Res({passthrough: true}) response: Response,
     ) {
         const result = await this.authService.signUp(
@@ -69,7 +69,7 @@ export class AuthController {
     @HttpCode(HttpStatus.OK)
     @Post("/signin")
     async signIn(
-        @Body() signInDto: SignInDto,
+        @Body() signInDto: SigninUserDto,
         @Res({passthrough: true}) response: Response,
     ) {
         const result = await this.authService.signIn(

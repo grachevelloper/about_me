@@ -1,1 +1,36 @@
-.article-page{}
+.article-page {
+    padding: 0 15%;
+    &__content {
+        .ant-input {
+            font-size: 16px;
+            line-height: 1.6;
+
+            &:focus,
+            &:hover {
+                border-color: var(--ant-color-primary);
+            }
+        }
+    }
+
+    &__meta {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+    &__tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 24px;
+    }
+
+    &__image {
+        width: 100%;
+        max-height: 400px;
+        object-fit: cover;
+        border-radius: 8px;
+        margin-bottom: 24px;
+    }
+}

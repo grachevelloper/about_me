@@ -17,11 +17,16 @@
         width: 100%;
     }
 
+    &__logout-option {
+        &:hover {
+            background-color: #ef4444; //color-Error
+        }
+    }
+
     &__logout-icon {
-        position: relative;
-        z-index: 100;
-        color: red;
-        cursor: pointer;
+        path {
+            color: #ef4444; //color-Error
+        }
     }
 
     &__title {

@@ -38,7 +38,8 @@
         "src/**/*",
         "/types/**/*",
         "webpack.config.js",
-        "public/locales"
+        "public/locales",
+        "../UserPage"
     ],
     "exclude": ["node_modules", "dist"]
 }

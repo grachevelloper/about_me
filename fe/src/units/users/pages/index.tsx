@@ -1,7 +1,7 @@
 import {RouteProps} from 'react-router-dom';
 
-import {SignInPage} from './SignInPage';
-import {SignUpPage} from './SignUpPage';
+import {SignInPage} from './SigninPage';
+import {SignUpPage} from './SignupPage';
 import {UserPage} from './UserPage';
 
 export const usersRoutes: RouteProps[] = [

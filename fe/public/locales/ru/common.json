@@ -13,6 +13,8 @@
     "layout.left.suggest": "Предложить ежедневку",
     "layout.cookie.accept": "Мы используем куки 😊 Используя сайт, вы соглашаетесь с использованием cookie",
     "logout": "Выйти из аккаунта",
+    "logout-modal.title": "Вы точно хотите выйти из аккаунта?",
+    "logout-modal.deny": "Пока останусь",
 
     "comment.reply": "Ответить",
 

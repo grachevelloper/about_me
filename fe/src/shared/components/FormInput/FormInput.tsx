@@ -1,7 +1,7 @@
 import {Form, Input, InputProps} from 'antd';
 import {TextAreaProps} from 'antd/es/input';
 
-import {FormField} from './types';
+import {FormField} from '@/typings/components';
 
 interface FormInputProps {
     field: FormField;
@@ -25,6 +25,9 @@ export function FormInput({field}: FormInputProps) {
         placeholder,
         variant: 'underlined',
         className: rootClassName,
+        style: {
+            minWidth: 200,
+        },
     };
 
     const renderInput = () => {
@@ -52,7 +55,7 @@ export function FormInput({field}: FormInputProps) {
 
     return (
         <Form.Item
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+            layout='vertical'
             name={name}
             label={label}
             rules={rules}

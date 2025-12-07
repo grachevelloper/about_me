@@ -2,6 +2,8 @@
     height: 450px;
     width: clamp(315px, 304.29px + 3.35vw, 390px);
 
+    transition: transform 0.3s ease-in-out;
+
     &::after {
         content: '';
         position: absolute;
@@ -27,6 +29,8 @@
                 #4f46e5
             ); //bgPrimaryActiveButton
         }
+
+        transform: scale(1.02);
     }
 
     &__title {

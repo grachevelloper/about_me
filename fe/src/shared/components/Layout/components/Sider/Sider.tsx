@@ -2,13 +2,15 @@ import {BulbOutlined, HomeOutlined, UserOutlined} from '@ant-design/icons';
 import {Flex, Layout, Menu} from 'antd';
 import {MenuItemType} from 'antd/es/menu/interface';
 import block from 'bem-cn-lite';
-import {useCallback} from 'react';
+import {useState} from 'react';
 import {useTranslation} from 'react-i18next';
+import {IoIosLogOut} from 'react-icons/io';
 import {PiArticleNyTimesThin} from 'react-icons/pi';
 import {useNavigate} from 'react-router-dom';
 
 import {useTodoForm} from '@/shared/context';
-import {useLogoutMutation} from '@/users/store';
+
+import {LogoutDialog} from '../LogoutDialog';
 
 import './Sider.scss';
 
@@ -19,12 +21,10 @@ const {Sider: AntSider} = Layout;
 export const Sider = () => {
     const {t} = useTranslation('common');
     const {setIsOpen} = useTodoForm();
-    const {mutate, isPending, isError} = useLogoutMutation();
+
     const navigate = useNavigate();
 
-    const handleLogout = useCallback(() => {
-        mutate();
-    }, []);
+    const [isSignoutModalOpen, setSignoutModalOpen] = useState<boolean>(false);
 
     const navigateItems: MenuItemType[] = [
         {
@@ -62,6 +62,13 @@ export const Sider = () => {
                 setIsOpen(true);
             },
         },
+        {
+            icon: <IoIosLogOut className={b('logout-icon')} />,
+            label: t('logout'),
+            key: 'action-1',
+            onClick: () => setSignoutModalOpen(true),
+            className: b('logout-option'),
+        },
     ];
 
     return (
@@ -84,10 +91,14 @@ export const Sider = () => {
                     theme='light'
                     mode='vertical'
                     items={actionItems}
-                    defaultSelectedKeys={[]}
+                    selectable={false}
                     rootClassName={b('menu')}
                 />
             </Flex>
+            <LogoutDialog
+                isOpen={isSignoutModalOpen}
+                onCancel={() => setSignoutModalOpen(false)}
+            />
         </AntSider>
     );
 };

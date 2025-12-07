@@ -1,0 +1,17 @@
+.sign-in-page {
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+
+    &__container {
+        width: 500px;
+
+        @media (max-width: 768px) {
+            width: 400px;
+        }
+
+        @media (max-width: 576px) {
+            width: 90%;
+        }
+    }
+}

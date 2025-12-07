@@ -1,4 +1,4 @@
-import {Button, Divider, Flex, FormInstance, Image} from 'antd';
+import {Flex, FormInstance, Image} from 'antd';
 import {useCallback, useEffect} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useNavigate} from 'react-router-dom';
@@ -9,7 +9,7 @@ import {CardProps, FormField} from '@/typings/components';
 import {SubmitData} from '@/users/types';
 import {AuthEmitter, SIGN_UP_EVENT} from '@/users/utils';
 
-import {useSignInFields} from '../../SignInPage/hooks/useSignInFields';
+import {useSignInFields} from '../../SigninPage/hooks/useSignInFields';
 import {SIGN_UP_STEP_SLUG} from '../constants';
 
 export const useSignUpFields = (
@@ -25,7 +25,7 @@ export const useSignUpFields = (
         'confirmPassword'
     );
     const isUsernameValid = useFieldValidation<string>(form, 'username');
-    const signInSteps = useSignInFields(form, 3);
+    const signInSteps = useSignInFields(form, 2);
 
     const handleNextStep = useCallback(() => {
         setSignStep((prev) => {
@@ -84,30 +84,30 @@ export const useSignUpFields = (
                 <ButtonAccept key='init-next' onClick={handleNextStep} />,
             ],
         },
-        {
-            title: t('auth.signup.way.title'),
-            content: (
-                <Flex justify='center' vertical>
-                    <Button onClick={handleNextStep}>
-                        {t('auth.signup.way.email')}
-                    </Button>
-                    <Divider size='middle' />
-                    <Button>Yandex</Button>
-                </Flex>
-            ),
-            index: 1,
-            actions: [
-                <ButtonDeny key='way-prev' onClick={handlePrevStep} />,
-                <ButtonAccept key='way-next' onClick={handleNextStep} />,
-            ],
-        },
+        // {
+        //     title: t('auth.signup.way.title'),
+        //     content: (
+        //         <Flex justify='center' vertical>
+        //             <Button onClick={handleNextStep}>
+        //                 {t('auth.signup.way.email')}
+        //             </Button>
+        //             <Divider size='middle' />
+        //             <Button>Yandex</Button>
+        //         </Flex>
+        //     ),
+        //     index: 1,
+        //     actions: [
+        //         <ButtonDeny key='way-prev' onClick={handlePrevStep} />,
+        //         <ButtonAccept key='way-next' onClick={handleNextStep} />,
+        //     ],
+        // },
         {
             title: t('auth.name.username.title'),
             name: 'username',
             label: t('auth.username.label'),
             placeholder: t('auth.username.placeholder'),
             rules: [{required: true, message: t('auth.username.required')}],
-            index: 2,
+            index: 1,
             actions: [
                 <ButtonDeny key='username-prev' onClick={handlePrevStep} />,
                 <ButtonAccept
@@ -138,7 +138,7 @@ export const useSignUpFields = (
                     },
                 }),
             ],
-            index: 5,
+            index: 4,
             actions: [
                 <ButtonDeny key='confirm-prev' onClick={handlePrevStep} />,
                 <ButtonAccept
@@ -164,7 +164,7 @@ export const useSignUpFields = (
                     />
                 </Flex>
             ),
-            index: 6,
+            index: 5,
             actions: [
                 <ButtonAccept
                     key='end-next'

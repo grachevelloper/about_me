@@ -32,6 +32,7 @@ const lightTheme: CustomThemeConfig = {
         colorSuccess: '#10b981',
         colorWarning: '#f59e0b',
         colorError: '#ef4444',
+        
         colorInfo: '#3b82f6',
 
         colorBgBase: '#ffffff',

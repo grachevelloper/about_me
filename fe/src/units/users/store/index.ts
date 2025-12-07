@@ -1,11 +1,11 @@
-import {useMutation, useQuery} from '@tanstack/react-query';
+import {useMutation} from '@tanstack/react-query';
 
 import {queryClient} from '@/shared/configs/api';
 
 import api from '../api';
 import {DtoSignInUser, DtoSignUpUser} from '../api/types';
 
-export const useSignUpMutation = () => {
+export const useSignupMutation = () => {
     return useMutation({
         mutationKey: ['signup'],
         mutationFn: (userData: DtoSignUpUser) => api.signUp(userData),
@@ -19,16 +19,16 @@ export const useLogoutMutation = () => {
     });
 };
 
-export const useSignInQuery = (signInData: DtoSignInUser) => {
-    const {data, isPending, isError} = useQuery(
+export const useSigninMutatuon = () => {
+    const {mutateAsync, data, isPending, isError} = useMutation(
         {
-            queryKey: ['signin'],
-            queryFn: () => api.signIn(signInData),
+            mutationKey: ['signin'],
+            mutationFn: (signInData: DtoSignInUser) => api.signIn(signInData),
         },
         queryClient
     );
 
-    return {user: data, isPending, isError};
+    return {user: data, isPending, isError, mutateAsync};
 };
 
 // export const useUserMutation = () => {

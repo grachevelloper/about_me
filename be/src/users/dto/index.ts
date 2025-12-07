@@ -14,7 +14,7 @@ import {UserStatus} from "@/types/user";
 
 import {Role} from "../../types";
 
-export class CreateUserDto {
+export class SigninUserDto {
     @ApiProperty({
         example: "user@example.com",
         description: "Email пользователя",
@@ -34,7 +34,8 @@ export class CreateUserDto {
         message: "Пароль должен содержать заглавные, строчные буквы и цифры",
     })
     password: string;
-
+}
+export class SignupUserDto extends SigninUserDto {
     @ApiProperty({example: "kolya-master", description: "Имя пользователя"})
     @IsString()
     @Length(1, 50)

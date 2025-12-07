@@ -13,7 +13,8 @@ import {
     type UserApi,
 } from './types';
 
-const YANDEX_CLIENT_ID = '123';
+const {YANDEX_CLIENT_ID} = process.env;
+
 const Api: UserApi = {
     signIn: async (signInData: DtoSignInUser) => {
         await query.post<SignResponse>(`/auth/signin`, signInData);

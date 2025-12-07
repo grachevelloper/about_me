@@ -5,6 +5,8 @@ interface ComponentBaseProps {
     title?: string;
     index: number;
     actions?: React.ReactNode[];
+    className?: string;
+    rootClassName?: string;
 }
 
 export interface FormField extends ComponentBaseProps {

@@ -32,7 +32,7 @@ export const FlexibleCard: React.FC<FlexibleCardProps> = ({
                 <Flex
                     gap='small'
                     justify={actionsAlign}
-                    align='center'
+                    align='start'
                     vertical={actionsVertical}
                     className={b('actions')}
                     style={{marginTop: 16}}
