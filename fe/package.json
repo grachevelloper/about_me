@@ -78,6 +78,7 @@
         "globals": "^16.4.0",
         "html-webpack-plugin": "^5.6.4",
         "https-browserify": "^1.0.0",
+        "i18next-resources-for-ts": "^1.9.0",
         "jiti": "^2.6.1",
         "mini-css-extract-plugin": "^2.9.4",
         "msw": "2.11.6",

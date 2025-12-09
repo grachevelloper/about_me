@@ -1,6 +1,6 @@
 .article-card {
     height: 450px;
-    width: clamp(315px, 304.29px + 3.35vw, 390px);
+    width: clamp(285px, 264.29px + 4.91vw, 390px);
 
     transition: transform 0.3s ease-in-out;
 
@@ -70,6 +70,7 @@
 
     &__content {
         margin-bottom: 16px;
+        
     }
 
     &__tag {

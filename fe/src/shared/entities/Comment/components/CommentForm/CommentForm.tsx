@@ -46,7 +46,7 @@ export const CommentForm = ({
             }}
         >
             <Input.TextArea
-                placeholder={t('comment.placeholder')}
+                placeholder={t('comments.placeholder')}
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 autoSize={{minRows: 3}}

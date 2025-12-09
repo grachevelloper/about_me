@@ -1,12 +1,36 @@
+@import 'animate.css';
+
 .layout {
+    &__overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+        display: block;
+
+        opacity: 0;
+        animation: fadeIn 0.3s ease forwards;
+    }
+
     &__content {
         padding: 50px 70px;
 
-        @media (max-width: 1024px) {
-            padding: 30px 50px;
+        @media (max-width: 992px) {
+            padding: 20px 50px;
         }
-        @media (max-width: 768px) {
-            padding: 10px 20px;
+
+        @media (max-width: 575px) {
+            padding: 20px 50px;
         }
+    }
+
+    &__sider-collapse-button {
+        position: fixed;
+        margin: 20px;
+        animation: fadeIn ease-in-out 1.5s forwards;
+        z-index: 999;
     }
 }

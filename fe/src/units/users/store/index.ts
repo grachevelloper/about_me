@@ -20,7 +20,7 @@ export const useLogoutMutation = () => {
 };
 
 export const useSigninMutatuon = () => {
-    const {mutateAsync, data, isPending, isError} = useMutation(
+    const {mutateAsync, data, isPending, error} = useMutation(
         {
             mutationKey: ['signin'],
             mutationFn: (signInData: DtoSignInUser) => api.signIn(signInData),
@@ -28,7 +28,7 @@ export const useSigninMutatuon = () => {
         queryClient
     );
 
-    return {user: data, isPending, isError, mutateAsync};
+    return {user: data, isPending, error, mutateAsync};
 };
 
 // export const useUserMutation = () => {

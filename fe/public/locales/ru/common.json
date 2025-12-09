@@ -16,14 +16,27 @@
     "logout-modal.title": "Вы точно хотите выйти из аккаунта?",
     "logout-modal.deny": "Пока останусь",
 
-    "comment.reply": "Ответить",
+    "comments": "Комментарии",
+    "comments.placeholder": "Оставьте комментарий...",
+    "comments.submit": "Отправить",
+    "comments.reply": "Ответить",
+    "comments.edit": "Редактировать",
+    "comments.delete": "Удалить",
+    "comments.noComments": "Комментариев пока нет",
+    "comments.beFirst": "Будьте первым!",
 
-    "comment.placeholder": "Напишите ваш комментарий",
+    "pagination.previous": "Назад",
+    "pagination.next": "Далее",
+    "pagination.page": "Страница",
+    "pagination.of": "из",
+    "pagination.show": "Показать",
+    "pagination.items": "элементов",
 
     "like": "Поставить лайк",
     "edit": "Изменить",
     "create": "Создать",
     "cancel": "Отменить",
     "accept": "Принять",
-    "updated-at": "Изменено: "
+    "updated-at": "Изменено: {{date}}",
+    "created-at": "Создано {{date}}"
 }

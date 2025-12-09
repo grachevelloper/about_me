@@ -7,6 +7,7 @@ import {Navigate, Outlet} from 'react-router-dom';
 import {checkAuth} from './api';
 
 import './AuthLayout.scss';
+import {AuthNavigateButton} from './components/AuthNavigateButton';
 
 const b = block('auth-layout');
 
@@ -36,6 +37,7 @@ export const AuthLayout = () => {
             <Content className={b('content')}>
                 <Outlet />
             </Content>
+            <AuthNavigateButton />
         </Layout>
     );
 };

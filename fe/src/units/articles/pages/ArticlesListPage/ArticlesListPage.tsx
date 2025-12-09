@@ -1,4 +1,5 @@
-import {Button, Col, Flex, Input, Row, Space, Typography} from 'antd';
+import {Col, Flex, Input, Row, Typography} from 'antd';
+import block from 'bem-cn-lite';
 import {useTranslation} from 'react-i18next';
 import {useNavigate} from 'react-router-dom';
 
@@ -6,6 +7,10 @@ import {Article} from '../../types';
 
 import {ArticleCard} from './components/ArticleCard';
 import {SearchPanel} from './components/SearchPanel';
+
+import './ArticlesListPage.scss';
+
+const b = block('aritcles-list-page');
 
 const {Title, Text, Paragraph} = Typography;
 const {Search} = Input;
@@ -41,11 +46,7 @@ export const ArticlesListPage = () => {
     };
 
     return (
-        <Flex
-            vertical
-            gap='large'
-            style={{padding: '24px', maxWidth: 1200, margin: '0 auto'}}
-        >
+        <Flex vertical gap='large' className={b()}>
             <div>
                 <Title level={1} style={{marginBottom: '8px'}}>
                     {t('page.title')}
@@ -69,23 +70,6 @@ export const ArticlesListPage = () => {
                     </Col>
                 ))}
             </Row>
-
-            <div
-                style={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    marginTop: 32,
-                }}
-            >
-                <Space>
-                    <Button type='primary'>1</Button>
-                    <Button>2</Button>
-                    <Button>3</Button>
-                    <Button>4</Button>
-                    <Button>...</Button>
-                    <Button>{t('pagination.next')}</Button>
-                </Space>
-            </div>
         </Flex>
     );
 };

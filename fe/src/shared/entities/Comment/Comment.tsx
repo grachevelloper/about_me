@@ -150,8 +150,7 @@ export const Comment = ({comment, className, isNew = false}: CommentProps) => {
                     <Flex>
                         {updatedAt && updatedAt !== createdAt && (
                             <Typography.Text rootClassName={b('created-at')}>
-                                {t('updated-at')}
-                                {formatDate(updatedAt)}
+                                {t('updated-at', {date: formatDate(updatedAt)})}
                             </Typography.Text>
                         )}
                         {isEditable ? (
@@ -178,7 +177,7 @@ export const Comment = ({comment, className, isNew = false}: CommentProps) => {
                             </span>
                         ) : (
                             <span className={b('reply')} onClick={handleReply}>
-                                {t('comment.reply')}
+                                {t('comments.reply')}
                             </span>
                         )}
                     </Flex>

@@ -16,6 +16,7 @@ export function FormInput({field}: FormInputProps) {
         dependencies,
         rules,
         type,
+        style,
         placeholder,
         className,
         rootClassName,
@@ -61,6 +62,7 @@ export function FormInput({field}: FormInputProps) {
             rules={rules}
             dependencies={dependencies}
             className={className}
+            style={style}
         >
             {renderInput()}
         </Form.Item>

@@ -19,7 +19,7 @@ interface ArticleCardProps {
 export const ArticleCard: React.FC<ArticleCardProps> = ({article, onClick}) => {
     const {t} = useTranslation('article');
     const {
-        token: {padding, borderRadius},
+        token: {padding, paddingSM, borderRadius},
     } = theme.useToken();
     return (
         <Card
@@ -51,7 +51,7 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({article, onClick}) => {
                 vertical
                 gap={8}
                 style={{
-                    padding,
+                    padding: paddingSM,
                     borderRadius,
                 }}
             >

@@ -95,6 +95,9 @@ module.exports = {
                 publicPath: '/',
             },
         ],
+        client: {
+            overlay: false,
+        },
     },
     plugins: [
         new HTMLWebpackPlugin({

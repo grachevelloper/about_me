@@ -8,6 +8,11 @@
     overflow: auto;
     height: 100vh;
 
+    @media (max-width: 1024px) {
+        position: fixed;
+        z-index: 1000;
+    }
+
     &__container {
         height: 100%;
         padding: 0 0 15% 0;

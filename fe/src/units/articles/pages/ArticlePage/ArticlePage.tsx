@@ -1,11 +1,13 @@
 import {Tag as AntTag, Col, Divider, Image, Row, theme, Typography} from 'antd';
-import TextArea from 'antd/es/input/TextArea';
 import block from 'bem-cn-lite';
 import {useTranslation} from 'react-i18next';
 
 import {CommentsWrapper} from '@/shared/components/CommentsWrapper';
+import {LikeButton} from '@/shared/components/LikeButton';
+import {useLayout} from '@/shared/hooks';
+import {formatDate} from '@/shared/utils';
 
-import {type Article, type Tag} from '@/articles/types';
+import {type Article, type Tag} from '../../types';
 
 import './ArticlePage.scss';
 
@@ -14,9 +16,18 @@ const b = block('article-page');
 const {Title, Text} = Typography;
 
 export const ArticlePage = () => {
+    const isSmall = useLayout();
     const {t} = useTranslation('article');
+    const {t: tCommon} = useTranslation('common');
     const {
-        token: {borderRadius, colorBorder, colorPrimary, colorTextSecondary},
+        token: {
+            padding,
+            fontSize,
+            colorBorder,
+            colorPrimary,
+            colorTextSecondary,
+            borderRadius,
+        },
     } = theme.useToken();
 
     const initialData: Article = {
@@ -24,50 +35,65 @@ export const ArticlePage = () => {
         title: t('Древний рим в новое время'),
         createdAt: '15 мая 2024',
         likesCount: 89,
-        content: 'ПОПОАОАО',
+        content: `
+Der modernste Verkehrsservice, mehr Programme und störungsfreier Empfang: Wer
+den Radio-Standard DAB+ im Auto empfangen möchte, kann ihn nachrüsten. Wir
+erklären, wie das geht und warum über zehn Jahre alte Autos im Vorteil
+sind.
+Einsteigen, losfahren und sich mit dem Daumen am Lenkrad durch die Sender
+zappen – im Auto hat das Radio für viele seine eigentliche Daseinsberechtigung. Es
+ist das perfekte Nebenbeimedium für unterwegs. Allerdings kommt die Technik in
+die Jahre. Einen konkreten Abschalttermin gibt es für die in den Fünfzigern
+eingeführte Ultrakurzwelle in Deutschland zwar nicht, doch das Digitalradio DAB+
+wird ihr mittelfristig den Rang ablaufen. In Norwegen ist UKW bereits in den
+Ruhestand verabschiedet worden, in der Schweiz steht die Pensionierung des
+Dampfradios in zwei Jahren an. Auch in Deutschland wird der Ausbau der digitalen
+Sendestationen vorangetrieben. Entlang der Autobahnen liegt die Abdeckung bereits
+heute bei fast 100 Prozent, bundesweit bei rund 90 Prozent.
+Im Auto beginnt die Umstellung wohl schon kommendes Jahr, jedenfalls formell.
+Das EU-Parlament wird 2019 DAB+ als Pflichtausstattung bei Neuwagen
+vorschreiben. Zwei Jahre sind als Übergangsfrist vorgesehen. Bis dahin müssen
+Neuwagenkäufer je nach Hersteller noch einen Aufpreis für das Digitalradio zahlen.
+Während RПовествование является основным типом, так как текст построен как последовательный рассказ о событиях в хронологическом порядке (от 1957 года к 1965-му и далее).
+
+Описание используется для характеристики понятий (Вселенная, космос), объектов (первый спутник) и ситуаций (выход в открытый космос).
+
+Рассуждение присутствует в объяснении важности тех или иных шагов («Тщательно изучив... ученые смогли...»).
+ndersuchlauf ist passé, da alle verfügbaren
+Stationen automatisch erkannt und mit Namen aufgelistet werden. Auch die
+Favoritenliste bleibt bei bundesweiten Sendern aktuell, weil jeder Sender stets auf
+seiner für ihn reservierten Welle ausgestrahlt wird. UKW kann das nicht. So oder
+so: Wer häufig längere Strecken fährt, erspart sich mit DAB+ die nervige manuelle
+Suche nach einem passenden Radioprogramm.`,
         comments: [],
         tags: [{id: '1', name: 'react'}],
         readTime: 3,
         image: 'https://picsum.photos/400/250?random=1',
     };
-    const handleEnd = () =>
-        // newValueType: T,
-        // newValue: Article[T]
-        {
-            // Здесь будет логика обновления данных статьи
-            // console.log('Update:', newValueType, newValue);
-        };
 
-    const handleContentChange = (value: string) => {
-        // handleEnd('content', value);
-    };
-
-    const handleTitleChange = (value: string) => {
-        // handleEnd('title', value);
-    };
-
-    const formatDate = (dateString?: string) => {
-        if (!dateString) return '';
-        return new Date(dateString).toLocaleDateString();
+    const renderTitle = () => {
+        return (
+            <Title
+                level={1}
+                style={{marginBottom: 0}}
+                className={b('title')}
+                ellipsis
+            >
+                {initialData.title}
+            </Title>
+        );
     };
 
     return (
         <div className={b()}>
-            {/* Заголовок статьи */}
-            <Divider orientation='left' orientationMargin={0}>
-                <Title
-                    level={1}
-                    editable={{
-                        onChange: handleTitleChange,
-                        triggerType: ['text'],
-                    }}
-                    style={{marginBottom: 0}}
-                >
-                    {initialData.title}
-                </Title>
-            </Divider>
+            {isSmall ? (
+                renderTitle()
+            ) : (
+                <Divider orientation='left' orientationMargin={0}>
+                    {renderTitle()}
+                </Divider>
+            )}
 
-            {/* Мета-информация */}
             <Row
                 gutter={32}
                 justify='space-between'
@@ -78,27 +104,9 @@ export const ArticlePage = () => {
                     <Row gutter={16} align='middle'>
                         {initialData.readTime && (
                             <Col>
-                                <Text type='secondary' style={{fontSize: 14}}>
-                                    {t('article.readTime', {
+                                <Text type='secondary' style={{fontSize}}>
+                                    {t('articles.read_time', {
                                         minutes: initialData.readTime,
-                                    })}
-                                </Text>
-                            </Col>
-                        )}
-                        {initialData.updatedAt && (
-                            <Col>
-                                <Text type='secondary' style={{fontSize: 14}}>
-                                    {t('article.updatedAt', {
-                                        date: formatDate(initialData.updatedAt),
-                                    })}
-                                </Text>
-                            </Col>
-                        )}
-                        {initialData.createdAt && (
-                            <Col>
-                                <Text type='secondary' style={{fontSize: 14}}>
-                                    {t('article.createdAt', {
-                                        date: formatDate(initialData.createdAt),
                                     })}
                                 </Text>
                             </Col>
@@ -107,21 +115,28 @@ export const ArticlePage = () => {
                 </Col>
                 <Col>
                     <Row gutter={8} align='middle'>
-                        <Col>
-                            <Text strong style={{color: colorPrimary}}>
-                                {initialData.likesCount}
-                            </Text>
-                        </Col>
-                        <Col>
-                            <Text type='secondary' style={{fontSize: 14}}>
-                                {t('article.likes')}
-                            </Text>
-                        </Col>
+                        {initialData.updatedAt && (
+                            <Col>
+                                <Text type='secondary' style={{fontSize}}>
+                                    {tCommon('updated-at', {
+                                        date: formatDate(initialData.updatedAt),
+                                    })}
+                                </Text>
+                            </Col>
+                        )}
+                        {initialData.createdAt && (
+                            <Col>
+                                <Text type='secondary' style={{fontSize}}>
+                                    {tCommon('created-at', {
+                                        date: formatDate(initialData.createdAt),
+                                    })}
+                                </Text>
+                            </Col>
+                        )}
                     </Row>
                 </Col>
             </Row>
 
-            {/* Изображение статьи */}
             {initialData.image && (
                 <Row style={{marginBottom: 32}}>
                     <Col span={24}>
@@ -141,14 +156,8 @@ export const ArticlePage = () => {
                 </Row>
             )}
 
-            {/* Теги */}
             {initialData.tags.length > 0 && (
                 <Row gutter={8} style={{marginBottom: 32}}>
-                    <Col>
-                        <Text strong style={{marginRight: 8}}>
-                            {t('article.tags')}:
-                        </Text>
-                    </Col>
                     {initialData.tags.map((tag: Tag) => (
                         <Col key={tag.id}>
                             <AntTag
@@ -165,29 +174,28 @@ export const ArticlePage = () => {
                 </Row>
             )}
 
-            {/* Содержимое статьи */}
-            <Row style={{marginBottom: 32}}>
+            <Row>
                 <Col span={24}>
-                    <TextArea
+                    <Typography.Text
                         className={b('content')}
-                        defaultValue={initialData.content}
-                        variant='borderless'
-                        autoSize={{minRows: 10, maxRows: 50}}
-                        onBlur={(e) => handleContentChange(e.target.value)}
                         style={{
-                            border: `2px solid ${colorBorder}`,
-                            borderRadius: borderRadius,
-                            padding: 16,
-                            fontSize: 16,
-                            lineHeight: 1.6,
+                            fontSize,
                         }}
-                    />
+                    >
+                        {initialData.content}
+                    </Typography.Text>
+                </Col>
+            </Row>
+
+            <Row justify='end'>
+                <Col span='24'>
+                    <LikeButton isLiked onClick={() => {}} />
                 </Col>
             </Row>
 
             <Divider orientation='left' orientationMargin={0}>
                 <Title level={3} style={{marginBottom: 0}}>
-                    {t('article.comments')} ({initialData.comments.length})
+                    {tCommon('comments')} ({initialData.comments.length})
                 </Title>
             </Divider>
 

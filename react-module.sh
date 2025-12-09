@@ -23,6 +23,8 @@ echo ".$block_name{}" > "${module}.scss"
 
 
 cat > "$module.tsx" << EOF
+import {theme} from 'antd';
+
 import block from 'bem-cn-lite'
 
 import './$module.scss'
@@ -30,8 +32,11 @@ import './$module.scss'
 const b = block('$block_name')
 
 export const $module = () => {
+    const {token: {}} = theme.useToken();
     return (
-        
+        <div 
+        className={b()}>
+        </div>
     )
 }
 EOF

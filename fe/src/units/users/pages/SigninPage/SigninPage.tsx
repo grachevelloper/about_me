@@ -1,5 +1,6 @@
-import {Flex, Form} from 'antd';
+import {Flex, Form, theme} from 'antd';
 import block from 'bem-cn-lite';
+import {useCallback, useEffect} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useNavigate} from 'react-router-dom';
 
@@ -8,6 +9,7 @@ import {FlexibleCard} from '@/shared/components/FlexibleCard';
 import {FormInput} from '@/shared/components/FormInput';
 import {useAuth} from '@/shared/context';
 
+import {AuthNavigateButton} from '../../components/AuthNavigateButton';
 import {useSigninMutatuon} from '../../store';
 
 import {useSignInFields} from './hooks';
@@ -22,14 +24,16 @@ interface SignInForm {
 }
 
 export const SigninPage = () => {
+    const {
+        token: {colorError, paddingSM},
+    } = theme.useToken();
     const {t} = useTranslation('auth');
     const [form] = Form.useForm<SignInForm>();
     const navigate = useNavigate();
-    const {isPending, isError, mutateAsync, user} = useSigninMutatuon();
+    const {isPending, error, mutateAsync, user} = useSigninMutatuon();
     const {setUserData} = useAuth();
     const handleSubmit = async () => {
         const userData = await form.validateFields(['email', 'password']);
-        console.log(userData);
         await mutateAsync(userData);
         if (user) {
             setUserData(user);
@@ -38,11 +42,50 @@ export const SigninPage = () => {
     };
     const signInFields = useSignInFields(form);
 
-    const renderSignInFields = () => {
+    const renderSignInFields = useCallback(() => {
         return signInFields.map((field) => (
-            <FormInput field={field} key={field.name} />
+            <FormInput
+                field={{...field, style: {marginBottom: paddingSM}}}
+                key={field.name}
+            />
         ));
-    };
+    }, [signInFields]);
+
+    const renderErrors = useCallback(() => {
+        const errorText = () => {
+            switch (error?.message) {
+                case 'Invalid credentials':
+                    return t('auth.sign.invalid_credentials');
+                case 'Incorrect password':
+                    return t('auth.sign.incorrect_password');
+                default:
+                    return '';
+            }
+        };
+
+        return (
+            <span
+                style={{
+                    paddingLeft: paddingSM,
+                    color: colorError,
+                }}
+                className={b('server-error')}
+            >
+                {errorText()}
+            </span>
+        );
+    }, [error]);
+
+    useEffect(() => {
+        form.setFieldsValue({
+            email: '',
+            password: '',
+        });
+    }, [form]);
+
+    useEffect(() => {
+        console.log('rjsbrogujik;drmgm', error);
+    }, [error]);
 
     return (
         <Flex className={b()} align='center' justify='center'>
@@ -59,6 +102,7 @@ export const SigninPage = () => {
                     ]}
                 >
                     {renderSignInFields()}
+                    {renderErrors()}
                 </FlexibleCard>
             </Form>
         </Flex>

@@ -21,9 +21,8 @@ apiAxios.interceptors.response.use(
                 if (!window.location.pathname.startsWith('/auth')) {
                     window.location.pathname = 'auth/signin';
                 }
-                return Promise.reject(error);
+                return Promise.reject(error.response.data);
             }
-            throw error;
         }
 
         if (
@@ -44,7 +43,7 @@ apiAxios.interceptors.response.use(
         };
 
         console.error('Error from backend:', errorData);
-        throw error;
+        return Promise.reject(error.response.data);
     }
 );
 

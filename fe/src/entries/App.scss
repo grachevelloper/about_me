@@ -59,3 +59,7 @@
     --ant-color-info-text: #1677ff;
     --ant-color-info-text-active: #0958d9;
 }
+
+body > iframe {
+    display: none;
+}

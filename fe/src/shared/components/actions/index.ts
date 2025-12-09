@@ -1,2 +1,2 @@
-export {ButtonAccept} from './ButtonAccept';
+export {ButtonAccept} from './ButtonAccept/ButtonAccept';
 export {ButtonDeny} from './ButtonDeny';

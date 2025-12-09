@@ -5,7 +5,7 @@ import block from 'bem-cn-lite';
 import {useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {IoIosLogOut} from 'react-icons/io';
-import {PiArticleNyTimesThin} from 'react-icons/pi';
+import {RiArticleLine} from 'react-icons/ri';
 import {useNavigate} from 'react-router-dom';
 
 import {useTodoForm} from '@/shared/context';
@@ -18,7 +18,11 @@ const b = block('sider');
 
 const {Sider: AntSider} = Layout;
 
-export const Sider = () => {
+interface SiderProps {
+    isCollapsed: boolean;
+    setCollapsed: () => void;
+}
+export const Sider = ({isCollapsed, setCollapsed}: SiderProps) => {
     const {t} = useTranslation('common');
     const {setIsOpen} = useTodoForm();
 
@@ -44,7 +48,7 @@ export const Sider = () => {
             },
         },
         {
-            icon: <PiArticleNyTimesThin />,
+            icon: <RiArticleLine />,
             label: t('layout.top.articles'),
             key: 'nav-3',
             onClick: () => {
@@ -75,7 +79,9 @@ export const Sider = () => {
         <AntSider
             className={b()}
             breakpoint='lg'
-            collapsedWidth='0'
+            collapsedWidth={0}
+            collapsed={isCollapsed}
+            onCollapse={() => setCollapsed((prev) => !prev)}
             theme='light'
         >
             <Flex vertical justify='space-between' className={b('container')}>

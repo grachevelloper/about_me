@@ -1,12 +1,14 @@
 import {QueryErrorResetBoundary} from '@tanstack/react-query';
 import {Layout as AntLayout, Button, theme} from 'antd';
 import block from 'bem-cn-lite';
-import {useEffect} from 'react';
+import {useEffect, useState} from 'react';
 import {ErrorBoundary} from 'react-error-boundary';
-import {Outlet} from 'react-router-dom';
+import {MdOutlineMenuOpen} from 'react-icons/md';
+import {Outlet, useLocation} from 'react-router-dom';
 
 import {useAuth} from '../../context';
 import {useCookie} from '../../hooks/useCookie';
+import {useLayout} from '../../hooks/useLayout';
 import {NewTodoForm} from '../NewTodoForm';
 
 import {isMe} from './api';
@@ -22,12 +24,20 @@ const {Content} = AntLayout;
 
 export const Layout = () => {
     const {setUserData} = useAuth();
+    const location = useLocation();
+    const isSmall = useLayout();
 
     const {value} = useCookie('cookie-accept');
+
+    const [isCollapsed, setCollapsed] = useState<boolean>(!!isSmall);
 
     const {
         token: {colorBgContainer, borderRadiusLG},
     } = theme.useToken();
+
+    const handleCollapse = () => {
+        setCollapsed((prev) => !prev);
+    };
 
     useEffect(() => {
         const getUser = async () => {
@@ -36,6 +46,16 @@ export const Layout = () => {
         };
         getUser();
     }, []);
+
+    useEffect(() => {
+        if (!isCollapsed) {
+            setCollapsed(true);
+        }
+    }, [location.pathname]);
+
+    useEffect(() => {
+        console.log(isSmall, !isCollapsed);
+    });
 
     return (
         <QueryErrorResetBoundary>
@@ -52,23 +72,27 @@ export const Layout = () => {
                     )}
                 >
                     <Animation />
-                    <AntLayout rootClassName={b()} hasSider>
+                    <AntLayout className={b()} hasSider>
+                        {!isCollapsed && isSmall && (
+                            <div
+                                className={b('overlay')}
+                                onClick={handleCollapse}
+                            />
+                        )}
                         <NewTodoForm />
                         {!value && <CookieMessage />}
-                        {/* <Image
-                            src='/assets/title.png'
-                            height={90}
-                            style={{objectFit: 'contain'}}
-                            rootClassName={b('title')}
-                            preview={false}
-                        /> */}
-                        {/* <Tooltip title={t('logout')}>
-                <LogoutOutlined
-                    onClick={handleLogout}
-                    className={b('logout-icon')}
-                />
-            </Tooltip> */}
-                        <Sider />
+
+                        {isCollapsed && (
+                            <MdOutlineMenuOpen
+                                size={30}
+                                className={b('sider-collapse-button')}
+                                onClick={handleCollapse}
+                            />
+                        )}
+                        <Sider
+                            setCollapsed={handleCollapse}
+                            isCollapsed={isCollapsed}
+                        />
                         <Content className={b('content')}>
                             <Outlet />
                         </Content>

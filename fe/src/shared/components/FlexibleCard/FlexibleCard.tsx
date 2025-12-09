@@ -1,4 +1,4 @@
-import {Card, CardProps, Flex} from 'antd';
+import {Card, CardProps, Flex, theme} from 'antd';
 import block from 'bem-cn-lite';
 import React from 'react';
 
@@ -24,6 +24,9 @@ export const FlexibleCard: React.FC<FlexibleCardProps> = ({
     children,
     ...cardProps
 }) => {
+    const {
+        token: {},
+    } = theme.useToken();
     return (
         <Card {...cardProps} className={b(null, className)}>
             {children}
@@ -35,7 +38,6 @@ export const FlexibleCard: React.FC<FlexibleCardProps> = ({
                     align='start'
                     vertical={actionsVertical}
                     className={b('actions')}
-                    style={{marginTop: 16}}
                 >
                     {actions.map((action, index) => (
                         <div key={index} className={b('action-item')}>
