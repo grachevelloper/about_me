@@ -17,8 +17,8 @@ import {
     ManyToOne,
 } from "typeorm";
 
-import {BaseEntity} from "../base/entity";
 import {User} from "../users/users.entity";
+import {BaseEntity} from "../utils/entity";
 import {Tag} from "./tag.entity";
 
 @Entity("articles")
@@ -92,4 +92,11 @@ export class Article extends BaseEntity {
     @ManyToOne(() => User)
     @JoinColumn({name: "authorId"})
     author: User;
+
+    @ApiProperty({
+        description: "Это черновик?",
+        default: true,
+    })
+    @Column({default: true})
+    isDraft: boolean;
 }

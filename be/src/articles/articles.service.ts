@@ -1,9 +1,19 @@
-import {Injectable, NotFoundException} from "@nestjs/common";
+import {
+    BadRequestException,
+    Injectable,
+    NotAcceptableException,
+    NotFoundException,
+} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
 
+import {LikesService} from "../likes/likes.service";
 import {UsersService} from "../users/users.service";
-import {CreateArticleDto, UpdateArticleDto} from "./article.dto";
+import {
+    CreateArticleDto,
+    ResponseArticle,
+    UpdateArticleDto,
+} from "./article.dto";
 import {Article} from "./articles.entity";
 
 @Injectable()
@@ -11,10 +21,13 @@ export class ArticlesService {
     constructor(
         @InjectRepository(Article)
         private articlesRepository: Repository<Article>,
+        private likesService: LikesService,
         private usersService: UsersService,
     ) {}
 
-    async create(createArticleData: CreateArticleDto) {
+    async create(
+        createArticleData: CreateArticleDto,
+    ): Promise<ResponseArticle> {
         const {authorId, title, content, readTime} = createArticleData;
         const author = await this.usersService.findById(authorId);
 
@@ -25,36 +38,73 @@ export class ArticlesService {
             title,
         });
 
-        return await this.articlesRepository.save(result);
+        const resultWithLike: ResponseArticle = {...result, hasLiked: false};
+
+        return await this.articlesRepository.save(resultWithLike);
     }
 
     async update(id: string, updateArticleData: UpdateArticleDto) {
-        const article = await this.findOne(id);
+        const article = await this.findOneForUpdate(id);
 
         Object.assign(article, updateArticleData);
 
         return await this.articlesRepository.save(article);
     }
 
-    async findOne(id: string): Promise<Article> {
+    async findOne(id: string, userId: string): Promise<ResponseArticle> {
         const article = await this.articlesRepository.findOne({
-            where: {id},
-            relations: ["author"],
+            where: {id, isDraft: false},
+            relations: ["author", "tags"],
         });
         if (!article) {
-            throw new NotFoundException("Comment not found");
+            throw new NotFoundException("Article not found");
+        }
+
+        const likedArticle = await this.likesService.hasLiked({
+            entityId: id,
+            userId,
+            entityType: "article",
+        });
+
+        return {...article, hasLiked: Boolean(likedArticle)};
+    }
+
+    async findOneForUpdate(id: string): Promise<Article> {
+        const article = await this.articlesRepository.findOne({
+            where: {id},
+            relations: ["tags"],
+        });
+        if (!article) {
+            throw new NotFoundException("Article not found");
         }
         return article;
     }
 
-    async findAllByAuthorId(authorId: string) {
+    async findAllByAuthorId(authorId: string, drafts = false) {
         return await this.articlesRepository.find({
-            where: {author: {id: authorId}},
-            relations: ["author"],
+            where: {author: {id: authorId}, isDraft: drafts},
+            relations: ["author", "tags"],
             order: {
                 createdAt: "DESC",
             },
         });
+    }
+
+    async publish(id: string, userId: string) {
+        const article = await this.articlesRepository.findOne({
+            where: {id},
+            relations: ["author"],
+        });
+        if (userId !== article?.author.id) {
+            throw new NotAcceptableException();
+        }
+        if (article.isDraft === true) {
+            throw new BadRequestException(
+                "Article have been publiched already",
+            );
+        }
+        article.isDraft = true;
+        return await this.articlesRepository.save(article);
     }
 
     async delete(id: string) {

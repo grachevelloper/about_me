@@ -50,7 +50,6 @@ const baseConfig = tseslint.config(
             "@stylistic": stylistic,
         },
         rules: {
-            // Общие правила
             "no-unused-vars": "off",
             "@typescript-eslint/no-unused-vars": [
                 "warn",

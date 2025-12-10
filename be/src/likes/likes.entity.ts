@@ -1,6 +1,6 @@
 import {Column, Entity} from "typeorm";
 
-import {UnUpdatableBaseEntity} from "../base/entity";
+import {UnUpdatableBaseEntity} from "../utils/entity";
 
 export type EntityLikeType = "comment" | "todo" | "article";
 

@@ -4,7 +4,7 @@ import * as bcrypt from "bcrypt";
 import {Repository} from "typeorm";
 
 import {Role} from "../types";
-import {UpdateUserDto} from "./dto";
+import {UpdateUserDto} from "./user.dto";
 import {User} from "./users.entity";
 
 @Injectable()
@@ -49,8 +49,10 @@ export class UsersService {
     }
 
     async delete(id: string): Promise<void> {
-        await this.findById(id);
-        await this.usersRepository.delete(id);
+        const result = await this.usersRepository.delete(id);
+        if (result.affected === 0) {
+            throw new NotFoundException("Article not found");
+        }
     }
 
     async update(id: string, updateData: UpdateUserDto) {

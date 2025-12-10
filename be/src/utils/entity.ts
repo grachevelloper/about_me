@@ -16,3 +16,7 @@ export class BaseEntity extends UnUpdatableBaseEntity {
     @UpdateDateColumn()
     updatedAt: string;
 }
+
+export class LikedEntity {
+    hasLiked: boolean;
+}

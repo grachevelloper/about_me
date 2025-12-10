@@ -5,30 +5,41 @@ import {
     NotFoundException,
 } from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
-import {DeleteResult, Repository} from "typeorm";
+import {EntityManager, Repository} from "typeorm";
 
-import {CommentsService} from "../comments/comments.service";
-import {TodosService} from "../todos/todos.service";
-import {UsersService} from "../users/users.service";
 import {CreateLikeDto, DeleteLikeDto} from "./likes.dto";
-import {Like} from "./likes.entity";
+import {EntityLikeType, Like} from "./likes.entity";
 
+type HasLikedProps = {
+    entityId: string;
+    entityType: EntityLikeType;
+    userId: string;
+};
 @Injectable()
 export class LikesService {
     constructor(
         @InjectRepository(Like)
         private likesRepository: Repository<Like>,
-        private todosService: TodosService,
-        private commentsService: CommentsService,
-        private usersService: UsersService,
     ) {}
+
+    async hasLiked({
+        entityId,
+        entityType,
+        userId,
+    }: HasLikedProps): Promise<boolean> {
+        return Boolean(
+            await this.likesRepository.findOne({
+                where: {
+                    entityId,
+                    entityType,
+                    authorId: userId,
+                },
+            }),
+        );
+    }
 
     async create(createLikeData: CreateLikeDto): Promise<Like> {
         const {entityId, entityType, authorId} = createLikeData;
-
-        await this.usersService.findById(authorId);
-
-        await this.checkEntityExists(entityId, entityType);
 
         const existingLike = await this.likesRepository.findOne({
             where: {entityId, entityType, authorId},
@@ -38,68 +49,153 @@ export class LikesService {
             throw new ConflictException("Already liked");
         }
 
-        const like = this.likesRepository.create(createLikeData);
-        const savedLike = await this.likesRepository.save(like);
+        return await this.likesRepository.manager.transaction(
+            async (transactionalEntityManager) => {
+                await this.checkEntityExistsInTransaction(
+                    entityId,
+                    entityType,
+                    transactionalEntityManager,
+                );
 
-        await this.incrementLikesCount(entityId, entityType);
+                const duplicateInTx = await transactionalEntityManager.findOne(
+                    Like,
+                    {
+                        where: {entityId, entityType, authorId},
+                    },
+                );
 
-        return savedLike;
+                if (duplicateInTx) {
+                    throw new ConflictException(
+                        "Already liked (concurrent request)",
+                    );
+                }
+
+                const like = transactionalEntityManager.create(
+                    Like,
+                    createLikeData,
+                );
+                const savedLike = await transactionalEntityManager.save(like);
+
+                await this.incrementLikesCountInTransaction(
+                    entityId,
+                    entityType,
+                    transactionalEntityManager,
+                );
+
+                return savedLike;
+            },
+        );
     }
 
-    async delete(deleteLikeData: DeleteLikeDto): Promise<DeleteResult> {
-        const {entityId, authorId, entityType} = deleteLikeData;
+    async delete(deleteLikeData: DeleteLikeDto): Promise<void> {
+        await this.likesRepository.manager.transaction(
+            async (transactionalEntityManager) => {
+                // 1. Удаляем лайк
+                const result = await transactionalEntityManager.delete(
+                    Like,
+                    deleteLikeData,
+                );
 
-        const like = await this.likesRepository.findOneBy(deleteLikeData);
+                if (result.affected === 0) {
+                    throw new NotFoundException("Like not found");
+                }
 
-        if (!like) {
-            throw new NotFoundException("Like not found");
-        }
-
-        const result = await this.likesRepository.delete({
-            authorId,
-            entityId,
-            entityType,
-        });
-
-        await this.decrementLikesCount(entityId, entityType);
-
-        return result;
+                // 2. Декрементим счетчик В транзакции
+                await this.decrementLikesCountInTransaction(
+                    deleteLikeData.entityId,
+                    deleteLikeData.entityType,
+                    transactionalEntityManager,
+                );
+            },
+        );
     }
 
-    private async incrementLikesCount(entityId: string, entityType: string) {
+    private async incrementLikesCountInTransaction(
+        entityId: string,
+        entityType: string,
+        transactionalEntityManager: EntityManager,
+    ) {
         switch (entityType) {
             case "todo":
-                await this.todosService.incrementLikesCount(entityId);
+                await transactionalEntityManager
+                    .createQueryBuilder()
+                    .update("todos")
+                    .set({likesCount: () => "likes_count + 1"})
+                    .where("id = :id", {id: entityId})
+                    .execute();
                 break;
             case "comment":
-                await this.commentsService.incrementLikesCount(entityId);
+                await transactionalEntityManager
+                    .createQueryBuilder()
+                    .update("comments")
+                    .set({likesCount: () => "likes_count + 1"})
+                    .where("id = :id", {id: entityId})
+                    .execute();
                 break;
             default:
                 throw new BadRequestException("Invalid entity type");
         }
     }
 
-    private async decrementLikesCount(entityId: string, entityType: string) {
+    private async decrementLikesCountInTransaction(
+        entityId: string,
+        entityType: string,
+        transactionalEntityManager: EntityManager,
+    ) {
         switch (entityType) {
             case "todo":
-                await this.todosService.decrementLikesCount(entityId);
+                await transactionalEntityManager
+                    .createQueryBuilder()
+                    .update("todos")
+                    .set({likesCount: () => "GREATEST(likes_count - 1, 0)"})
+                    .where("id = :id", {id: entityId})
+                    .execute();
                 break;
             case "comment":
-                await this.commentsService.decrementLikesCount(entityId);
+                await transactionalEntityManager
+                    .createQueryBuilder()
+                    .update("comments")
+                    .set({likesCount: () => "GREATEST(likes_count - 1, 0)"})
+                    .where("id = :id", {id: entityId})
+                    .execute();
                 break;
             default:
                 throw new BadRequestException("Invalid entity type");
         }
     }
 
-    private async checkEntityExists(entityId: string, entityType: string) {
+    private async checkEntityExistsInTransaction(
+        entityId: string,
+        entityType: string,
+        transactionalEntityManager: EntityManager,
+    ) {
         switch (entityType) {
-            case "todo":
-                await this.todosService.findOne(entityId);
+            case "todo": {
+                const todoExists = await transactionalEntityManager
+                    .createQueryBuilder()
+                    .select("1")
+                    .from("todos", "todo")
+                    .where("todo.id = :id", {id: entityId})
+                    .getRawOne();
+
+                if (!todoExists) {
+                    throw new NotFoundException("Todo not found");
+                }
                 break;
-            case "comment":
-                await this.commentsService.findOne(entityId);
+            }
+            case "comment": {
+                const commentExists = await transactionalEntityManager
+                    .createQueryBuilder()
+                    .select("1")
+                    .from("comments", "comment")
+                    .where("comment.id = :id", {id: entityId})
+                    .getRawOne();
+
+                if (!commentExists) {
+                    throw new NotFoundException("Comment not found");
+                }
                 break;
+            }
             default:
                 throw new BadRequestException("Invalid entity type");
         }

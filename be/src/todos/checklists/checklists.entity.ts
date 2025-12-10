@@ -1,6 +1,6 @@
 import {Column, Entity, JoinColumn, OneToOne} from "typeorm";
 
-import {BaseEntity} from "@/base/entity";
+import {BaseEntity} from "src/utils/entity";
 
 import {Todo} from "../todos.entity";
 

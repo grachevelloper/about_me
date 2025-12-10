@@ -26,7 +26,7 @@
             "@/auth/*": ["./src/auth/*"],
             "@/users/*": ["./src/users/*"],
             "@/decorators/*": ["src/decorators/*"],
-            "@/base/*": ["src/base/*"],
+            "@/base/*": ["src/utils/*"],
             "@/types/*": ["src/types/*"]
         }
     },

@@ -13,7 +13,7 @@ import {
 import {JwtService} from "@nestjs/jwt";
 import {Request, Response} from "express";
 
-import {SigninUserDto, SignupUserDto} from "@/users/dto";
+import {SigninUserDto, SignupUserDto} from "@/users/user.dto";
 
 import {Public} from "../decorators/auth.decorator";
 import {AuthService} from "./auth.service";

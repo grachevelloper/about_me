@@ -1,8 +1,4 @@
-import {
-    ConflictException,
-    Injectable,
-    UnauthorizedException,
-} from "@nestjs/common";
+import {Injectable, UnauthorizedException} from "@nestjs/common";
 
 import {Role} from "../types";
 import {User} from "../users/users.entity";
@@ -17,12 +13,6 @@ export class AuthService {
         email: string,
         password: string,
     ): Promise<User> {
-        const existingUser = await this.usersService.findByEmail(email);
-
-        if (existingUser) {
-            throw new ConflictException("User with this email already exists");
-        }
-
         const user = await this.usersService.create(
             email,
             password,
@@ -45,7 +35,7 @@ export class AuthService {
         return user;
     }
 
-    async isMe(id: string) {
+    async isMe(id: string): Promise<User> {
         const user = await this.usersService.findById(id);
 
         return user;

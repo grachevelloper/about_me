@@ -1,6 +1,6 @@
 import {Column, Entity, JoinColumn, ManyToOne} from "typeorm";
 
-import {BaseEntity} from "../base/entity";
+import {BaseEntity} from "../utils/entity";
 import {User} from "../users/users.entity";
 
 export type EntityCommentType = "todo" | "article";

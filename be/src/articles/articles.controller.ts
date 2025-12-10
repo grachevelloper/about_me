@@ -7,6 +7,7 @@ import {
     HttpStatus,
     Param,
     Post,
+    Req,
 } from "@nestjs/common";
 import {
     ApiBadRequestResponse,
@@ -19,8 +20,9 @@ import {
     ApiParam,
     ApiTags,
 } from "@nestjs/swagger";
+import {Request} from "express";
 
-import {CreateArticleDto} from "./article.dto";
+import {CreateArticleDto, ResponseArticle} from "./article.dto";
 import {Article} from "./articles.entity";
 import {ArticlesService} from "./articles.service";
 
@@ -50,7 +52,7 @@ export class ArticlesController {
     })
     async create(
         @Body() createArticleData: CreateArticleDto,
-    ): Promise<Article> {
+    ): Promise<ResponseArticle> {
         return await this.articlesService.create(createArticleData);
     }
 
@@ -72,8 +74,12 @@ export class ArticlesController {
     @ApiNotFoundResponse({
         description: "Статья не найдена",
     })
-    async findOne(@Param("id") id: string): Promise<Article> {
-        return await this.articlesService.findOne(id);
+    async findOne(
+        @Req() req: Request,
+        @Param("id") id: string,
+    ): Promise<ResponseArticle> {
+        const authorId = req.user.id;
+        return await this.articlesService.findOne(id, authorId);
     }
 
     @Delete(":id")
@@ -96,6 +102,27 @@ export class ArticlesController {
     })
     async delete(@Param("id") id: string): Promise<void> {
         await this.articlesService.delete(id);
+    }
+
+    @Post(":id/publish")
+    @ApiOperation({
+        summary: "Опубликовать статью",
+    })
+    @ApiParam({
+        name: "id",
+        type: String,
+        description: "Идентификатор статьи",
+        example: "123e4567-e89b-12d3-a456-426614174000",
+    })
+    @ApiNotFoundResponse({
+        description: "Статья не найдена",
+    })
+    async publichArticle(
+        @Req() req: Request,
+        @Param("id") id: string,
+    ): Promise<Article> {
+        const authorId = req.user.id;
+        return await this.articlesService.publish(id, authorId);
     }
 
     @Post(":id/like")
@@ -153,5 +180,20 @@ export class ArticlesController {
     })
     async findAll(@Param("authorId") authorId: string): Promise<Article[]> {
         return await this.articlesService.findAllByAuthorId(authorId);
+    }
+
+    @Get("drafts")
+    @ApiOperation({
+        summary: "Получение всех черновиков",
+        description: "Возвращает список всех статей с пагинацией",
+    })
+    @ApiOkResponse({
+        type: [Article],
+        description: "Список статей",
+    })
+    async findAllDrafts(
+        @Param("authorId") authorId: string,
+    ): Promise<Article[]> {
+        return await this.articlesService.findAllByAuthorId(authorId, true);
     }
 }

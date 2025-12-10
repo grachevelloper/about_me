@@ -19,7 +19,7 @@ import {AuthGuard} from "../auth/guards/auth.guard";
 import {RolesGuard} from "../auth/guards/roles.guard";
 import {Roles} from "../decorators/role.decorator";
 import {Role} from "../types";
-import {UpdateUserDto} from "./dto";
+import {UpdateUserDto} from "./user.dto";
 import {User} from "./users.entity";
 import {UsersService} from "./users.service";
 

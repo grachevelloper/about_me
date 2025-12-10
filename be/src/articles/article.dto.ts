@@ -11,6 +11,9 @@ import {
     ValidateNested,
 } from "class-validator";
 
+import {LikedEntity} from "../utils/entity";
+import {Article} from "./articles.entity";
+
 export class TagDto {
     @ApiProperty({
         description: "Название тега",
@@ -103,3 +106,5 @@ export class UpdateArticleDto {
     @IsOptional()
     readTime?: number;
 }
+
+export type ResponseArticle = Article & LikedEntity;
