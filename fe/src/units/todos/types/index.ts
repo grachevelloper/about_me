@@ -1,3 +1,14 @@
+import {LikedEntity} from '@/typings/common';
+
+export interface Todo extends LikedEntity {
+    title: string;
+    content: string;
+    priority: TodoPriority;
+    state: TodoState;
+    checklist?: string[];
+    authorId: string;
+}
+
 export enum TodoPriority {
     LOW = 'low',
     MEDIUM = 'medium',
@@ -10,18 +21,6 @@ export enum TodoState {
     PLANNING = 'planning',
     FINISHED = 'finished',
     CANCELED = 'canceled',
-}
-
-export interface Todo {
-    id: string;
-    title: string;
-    content: string;
-    priority: TodoPriority;
-    state: TodoState;
-    checklist?: string[];
-    authorId: string;
-    createdAt?: Date;
-    updatedAt?: Date;
 }
 
 export type EditValue = 'state' | 'priority';

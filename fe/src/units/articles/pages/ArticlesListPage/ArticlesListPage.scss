@@ -1,4 +1,9 @@
 .aritcles-list-page {
     width: 100%;
     min-height: 100vh;
+
+    &__create-article-button-row {
+        display: flex;
+        justify-content: flex-end;
+    }
 }

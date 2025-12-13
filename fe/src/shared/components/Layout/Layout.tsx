@@ -25,11 +25,10 @@ const {Content} = AntLayout;
 export const Layout = () => {
     const {setUserData} = useAuth();
     const location = useLocation();
-    const isSmall = useLayout();
+    const {isTablet, isMobile, isDesktop} = useLayout();
 
     const {value} = useCookie('cookie-accept');
-
-    const [isCollapsed, setCollapsed] = useState<boolean>(!!isSmall);
+    const [isCollapsed, setCollapsed] = useState<boolean>(!isDesktop);
 
     const {
         token: {colorBgContainer, borderRadiusLG},
@@ -48,14 +47,10 @@ export const Layout = () => {
     }, []);
 
     useEffect(() => {
-        if (!isCollapsed) {
+        if (!isCollapsed && !isDesktop) {
             setCollapsed(true);
         }
     }, [location.pathname]);
-
-    useEffect(() => {
-        console.log(isSmall, !isCollapsed);
-    });
 
     return (
         <QueryErrorResetBoundary>
@@ -73,7 +68,7 @@ export const Layout = () => {
                 >
                     <Animation />
                     <AntLayout className={b()} hasSider>
-                        {!isCollapsed && isSmall && (
+                        {!isCollapsed && !isDesktop && (
                             <div
                                 className={b('overlay')}
                                 onClick={handleCollapse}

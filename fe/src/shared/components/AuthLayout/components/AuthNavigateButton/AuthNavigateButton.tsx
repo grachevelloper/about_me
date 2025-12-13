@@ -6,6 +6,9 @@ import {RiLoginCircleLine} from 'react-icons/ri';
 import {VscAccount} from 'react-icons/vsc';
 import {useLocation, useNavigate} from 'react-router-dom';
 
+import {useSessionStorage} from '@/shared/hooks/useSessionStorage';
+
+import {PREV_AUTH_PAGE_VISITED} from '../../constants';
 import './AuthNavigateButton.scss';
 
 const b = block('auth-navigate-button');
@@ -20,10 +23,15 @@ type NavigateData = {
 export const AuthNavigateButton = () => {
     const {t} = useTranslation('auth');
     const {
-        token: {borderRadius, paddingSM},
+        token: {padding, borderRadius},
     } = theme.useToken();
-    const [isNotificationShown, setIsNotificationShown] = useState(false);
-    const [showFloatButton, setShowFloatButton] = useState(false);
+    const [isPrevVisited, setPrevVisited] = useSessionStorage<boolean>(
+        PREV_AUTH_PAGE_VISITED,
+        false
+    );
+    const [isNotificationShown, setIsNotificationShown] =
+        useState(isPrevVisited);
+    const [showFloatButton, setShowFloatButton] = useState(isPrevVisited);
     const location = useLocation();
     const navigate = useNavigate();
     const [api, contextHolder] = notification.useNotification();
@@ -58,17 +66,15 @@ export const AuthNavigateButton = () => {
     const {link, text, title, icon} = getLinkData();
 
     useEffect(() => {
-        if (!link || isNotificationShown) return;
+        if (!link || isNotificationShown || isPrevVisited) {
+            setShowFloatButton(true);
+            return;
+        }
 
+        setPrevVisited(true);
         api.open({
             message: (
-                <Typography.Title
-                    className={b('title')}
-                    style={{
-                        paddingLeft: paddingSM,
-                    }}
-                    level={5}
-                >
+                <Typography.Title className={b('title')} level={4}>
                     {title}
                 </Typography.Title>
             ),
@@ -79,13 +85,15 @@ export const AuthNavigateButton = () => {
                         navigate(link);
                         api.destroy();
                     }}
-                    style={{fontWeight: 500, paddingLeft: paddingSM}}
+                    style={{fontWeight: 500}}
                 >
                     {text}
                 </Typography.Link>
             ),
+            showProgress: true,
+            pauseOnHover: true,
             placement: 'bottomRight',
-            duration: 1000,
+            duration: 5,
             onClose: () => {
                 setIsNotificationShown(true);
                 setShowFloatButton(true);
@@ -93,8 +101,8 @@ export const AuthNavigateButton = () => {
 
             style: {
                 width: 270,
+                padding,
                 borderRadius,
-                padding: paddingSM,
             },
             className: b(),
         });
@@ -109,7 +117,7 @@ export const AuthNavigateButton = () => {
         return () => {
             clearTimeout(timer);
         };
-    }, [link, isNotificationShown, api, navigate, title, text]);
+    }, [link, api, navigate, title, text]);
 
     if (!link) {
         return null;

@@ -2,14 +2,15 @@ import {Form, Modal, Typography} from 'antd';
 import {useEffect} from 'react';
 import {useTranslation} from 'react-i18next';
 
-import {DtoCreateTodo} from '@/todos/api/types';
+import {FormField} from '@/typings/components';
 
-import {useCreateTodoMutation} from '../../../units/todos/store';
+import {DtoCreateTodo} from '@/todos/api/types';
+import {useCreateTodoMutation} from '@/todos/store';
+
 import {useTodoForm} from '../../context';
 import {useLocalStorage} from '../../hooks';
 import {NEW_TODO_KEY} from '../../utils/constants';
 import {FormInput} from '../FormInput';
-import {FormField} from '../FormInput/types';
 
 interface NewTodoFormProps {
     isSuggest?: boolean;
@@ -45,11 +46,13 @@ export const NewTodoForm = ({isSuggest = false}: NewTodoFormProps) => {
 
     const inputFields: FormField[] = [
         {
+            index: 0,
             label: tTodo('todo.table.col.todo'),
             name: 'title',
             placeholder: tTodo('new-todo-form.your-title.placeholder'),
         },
         {
+            index: 1,
             label: tTodo('todo.table.col.content'),
             name: 'content',
             type: 'text',

@@ -1,15 +1,18 @@
 import {type CommentType} from '@/shared/entities/Comment';
-export interface Article {
-    id?: string;
+import {LikedEntity} from '@/typings/common';
+
+import {User} from '../../users/types';
+
+export interface Article extends LikedEntity {
     title: string;
     image: string;
     content: string;
-    tags: Tag[];
+    tags?: Tag[];
     comments: CommentType[];
     likesCount: number;
     readTime?: number;
-    updatedAt?: string;
-    createdAt?: string;
+    author: User;
+    isDraft: boolean;
 }
 
 export interface Tag {

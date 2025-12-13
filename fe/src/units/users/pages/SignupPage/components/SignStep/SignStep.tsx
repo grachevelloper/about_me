@@ -1,12 +1,12 @@
-import {AuthEmitter, SIGN_UP_EVENT} from '@/users/utils';
 import {Typography} from 'antd';
 import block from 'bem-cn-lite';
 import React, {useEffect} from 'react';
 
 import {FlexibleCard} from '@/shared/components/FlexibleCard';
 import {FormInput} from '@/shared/components/FormInput';
-import {useLocalStorage} from '@/shared/hooks/useLocalStore';
+import {useLocalStorage} from '@/shared/hooks/useLocalStorage';
 import {CardProps, FormField} from '@/typings/components';
+import {AuthEmitter, SIGN_UP_EVENT} from '@/users/utils';
 
 import {SIGN_UP_STEP_SLUG} from '../../constants';
 import './SignStep.scss';

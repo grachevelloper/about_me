@@ -9,9 +9,12 @@
 
     "layout.top.main": "Главная",
     "layout.top.user": "Моя страница",
+    "layout.top.user.signup": "Зарегистрироваться",
     "layout.top.articles": "Статьи",
+    "layout.top.drafts": "Мои черновики",
     "layout.left.suggest": "Предложить ежедневку",
-    "layout.cookie.accept": "Мы используем куки 😊 Используя сайт, вы соглашаетесь с использованием cookie",
+    "layout.left.create_article": "Создать статью",
+    "layout.cookie.accept": "Мы используем куки 😊\nВы ведь не на диете?",
     "logout": "Выйти из аккаунта",
     "logout-modal.title": "Вы точно хотите выйти из аккаунта?",
     "logout-modal.deny": "Пока останусь",

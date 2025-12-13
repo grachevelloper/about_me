@@ -1,4 +1,4 @@
-import {Tag as AntTag, Col, Divider, Image, Row, theme, Typography} from 'antd';
+import {Col, Divider, Image, Row, theme, Typography} from 'antd';
 import block from 'bem-cn-lite';
 import {useTranslation} from 'react-i18next';
 
@@ -7,6 +7,7 @@ import {LikeButton} from '@/shared/components/LikeButton';
 import {useLayout} from '@/shared/hooks';
 import {formatDate} from '@/shared/utils';
 
+import {ArticleTag} from '../../components/ArticleTag';
 import {type Article, type Tag} from '../../types';
 
 import './ArticlePage.scss';
@@ -16,7 +17,7 @@ const b = block('article-page');
 const {Title, Text} = Typography;
 
 export const ArticlePage = () => {
-    const isSmall = useLayout();
+    const {isDesktop} = useLayout();
     const {t} = useTranslation('article');
     const {t: tCommon} = useTranslation('common');
     const {
@@ -33,7 +34,7 @@ export const ArticlePage = () => {
     const initialData: Article = {
         id: '1',
         title: t('Древний рим в новое время'),
-        createdAt: '15 мая 2024',
+        createdAt: new Date('15 мая 2024'),
         likesCount: 89,
         content: `
 Der modernste Verkehrsservice, mehr Programme und störungsfreier Empfang: Wer
@@ -69,6 +70,7 @@ Suche nach einem passenden Radioprogramm.`,
         tags: [{id: '1', name: 'react'}],
         readTime: 3,
         image: 'https://picsum.photos/400/250?random=1',
+        hasLiked: true,
     };
 
     const renderTitle = () => {
@@ -86,7 +88,7 @@ Suche nach einem passenden Radioprogramm.`,
 
     return (
         <div className={b()}>
-            {isSmall ? (
+            {!isDesktop ? (
                 renderTitle()
             ) : (
                 <Divider orientation='left' orientationMargin={0}>
@@ -119,7 +121,9 @@ Suche nach einem passenden Radioprogramm.`,
                             <Col>
                                 <Text type='secondary' style={{fontSize}}>
                                     {tCommon('updated-at', {
-                                        date: formatDate(initialData.updatedAt),
+                                        date: formatDate(
+                                            initialData?.updatedAt
+                                        ),
                                     })}
                                 </Text>
                             </Col>
@@ -160,15 +164,7 @@ Suche nach einem passenden Radioprogramm.`,
                 <Row gutter={8} style={{marginBottom: 32}}>
                     {initialData.tags.map((tag: Tag) => (
                         <Col key={tag.id}>
-                            <AntTag
-                                color={colorPrimary}
-                                style={{
-                                    borderRadius: borderRadius,
-                                    border: `1px solid ${colorBorder}`,
-                                }}
-                            >
-                                {tag.name}
-                            </AntTag>
+                            <ArticleTag name={tag.name} />
                         </Col>
                     ))}
                 </Row>
@@ -189,7 +185,10 @@ Suche nach einem passenden Radioprogramm.`,
 
             <Row justify='end'>
                 <Col span='24'>
-                    <LikeButton isLiked onClick={() => {}} />
+                    <LikeButton
+                        isLiked={initialData.hasLiked}
+                        onClick={() => {}}
+                    />
                 </Col>
             </Row>
 

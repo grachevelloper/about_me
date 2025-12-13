@@ -7,7 +7,7 @@ import {worker} from './__test__/mocks';
 import App from './entries/App';
 
 const container = document.getElementById('root');
-const root = createRoot(container!);
+const root = createRoot(container);
 
 const enableMocking = async () => {
     if (process.env.REACT_APP_ENABLE_MOCKS !== 'true') {

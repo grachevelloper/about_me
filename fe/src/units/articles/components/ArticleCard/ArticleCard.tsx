@@ -6,6 +6,7 @@ import {useTranslation} from 'react-i18next';
 import {Article} from '@/articles/types';
 
 import './ArticleCard.scss';
+import {formatDate} from '../../../../shared/utils/date';
 
 const b = block('article-card');
 
@@ -75,7 +76,7 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({article, onClick}) => {
                     <Flex gap={4}>
                         <CalendarOutlined />
                         <Typography.Text type='secondary'>
-                            {article?.createdAt}
+                            {formatDate(article?.createdAt)}
                         </Typography.Text>
                     </Flex>
 

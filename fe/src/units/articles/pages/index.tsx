@@ -2,6 +2,7 @@ import {RouteProps} from 'react-router-dom';
 
 import {ArticlePage} from './ArticlePage';
 import {ArticlesListPage} from './ArticlesListPage';
+import {CreateArticlePage} from './CreateArticlePage';
 
 export const articlesRoutes: RouteProps[] = [
     {
@@ -9,7 +10,11 @@ export const articlesRoutes: RouteProps[] = [
         element: <ArticlesListPage />,
     },
     {
-        path: 'articles/:id',
+        path: 'articles/new',
+        element: <CreateArticlePage />,
+    },
+    {
+        path: 'articles/:id((?!new[^/]+))',
         element: <ArticlePage />,
     },
 ];

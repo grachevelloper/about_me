@@ -32,7 +32,7 @@ const lightTheme: CustomThemeConfig = {
         colorSuccess: '#10b981',
         colorWarning: '#f59e0b',
         colorError: '#ef4444',
-        
+
         colorInfo: '#3b82f6',
 
         colorBgBase: '#ffffff',
@@ -86,7 +86,6 @@ const lightTheme: CustomThemeConfig = {
             defaultBg: '#ffffff',
             defaultBorderColor: '#d1d5db',
             defaultColor: '#374151',
-            primaryBorderColor: '#4f46e5',
         },
         Card: {
             ...CARD,
@@ -103,6 +102,7 @@ const lightTheme: CustomThemeConfig = {
             itemBg: '#f9fafb',
             itemSelectedBg: 'linear-gradient(90deg, #eef2ff 0%, #e0e7ff 100%)',
             itemColor: '#1f2937',
+            itemHoverColor: '#7069f0ff',
             itemSelectedColor: '#4f46e5',
             itemActiveBg: 'linear-gradient(90deg, #e0e7ff 0%, #c7d2fe 100%)',
         },

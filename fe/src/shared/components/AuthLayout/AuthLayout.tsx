@@ -2,12 +2,12 @@ import {Layout} from 'antd';
 import {Content} from 'antd/es/layout/layout';
 import block from 'bem-cn-lite';
 import {useEffect, useState} from 'react';
-import {Navigate, Outlet} from 'react-router-dom';
+import {Outlet, useNavigate} from 'react-router-dom';
 
 import {checkAuth} from './api';
+import {AuthNavigateButton} from './components/AuthNavigateButton';
 
 import './AuthLayout.scss';
-import {AuthNavigateButton} from './components/AuthNavigateButton';
 
 const b = block('auth-layout');
 
@@ -15,6 +15,8 @@ export const AuthLayout = () => {
     const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(
         null
     );
+    const navigate = useNavigate();
+
     useEffect(() => {
         const verifyAuth = async () => {
             const authStatus = await checkAuth();
@@ -29,7 +31,7 @@ export const AuthLayout = () => {
     }
 
     if (isAuthenticated) {
-        return <Navigate to='/todos' replace />;
+        navigate('/todos');
     }
 
     return (

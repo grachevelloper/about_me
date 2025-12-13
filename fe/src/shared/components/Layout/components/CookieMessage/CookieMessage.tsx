@@ -31,11 +31,12 @@ export const CookieMessage = () => {
                             display: 'flex',
                             alignItems: 'center',
                             gap: token.marginSM,
+                            whiteSpace: 'pre-wrap',
                         }}
                     >
                         <LuCookie
+                            size={40}
                             style={{
-                                width: 80,
                                 color: token.colorPrimary,
                             }}
                         />

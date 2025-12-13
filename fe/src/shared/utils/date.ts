@@ -1,4 +1,5 @@
-export const formatDate = (date: Date | string) => {
+export const formatDate = (date?: Date | string) => {
+    if (!date) return '';
     const dateObj = typeof date === 'string' ? new Date(date) : date;
     return dateObj.toLocaleString('ru', {
         year: 'numeric',

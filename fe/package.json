@@ -10,7 +10,7 @@
         "lint": "eslint src --ext .ts,.tsx,.js,.jsx",
         "lint:fix": "eslint src --ext .ts,.tsx,.js,.jsx --fix",
         "analyze": "webpack --mode production --analyze",
-        "interface": "i18next-resources-for-ts interface -i ./public/locales/ru -o ./src/typings/i18next.d.ts",
+        "interface": "i18next-resources-for-ts interface -i ./public/locales/ru -o ./src/typings/resources.ts",
         "email": "email dev  --dir ./src/units/emails"
     },
     "keywords": [],

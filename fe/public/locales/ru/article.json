@@ -7,14 +7,10 @@
 
     "article.search.placeholder": "Схоластика папы Иоанна XII...",
 
-    "actions.writeArticle": "Написать статью",
-    "actions.filters": "Фильтры",
-    "actions.readMore": "Читать далее",
-    "actions.edit": "Редактировать",
-    "actions.delete": "Удалить",
-    "actions.save": "Сохранить",
-    "actions.publish": "Опубликовать",
-    "actions.share": "Поделиться",
+    "articles.create": "Написать статью",
+    "articles.filters": "Фильтры",
+    "articles.read_more": "Читать далее",
+    "article.placeholder": "Всё с чего-то начинается...😉",
 
     "articles.recent": "Недавние статьи",
     "articles.popular": "Популярные",

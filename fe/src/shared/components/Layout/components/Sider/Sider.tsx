@@ -1,14 +1,17 @@
 import {BulbOutlined, HomeOutlined, UserOutlined} from '@ant-design/icons';
-import {Flex, Layout, Menu} from 'antd';
+import {Flex, Layout, Menu, theme} from 'antd';
 import {MenuItemType} from 'antd/es/menu/interface';
 import block from 'bem-cn-lite';
 import {useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {IoIosLogOut} from 'react-icons/io';
-import {RiArticleLine} from 'react-icons/ri';
+import {MdOutlineCreate} from 'react-icons/md';
+import {RiArticleLine, RiDraftLine} from 'react-icons/ri';
 import {useNavigate} from 'react-router-dom';
 
-import {useTodoForm} from '@/shared/context';
+import {useAuth, useTodoForm} from '@/shared/context';
+import {useLayout} from '@/shared/hooks';
+import {Role} from '@/typings/common';
 
 import {LogoutDialog} from '../LogoutDialog';
 
@@ -24,11 +27,27 @@ interface SiderProps {
 }
 export const Sider = ({isCollapsed, setCollapsed}: SiderProps) => {
     const {t} = useTranslation('common');
+    const {user} = useAuth();
+    const {isTablet, isMobile} = useLayout();
     const {setIsOpen} = useTodoForm();
-
+    const {
+        token: {fontSizeLG},
+    } = theme.useToken();
     const navigate = useNavigate();
 
     const [isSignoutModalOpen, setSignoutModalOpen] = useState<boolean>(false);
+
+    const isAdmin = user?.role === Role.ADMIN;
+    const adminNaviage: MenuItemType[] = [
+        {
+            icon: <RiArticleLine />,
+            label: t('layout.top.drafts'),
+            key: 'nav-3',
+            onClick: () => {
+                navigate('/articles/drafts');
+            },
+        },
+    ];
 
     const navigateItems: MenuItemType[] = [
         {
@@ -40,41 +59,66 @@ export const Sider = ({isCollapsed, setCollapsed}: SiderProps) => {
             },
         },
         {
-            icon: <UserOutlined />,
-            label: t('layout.top.user'),
-            key: 'nav-2',
-            onClick: () => {
-                navigate('/user');
-            },
-        },
-        {
-            icon: <RiArticleLine />,
+            icon: <RiDraftLine />,
             label: t('layout.top.articles'),
-            key: 'nav-3',
+            key: 'nav-1',
             onClick: () => {
                 navigate('/articles');
             },
         },
+        ...(isAdmin ? adminNaviage : []),
     ];
 
-    const actionItems: MenuItemType[] = [
+    const userActions: MenuItemType[] = [
         {
             icon: <BulbOutlined />,
             label: t('layout.left.suggest'),
-            key: 'action-0',
+            key: 'action-user-0',
             onClick: () => {
                 setIsOpen(true);
             },
         },
+    ];
+
+    const adminActions: MenuItemType[] = [
         {
-            icon: <IoIosLogOut className={b('logout-icon')} />,
-            label: t('logout'),
-            key: 'action-1',
-            onClick: () => setSignoutModalOpen(true),
-            className: b('logout-option'),
+            icon: <MdOutlineCreate />,
+            label: t('layout.left.create_article'),
+            key: 'action-admin-0',
+            onClick: () => {
+                navigate('/articles/new');
+            },
         },
     ];
 
+    const actionItems: MenuItemType[] = user
+        ? [
+              ...(isAdmin ? adminActions : userActions),
+              {
+                  icon: <IoIosLogOut className={b('logout-icon')} />,
+                  label: t('logout'),
+                  key: 'action-1',
+                  onClick: () => setSignoutModalOpen(true),
+                  className: b('logout-option'),
+              },
+          ]
+        : [
+              {
+                  icon: <UserOutlined />,
+                  label: t('layout.top.user.signup'),
+                  key: 'nav-0',
+                  onClick: () => {
+                      navigate('/auth/signup');
+                  },
+              },
+          ];
+
+    const calculateWidth = () => {
+        if (isTablet) return '25%';
+        if (isMobile) return '250px';
+        return '20%';
+    };
+    console.log(user);
     return (
         <AntSider
             className={b()}
@@ -83,14 +127,21 @@ export const Sider = ({isCollapsed, setCollapsed}: SiderProps) => {
             collapsed={isCollapsed}
             onCollapse={() => setCollapsed((prev) => !prev)}
             theme='light'
+            width={calculateWidth()}
+            style={{
+                maxWidth: '400px',
+            }}
         >
             <Flex vertical justify='space-between' className={b('container')}>
                 <Menu
                     theme='light'
                     mode='vertical'
                     items={navigateItems}
-                    defaultSelectedKeys={[]}
+                    defaultSelectedKeys={['nav-0']}
                     rootClassName={b('menu')}
+                    style={{
+                        fontSize: fontSizeLG,
+                    }}
                 />
 
                 <Menu
@@ -99,6 +150,9 @@ export const Sider = ({isCollapsed, setCollapsed}: SiderProps) => {
                     items={actionItems}
                     selectable={false}
                     rootClassName={b('menu')}
+                    style={{
+                        fontSize: fontSizeLG,
+                    }}
                 />
             </Flex>
             <LogoutDialog

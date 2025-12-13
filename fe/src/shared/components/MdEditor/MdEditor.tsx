@@ -1,28 +1,28 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
 //TODO: make it alive
 import {
+    KitchenSinkToolbar,
     MDXEditor,
     MDXEditorMethods,
+    MDXEditorProps,
     headingsPlugin,
     linkDialogPlugin,
     linkPlugin,
-    listsPlugin,
     markdownShortcutPlugin,
     quotePlugin,
     thematicBreakPlugin,
+    toolbarPlugin,
 } from '@mdxeditor/editor';
 import '@mdxeditor/editor/style.css';
 import {ForwardedRef} from 'react';
 
-interface InitializedMDXEditorProps {
+interface InitializedMDXEditorProps extends MDXEditorProps {
     editorRef?: ForwardedRef<MDXEditorMethods>;
-    markdown?: string;
-    onChange?: (markdown: string) => void;
 }
 
 export function MdEditor({
     editorRef,
     markdown,
+
     ...props
 }: InitializedMDXEditorProps) {
     return (
@@ -30,12 +30,12 @@ export function MdEditor({
             ref={editorRef}
             plugins={[
                 headingsPlugin(),
-                listsPlugin(),
                 linkPlugin(),
                 linkDialogPlugin(),
                 quotePlugin(),
                 thematicBreakPlugin(),
                 markdownShortcutPlugin(),
+                toolbarPlugin({toolbarContents: () => <KitchenSinkToolbar />}),
             ]}
             {...props}
             markdown={markdown || ''}

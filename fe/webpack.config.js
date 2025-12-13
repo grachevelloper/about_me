@@ -72,6 +72,7 @@ module.exports = {
         alias: {
             '@/pages': path.resolve(__dirname, './src/pages'),
             '@/todos': path.resolve(__dirname, './src/units/todos'),
+            '@/typings': path.resolve(__dirname, './src/typings'),
             '@/articles': path.resolve(__dirname, './src/units/articles'),
             '@/users': path.resolve(__dirname, './src/units/users'),
             '@/tests': path.resolve(__dirname, './src/__test__'),

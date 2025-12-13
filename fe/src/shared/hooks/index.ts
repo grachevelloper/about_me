@@ -1,4 +1,4 @@
 export {useCookie} from './useCookie';
 export {useFieldValidation} from './useFieldValidation';
 export {useLayout} from './useLayout';
-export {useLocalStorage} from './useLocalStore';
+export {useLocalStorage} from './useLocalStorage';
