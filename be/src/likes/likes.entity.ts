@@ -9,7 +9,11 @@ export class Like extends UnUpdatableBaseEntity {
     @Column("uuid")
     authorId: string;
 
-    @Column()
+    @Column({
+        type: "enum",
+        enumName: "entity_liked_type",
+        enum: ["comment", "todo", "article"],
+    })
     entityType: EntityLikeType;
 
     @Column("uuid")

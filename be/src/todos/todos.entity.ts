@@ -1,6 +1,6 @@
+import {BaseEntity} from "src/utils/entity";
 import {Column, Entity, OneToOne} from "typeorm";
 
-import {BaseEntity} from "src/utils/entity";
 import {TodoPriority, TodoState} from "@/types/todo";
 
 import {CheckList} from "./checklists/checklists.entity";
@@ -16,10 +16,20 @@ export class Todo extends BaseEntity {
     @Column()
     authorId: string;
 
-    @Column({default: TodoPriority.MEDIUM})
+    @Column({
+        type: "enum",
+        enumName: "todo_priority",
+        enum: ["Hight", "Medium", "Low", "Super"],
+        default: "Medium",
+    })
     priority?: TodoPriority;
 
-    @Column({default: TodoState.PLANNING})
+    @Column({
+        type: "enum",
+        enumName: "todo_state",
+        enum: ["Planning", "In_work", "Finished", "Canceled"],
+        default: "Planning",
+    })
     state?: TodoState;
 
     @OneToOne(() => CheckList, (item) => item.todo, {

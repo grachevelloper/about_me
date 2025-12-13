@@ -13,8 +13,12 @@ export class SomeFixes1764872338624 implements MigrationInterface {
         await queryRunner.query(
             `ALTER TABLE "refresh_tokens" DROP CONSTRAINT "fk_refresh_tokens_user_id"`,
         );
-        await queryRunner.query(`DROP INDEX IF EXISTS "public"."idx_checklists_todo_id"`);
-        await queryRunner.query(`DROP INDEX IF EXISTS "public"."idx_todos_author_id"`);
+        await queryRunner.query(
+            `DROP INDEX IF EXISTS "public"."idx_checklists_todo_id"`,
+        );
+        await queryRunner.query(
+            `DROP INDEX IF EXISTS "public"."idx_todos_author_id"`,
+        );
         await queryRunner.query(
             `DROP INDEX IF EXISTS "public"."idx_refresh_tokens_user_id"`,
         );
@@ -33,24 +37,28 @@ export class SomeFixes1764872338624 implements MigrationInterface {
             `ALTER TABLE "todos" ADD "author_id" character varying NOT NULL`,
         );
         await queryRunner.query(`ALTER TABLE "todos" DROP COLUMN "priority"`);
-        await queryRunner.query(`DROP TYPE IF EXISTS "public"."todo_priority_enum"`);
+        await queryRunner.query(
+            `DROP TYPE IF EXISTS "public"."todo_priority_enum"`,
+        );
         await queryRunner.query(
             `ALTER TABLE "todos" ADD "priority" character varying NOT NULL DEFAULT 'medium'`,
         );
         await queryRunner.query(`ALTER TABLE "todos" DROP COLUMN "state"`);
-        await queryRunner.query(`DROP TYPE IF EXISTS "public"."todo_state_enum"`);
+        await queryRunner.query(
+            `DROP TYPE IF EXISTS "public"."todo_state_enum"`,
+        );
         await queryRunner.query(
             `ALTER TABLE "todos" ADD "state" character varying NOT NULL DEFAULT 'planning'`,
         );
         await queryRunner.query(
             `ALTER TABLE "refresh_tokens" ALTER COLUMN "created_at" SET NOT NULL`,
         );
-        
+
         // ИСПРАВЛЕНИЕ: Изменить тип колонки вместо удаления/добавления
         await queryRunner.query(
             `ALTER TABLE "refresh_tokens" ALTER COLUMN "token_hash" TYPE character varying USING token_hash::character varying`,
         );
-        
+
         await queryRunner.query(
             `ALTER TABLE "refresh_tokens" ALTER COLUMN "revoked" SET NOT NULL`,
         );
@@ -66,12 +74,12 @@ export class SomeFixes1764872338624 implements MigrationInterface {
         await queryRunner.query(
             `ALTER TABLE "refresh_tokens" ALTER COLUMN "revoked" DROP NOT NULL`,
         );
-        
+
         // Вернуть тип обратно в text
         await queryRunner.query(
             `ALTER TABLE "refresh_tokens" ALTER COLUMN "token_hash" TYPE text USING token_hash::text`,
         );
-        
+
         await queryRunner.query(
             `ALTER TABLE "refresh_tokens" ALTER COLUMN "created_at" DROP NOT NULL`,
         );

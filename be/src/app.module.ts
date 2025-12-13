@@ -7,6 +7,7 @@ import * as dotenv from "dotenv";
 import {AppController} from "./app.controller";
 import {AppService} from "./app.service";
 import {ArticlesModule} from "./articles/articles.module";
+import {TagsModule} from "./articles/tags/tags.module";
 import {AuthModule} from "./auth/auth.module";
 import {AuthGuard} from "./auth/guards/auth.guard";
 import {CommentsModule} from "./comments/comments.module";
@@ -38,6 +39,7 @@ dotenv.config();
         LikesModule,
         CommentsModule,
         ArticlesModule,
+        TagsModule,
     ],
     controllers: [AppController],
     providers: [

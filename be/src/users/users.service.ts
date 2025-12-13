@@ -3,8 +3,7 @@ import {InjectRepository} from "@nestjs/typeorm";
 import * as bcrypt from "bcrypt";
 import {Repository} from "typeorm";
 
-import {Role} from "../types";
-import {UpdateUserDto} from "./user.dto";
+import {CreateUserDto, UpdateUserDto} from "./user.dto";
 import {User} from "./users.entity";
 
 @Injectable()
@@ -27,12 +26,9 @@ export class UsersService {
         return user;
     }
 
-    async create(
-        email: string,
-        password: string,
-        role: Role,
-        username?: string,
-    ): Promise<User> {
+    async create(createUserDto: CreateUserDto): Promise<User> {
+        const {email, password, role, username} = createUserDto;
+
         const emailExists = await this.usersRepository.findOneBy({email});
         if (emailExists) {
             throw new ConflictException("User with this email already exists");

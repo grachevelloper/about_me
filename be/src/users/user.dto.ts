@@ -15,10 +15,6 @@ import {UserStatus} from "@/types/user";
 import {Role} from "../types";
 
 export class SigninUserDto {
-    @ApiProperty({
-        example: "user@example.com",
-        description: "Email пользователя",
-    })
     @IsEmail()
     @MaxLength(255)
     email: string;
@@ -36,10 +32,14 @@ export class SigninUserDto {
     password: string;
 }
 export class SignupUserDto extends SigninUserDto {
-    @ApiProperty({example: "kolya-master", description: "Имя пользователя"})
     @IsString()
     @Length(1, 50)
     username: string;
+}
+
+export class CreateUserDto extends SignupUserDto {
+    @IsEnum(Role)
+    role: Role;
 }
 
 export class UpdateUserDto {
@@ -52,29 +52,14 @@ export class UpdateUserDto {
     @IsOptional()
     username?: string;
 
-    @ApiPropertyOptional({
-        enum: Role,
-        enumName: "Role",
-        example: Role.ADMIN,
-        description: "Роль пользователя",
-    })
     @IsEnum(Role)
     @IsOptional()
     role?: Role;
 
-    @ApiPropertyOptional({
-        example: "https://example.com/avatar.jpg",
-        description: "URL аватара пользователя",
-    })
     @IsString()
     @IsOptional()
     avatar?: string;
 
-    @ApiPropertyOptional({
-        enum: UserStatus,
-        enumName: "UserStatus",
-        description: "Статус пользователя",
-    })
     @IsEnum(UserStatus)
     @IsOptional()
     status?: UserStatus;

@@ -11,10 +11,16 @@ import {LikesService} from "../likes/likes.service";
 import {UsersService} from "../users/users.service";
 import {
     CreateArticleDto,
+    RequestGetArticles,
     ResponseArticle,
+    ResponseGetArticles,
     UpdateArticleDto,
 } from "./article.dto";
 import {Article} from "./articles.entity";
+
+type FindAll = Omit<RequestGetArticles, "tags"> & {
+    tags?: string[];
+};
 
 @Injectable()
 export class ArticlesService {
@@ -69,6 +75,69 @@ export class ArticlesService {
         return {...article, hasLiked: Boolean(likedArticle)};
     }
 
+    async findAll(filters: FindAll): Promise<ResponseGetArticles> {
+        const {
+            page,
+            limit,
+            search,
+            authorId,
+            tags,
+            minLikes,
+            createdAfter,
+            sortBy,
+            order,
+        } = filters;
+
+        const skip = (page - 1) * limit;
+
+        const queryBuilder = this.articlesRepository
+            .createQueryBuilder("article")
+            .leftJoinAndSelect("article.author", "author")
+            .leftJoinAndSelect("article.tags", "tags");
+
+        if (search) {
+            queryBuilder.andWhere("article.title ILIKE :search", {
+                search: `%${search}%`,
+            });
+        }
+        if (authorId) {
+            queryBuilder.andWhere("article.authorId = :authorId", {authorId});
+        }
+        if (tags) {
+            const tagArray = Array.isArray(tags) ? tags : [tags];
+            queryBuilder
+                .innerJoin("article.tags", "tag")
+                .andWhere("tag.name IN (:...tags)", {tags: tagArray});
+        }
+        if (minLikes) {
+            queryBuilder.andWhere("article.likesCount >= :minLikes", {
+                minLikes,
+            });
+        }
+        if (createdAfter) {
+            queryBuilder.andWhere("article.createdAt >= :createdAfter", {
+                createdAfter: new Date(createdAfter),
+            });
+        }
+
+        queryBuilder.orderBy(`article.${sortBy}`, order as "ASC" | "DESC");
+
+        queryBuilder.skip(skip).take(limit + 1);
+
+        const result = await queryBuilder.getMany();
+
+        const articles = result.slice(0, -1);
+
+        const next = result.at(-1)?.id;
+
+        return {
+            articles,
+            page,
+            limit,
+            next,
+        };
+    }
+
     async findOneForUpdate(id: string): Promise<Article> {
         const article = await this.articlesRepository.findOne({
             where: {id},
@@ -104,7 +173,8 @@ export class ArticlesService {
             );
         }
         article.isDraft = true;
-        return await this.articlesRepository.save(article);
+        await this.articlesRepository.save(article);
+        return true;
     }
 
     async delete(id: string) {

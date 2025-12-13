@@ -13,12 +13,12 @@ export class AuthService {
         email: string,
         password: string,
     ): Promise<User> {
-        const user = await this.usersService.create(
+        const user = await this.usersService.create({
             email,
             password,
-            Role.USER,
             username,
-        );
+            role: Role.USER,
+        });
 
         return user;
     }

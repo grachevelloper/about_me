@@ -1,7 +1,7 @@
 import {Column, Entity, JoinColumn, ManyToOne} from "typeorm";
 
-import {BaseEntity} from "../utils/entity";
 import {User} from "../users/users.entity";
+import {BaseEntity} from "../utils/entity";
 
 export type EntityCommentType = "todo" | "article";
 
@@ -14,7 +14,11 @@ export class Comment extends BaseEntity {
     @Column()
     content: string;
 
-    @Column({type: "varchar"})
+    @Column({
+        type: "enum",
+        enumName: "entity_commented_type",
+        enum: ["todo", "article"],
+    })
     entityType: EntityCommentType;
 
     @Column({type: "uuid"})

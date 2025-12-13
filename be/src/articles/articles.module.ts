@@ -6,13 +6,14 @@ import {UsersModule} from "../users/users.module";
 import {ArticlesController} from "./articles.controller";
 import {Article} from "./articles.entity";
 import {ArticlesService} from "./articles.service";
-import {Tag} from "./tag.entity";
+import {TagsModule} from "./tags/tags.module";
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([Article, Tag]),
+        TypeOrmModule.forFeature([Article]),
         UsersModule,
         LikesModule,
+        TagsModule,
     ],
     controllers: [ArticlesController],
     providers: [ArticlesService],
