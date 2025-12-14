@@ -20,12 +20,14 @@ const baseConfig = tseslint.config(
             "import/resolver": {
                 alias: {
                     map: [
-                        ["@/users/*", "./src/users/*"],
-                        ["@/auth/*", "./src/auth/*"],
-                        ["@/todos/*", "./src/users/*"],
+                        ["@/users/*", "./src/modules/users/*"],
+                        ["@/auth/*", "./src/processes/auth/*"],
+                        ["@/todos/*", "./src/modules/users/*"],
+                        ["@/articles/*", "./src/modules/articles/*"],
+                        ["@/comments/*", "./src/modules/comments/*"],
+                        ["@/likes/*", "./src/modules/likes/*"],
                         ["@/types/*", "./src/types/*"],
-                        ["@/base/*", "./src/base/*"],
-                        ["@/decorators/*", "./src/decorators/*"],
+                        ["@/shared/*", "./src/shared/*"],
                     ],
                 },
             },

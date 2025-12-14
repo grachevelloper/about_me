@@ -1,5 +1,6 @@
 import {Cascader, Col, Row, theme} from 'antd';
 import block from 'bem-cn-lite';
+import {useTranslation} from 'react-i18next';
 
 import {MdEditor} from '@/shared/components/MdEditor';
 
@@ -7,7 +8,6 @@ import {ArticleTag} from '../../components/ArticleTag';
 import {useCreateArticle} from '../../store';
 import {Tag} from '../../types';
 
-import {useTranslation} from 'react-i18next';
 import './CreateArticlePage.scss';
 
 const b = block('create-article-page');
@@ -42,6 +42,7 @@ export const CreateArticlePage = () => {
                     className={b('mk-editor')}
                     placeholder={t('article.placeholder')}
                     markdown={content}
+                    editable
                 />
             </Row>
         </div>

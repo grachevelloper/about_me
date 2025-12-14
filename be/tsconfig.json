@@ -22,13 +22,15 @@
         "strictBindCallApply": true,
         "noFallthroughCasesInSwitch": true,
         "paths": {
-            "@/todos/*": ["./src/todos/*"],
-            "@/auth/*": ["./src/auth/*"],
-            "@/users/*": ["./src/users/*"],
-            "@/decorators/*": ["src/decorators/*"],
-            "@/base/*": ["src/utils/*"],
+            "@/todos/*": ["src/modules/todos/*"],
+            "@/auth/*": ["src/processes/auth/*"],
+            "@/comments/*": ["src/modules/comments/*"],
+            "@/articles/*": ["src/modules/articles/*"],
+            "@/likes/*": ["src/modules/likes/*"],
+            "@/users/*": ["src/modules/users/*"],
+            "@/shared/*": ["src/shared/*"],
             "@/types/*": ["src/types/*"]
         }
     },
-    "include": ["src/**/*", "src/users/types/**/*.d.ts", "test/**/*"]
+    "include": ["src/**/*", "src/modules/users/types/**/*.d.ts", "test/**/*"]
 }
