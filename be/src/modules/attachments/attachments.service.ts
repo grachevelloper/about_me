@@ -1,12 +1,10 @@
 import {Injectable} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
-import {Express} from "express";
 import {Repository} from "typeorm";
 
-import {FileUpload} from "../../shared/storage/s3/s3.interface";
 import {S3StorageService} from "../../shared/storage/s3/s3.service";
 import {Attachment} from "./attachments.entity";
-import {EntityImageType as EntityAttachmentType} from "./attachments.interface";
+import {EntityAttachmentType} from "./attachments.interface";
 
 @Injectable()
 export class AttachmentsService {
@@ -45,13 +43,27 @@ export class AttachmentsService {
     ) {
         const attachments = await this.getEntityImages(entityType, entityId);
 
-        await Promise.all(
-            attachments.map((att) => this.s3Service.delete(att.s3Key)),
-        );
+        try {
+            await Promise.all(
+                attachments.map((att) => this.s3Service.delete(att.s3Key)),
+            );
 
-        await this.attachmentsRepo.delete({entityType, entityId});
+            const result = await this.attachmentsRepo.delete({
+                entityType,
+                entityId,
+            });
 
-        return {deleted: attachments.length};
+            return {deleted: result.affected || 0};
+        } catch (error) {
+            console.error("Failed to delete entity images", {
+                entityType,
+                entityId,
+                error,
+                attachmentsCount: attachments.length,
+            });
+
+            throw error;
+        }
     }
 
     async deleteAttachmentByS3Key(s3Key: string) {

@@ -30,31 +30,34 @@ import '@mdxeditor/editor/style.css';
 import {Flex} from 'antd';
 import block from 'bem-cn-lite';
 import {ForwardedRef} from 'react';
+
 import './MdEditor.scss';
+import {imageUploadHandler} from './utils';
 
 const b = block('md-editor');
+
+export type EntityAttachmentType = 'article | todo';
 
 interface InitializedMDXEditorProps extends MDXEditorProps {
     editorRef?: ForwardedRef<MDXEditorMethods>;
     editable?: boolean;
+    entityType: EntityAttachmentType;
+    entityId: string;
 }
 
 export function MdEditor({
     editorRef,
     markdown,
     editable,
+    entityType,
+    entityId,
     ...props
 }: InitializedMDXEditorProps) {
     const plugins = [
         headingsPlugin({allowedHeadingLevels: [1, 2, 3]}),
         linkPlugin(),
         imagePlugin({
-            imageAutocompleteSuggestions: [
-                'https://via.placeholder.com/150',
-                'https://via.placeholder.com/150',
-            ],
-            imageUploadHandler: async () =>
-                Promise.resolve('https://picsum.photos/200/300'),
+            imageUploadHandler: imageUploadHandler(entityType, entityId),
         }),
         listsPlugin(),
         linkDialogPlugin(),

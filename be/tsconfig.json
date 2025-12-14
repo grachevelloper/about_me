@@ -23,6 +23,7 @@
         "noFallthroughCasesInSwitch": true,
         "paths": {
             "@/todos/*": ["src/modules/todos/*"],
+            "@/attachments/*": ["src/modules/attachments/*"],
             "@/auth/*": ["src/processes/auth/*"],
             "@/comments/*": ["src/modules/comments/*"],
             "@/articles/*": ["src/modules/articles/*"],

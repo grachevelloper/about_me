@@ -7,6 +7,7 @@ import {AuthGuard} from "src/shared/guards/auth.guard";
 
 import {ArticlesModule} from "@/articles/articles.module";
 import {TagsModule} from "@/articles/tags/tags.module";
+import {AttachmentModule} from "@/attachments/attachments.module";
 import {AuthModule} from "@/auth/auth.module";
 import {CommentsModule} from "@/comments/comments.module";
 import {LikesModule} from "@/likes/likes.module";
@@ -42,6 +43,7 @@ dotenv.config();
         CommentsModule,
         ArticlesModule,
         TagsModule,
+        AttachmentModule,
     ],
     controllers: [AppController],
     providers: [

@@ -23,6 +23,7 @@ const baseConfig = tseslint.config(
                         ["@/users/*", "./src/modules/users/*"],
                         ["@/auth/*", "./src/processes/auth/*"],
                         ["@/todos/*", "./src/modules/users/*"],
+                        ["@/attachments/*", "./src/modules/attachments/*"],
                         ["@/articles/*", "./src/modules/articles/*"],
                         ["@/comments/*", "./src/modules/comments/*"],
                         ["@/likes/*", "./src/modules/likes/*"],

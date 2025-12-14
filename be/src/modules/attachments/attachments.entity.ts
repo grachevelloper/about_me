@@ -1,7 +1,7 @@
 import {Column, Entity} from "typeorm";
 
 import {UnUpdatableBaseEntity} from "../../shared/utils/entity";
-import {EntityImageType} from "./attachments.interface";
+import {EntityAttachmentType} from "./attachments.interface";
 
 @Entity("attachments")
 export class Attachment extends UnUpdatableBaseEntity {
@@ -16,7 +16,7 @@ export class Attachment extends UnUpdatableBaseEntity {
         enum: ["user", "article", "todo"],
         enumName: "entity_image_type",
     })
-    entityType: EntityImageType;
+    entityType: EntityAttachmentType;
 
     @Column("uuid")
     entityId: string;
