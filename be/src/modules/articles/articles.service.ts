@@ -22,6 +22,8 @@ type FindAll = Omit<RequestGetArticles, "tags"> & {
     tags?: string[];
 };
 
+const {S3_PUBLIC_DOMAIN} = process.env;
+
 @Injectable()
 export class ArticlesService {
     constructor(
@@ -32,14 +34,16 @@ export class ArticlesService {
     ) {}
 
     async create(
+        authorId: string,
         createArticleData: CreateArticleDto,
     ): Promise<ResponseArticle> {
-        const {authorId, title, content, readTime} = createArticleData;
+        const {title, content, readTime} = createArticleData;
         const author = await this.usersService.findById(authorId);
 
         const result = this.articlesRepository.create({
             author,
             content,
+            image: `${S3_PUBLIC_DOMAIN}/draft-placeholder/image.png`,
             readTime,
             title,
         });
@@ -59,7 +63,7 @@ export class ArticlesService {
 
     async findOne(id: string, userId: string): Promise<ResponseArticle> {
         const article = await this.articlesRepository.findOne({
-            where: {id, isDraft: false},
+            where: {id},
             relations: ["author", "tags"],
         });
         if (!article) {
@@ -138,7 +142,7 @@ export class ArticlesService {
         };
     }
 
-    async findOneForUpdate(id: string): Promise<Article> {
+    private async findOneForUpdate(id: string): Promise<Article> {
         const article = await this.articlesRepository.findOne({
             where: {id},
             relations: ["tags"],

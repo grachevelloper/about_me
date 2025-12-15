@@ -3,11 +3,13 @@ import block from 'bem-cn-lite';
 import {useTranslation} from 'react-i18next';
 import {useNavigate} from 'react-router-dom';
 
-import {ButtonAccept} from '@/shared/components/actions';
 import {useAuth} from '@/shared/context';
 import {Role} from '@/typings/common';
 
+import imagePlaceholder from '@/public/assets/image-placeholder.png';
+
 import {ArticleCard} from '../../components/ArticleCard';
+import {CreateNewArticleButton} from '../../components/CreateNewArticleButton';
 import {SearchPanel} from '../../components/SearchPanel';
 import {Article} from '../../types';
 
@@ -19,30 +21,30 @@ const {Title, Text, Paragraph} = Typography;
 const {Search} = Input;
 
 export const ArticlesListPage = () => {
-    const {user} = useAuth();
-
+    const {t} = useTranslation('article');
     const {
         token: {colorPrimary},
     } = theme.useToken();
+    const {user} = useAuth();
     const role = user?.role || Role.USER;
 
-    const {t} = useTranslation('article');
     const navigate = useNavigate();
 
     const canWriteArticle = role === Role.WRITER || role === Role.ADMIN;
-
     const mockArticles: Article[] = [
         {
             id: '1',
             title: 'Древний рим в новое время',
             createdAt: new Date(Date.now()),
+            author: user!,
+            isDraft: false,
             likesCount: 89,
             content: 'ПОПОАОАО',
             comments: [],
             tags: [{id: '1', name: 'react'}],
             readTime: 3,
             hasLiked: true,
-            image: 'https://picsum.photos/400/250?random=1',
+            image: imagePlaceholder,
         },
     ];
 
@@ -59,7 +61,7 @@ export const ArticlesListPage = () => {
     };
 
     const renderNewArticleButton = () => {
-        return canWriteArticle && <ButtonAccept text={t('articles.create')} />;
+        return canWriteArticle && <CreateNewArticleButton />;
     };
 
     return (

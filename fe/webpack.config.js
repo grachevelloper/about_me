@@ -68,7 +68,7 @@ module.exports = {
     },
 
     resolve: {
-        extensions: ['.js', '.json', '.ts', '.tsx', '.jsx'],
+        extensions: ['.js', '.json', '.ts', '.tsx', '.jsx', '.png'],
         alias: {
             '@/pages': path.resolve(__dirname, './src/pages'),
             '@/todos': path.resolve(__dirname, './src/units/todos'),
@@ -130,11 +130,13 @@ module.exports = {
             },
             {
                 test: /\.(png|jpg|jpeg|svg|gif)$/,
-                include: [path.resolve(__dirname, 'public')],
                 type: 'asset/resource',
                 generator: {
-                    filename: '[name][ext][query]',
+                    filename: isDev
+                        ? '[path][name][ext]'
+                        : 'assets/[contenthash][ext][query]',
                 },
+                exclude: [/\.(js|mjs|jsx|ts|tsx)$/, /\.html$/, /\.json$/],
             },
             {
                 test: /\.(ttf|woff|woff2|eot)$/,

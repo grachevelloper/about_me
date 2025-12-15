@@ -12,6 +12,9 @@
     "articles.read_more": "Читать далее",
     "article.placeholder": "Всё с чего-то начинается...😉",
 
+    "article.new.title": "Моя новая статья",
+    "article.new.description.error": "Сообщите, пожалуйста, мне об ошибке",
+    "article.new.title.error": "Что-то пошло не так",
     "articles.recent": "Недавние статьи",
     "articles.popular": "Популярные",
     "articles.featured": "Рекомендуемые",

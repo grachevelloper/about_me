@@ -9,10 +9,16 @@ export const imageUploadHandler = (
     return async (image: File) => {
         const formData = new FormData();
         formData.append('image', image);
-        const response = await query.post('/attachments', {
-            entityId,
-            entityType,
-        });
+        const response = await query.post(
+            `/attachments/${entityType}/${entityId}`,
+            {
+                data: formData,
+
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            }
+        );
         return response;
     };
 };

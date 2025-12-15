@@ -27,10 +27,6 @@ export class CreateArticleDto {
     @IsNotEmpty()
     title: string;
 
-    @IsUrl()
-    @IsNotEmpty()
-    image: string;
-
     @IsString()
     @IsNotEmpty()
     content: string;
@@ -45,16 +41,16 @@ export class CreateArticleDto {
     @Min(1)
     @IsOptional()
     readTime?: number;
-
-    @IsString()
-    @IsNotEmpty()
-    authorId: string;
 }
 
 export class UpdateArticleDto {
     @IsString()
     @IsOptional()
     title?: string;
+
+    @IsUrl()
+    @IsOptional()
+    image?: string;
 
     @IsString()
     @IsOptional()

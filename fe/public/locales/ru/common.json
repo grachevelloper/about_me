@@ -7,6 +7,8 @@
     "button.continue": "Далее",
     "button.back": "Назад",
 
+    "page.no_permission.title": "Упс... У тебя нет доступа к этой странице(",
+    "page.no_permission.button": "Вернуться назад",
     "layout.top.main": "Главная",
     "layout.top.user": "Моя страница",
     "layout.top.user.signup": "Зарегистрироваться",

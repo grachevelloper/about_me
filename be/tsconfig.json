@@ -30,8 +30,9 @@
             "@/likes/*": ["src/modules/likes/*"],
             "@/users/*": ["src/modules/users/*"],
             "@/shared/*": ["src/shared/*"],
-            "@/types/*": ["src/types/*"]
+            "@/types/*": ["src/types/*"],
+            "@/config/*": ["src/config/*"]
         }
     },
-    "include": ["src/**/*", "src/modules/users/types/**/*.d.ts", "test/**/*"]
+    "include": ["src/**/*", "src/types/**/*.d.ts", "test/**/*"]
 }

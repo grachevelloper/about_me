@@ -22,7 +22,7 @@ import {AttachmentsService} from "./attachments.service";
 export class AttachmentsController {
     constructor(private attachmentsService: AttachmentsService) {}
 
-    @Post()
+    @Post(":entityType/:entityId")
     @UseInterceptors(FileInterceptor("file"))
     async upload(
         @UploadedFile(
@@ -36,7 +36,7 @@ export class AttachmentsController {
             }),
         )
         file: Express.Multer.File,
-        @Body() createData: CreateAttachmentDto,
+        @Param() createData: CreateAttachmentDto,
     ) {
         return this.attachmentsService.attachImage(
             file,

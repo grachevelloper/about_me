@@ -1,3 +1,5 @@
+import "@/config/s3";
+
 import {Module} from "@nestjs/common";
 import {ConfigModule, ConfigService} from "@nestjs/config";
 import {APP_GUARD} from "@nestjs/core";
@@ -10,11 +12,12 @@ import {TagsModule} from "@/articles/tags/tags.module";
 import {AttachmentModule} from "@/attachments/attachments.module";
 import {AuthModule} from "@/auth/auth.module";
 import {CommentsModule} from "@/comments/comments.module";
+import s3Config from "@/config/s3";
 import {LikesModule} from "@/likes/likes.module";
+import {S3Module} from "@/shared/storage/s3/s3.module";
 import {TodosModule} from "@/todos/todos.module";
 import {UsersModule} from "@/users/users.module";
 
-import {S3StorageService} from "../../shared/storage/s3/s3.service";
 import {AppController} from "./app.controller";
 import {AppService} from "./app.service";
 import dataSourceOptions from "./data-source";
@@ -24,7 +27,9 @@ dotenv.config();
 @Module({
     imports: [
         ConfigModule.forRoot({
+            isGlobal: true,
             envFilePath: ["../.env"],
+            load: [s3Config],
         }),
         TypeOrmModule.forRootAsync({
             imports: [ConfigModule],
@@ -44,6 +49,7 @@ dotenv.config();
         ArticlesModule,
         TagsModule,
         AttachmentModule,
+        S3Module,
     ],
     controllers: [AppController],
     providers: [
@@ -52,8 +58,6 @@ dotenv.config();
             provide: APP_GUARD,
             useClass: AuthGuard,
         },
-        S3StorageService,
     ],
-    exports: [S3StorageService],
 })
 export class AppModule {}

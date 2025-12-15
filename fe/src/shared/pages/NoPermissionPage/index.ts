@@ -1,0 +1,1 @@
+export {NoPermissionPage} from './NoPermissionPage'

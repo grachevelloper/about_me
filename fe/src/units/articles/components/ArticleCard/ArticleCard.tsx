@@ -5,8 +5,8 @@ import {useTranslation} from 'react-i18next';
 
 import {Article} from '@/articles/types';
 
-import './ArticleCard.scss';
 import {formatDate} from '../../../../shared/utils/date';
+import './ArticleCard.scss';
 
 const b = block('article-card');
 
@@ -34,9 +34,7 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({article, onClick}) => {
             cover={
                 <Image
                     alt={article.title}
-                    src={
-                        'https://cdn.mos.cms.futurecdn.net/Tn2awspunwJuaJY7MUE4PM-2560-80.jpg'
-                    }
+                    src={article.image}
                     preview={false}
                     style={{
                         borderRadius,

@@ -29,6 +29,7 @@ const baseConfig = tseslint.config(
                         ["@/likes/*", "./src/modules/likes/*"],
                         ["@/types/*", "./src/types/*"],
                         ["@/shared/*", "./src/shared/*"],
+                        ["@/config/*", "./src/config/*"],
                     ],
                 },
             },

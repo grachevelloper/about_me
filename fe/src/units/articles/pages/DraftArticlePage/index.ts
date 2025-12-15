@@ -1,0 +1,1 @@
+export {DraftArticlePage} from './DraftArticlePage';

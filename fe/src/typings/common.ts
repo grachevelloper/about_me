@@ -12,7 +12,7 @@ export interface Tokens {
 export interface BaseEntity {
     createdAt?: Date;
     updatedAt?: Date;
-    id?: string;
+    id: string;
 }
 
 export interface LikedEntity extends BaseEntity {

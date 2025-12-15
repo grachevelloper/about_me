@@ -6,6 +6,7 @@ import {
     HttpCode,
     HttpStatus,
     Param,
+    Patch,
     Post,
     Query,
     Req,
@@ -18,6 +19,7 @@ import {
     RequestGetArticles,
     ResponseArticle,
     ResponseGetArticles,
+    UpdateArticleDto,
 } from "./article.interface";
 import {Article} from "./articles.entity";
 import {ArticlesService} from "./articles.service";
@@ -28,9 +30,12 @@ export class ArticlesController {
 
     @Post()
     async create(
+        @Req() req: Request,
         @Body() createArticleData: CreateArticleDto,
     ): Promise<ResponseArticle> {
-        return await this.articlesService.create(createArticleData);
+        const authorId = req.user.id;
+
+        return await this.articlesService.create(authorId, createArticleData);
     }
 
     @Get(":id")
@@ -40,6 +45,14 @@ export class ArticlesController {
     ): Promise<ResponseArticle> {
         const authorId = req.user.id;
         return await this.articlesService.findOne(id, authorId);
+    }
+
+    @Patch(":id")
+    async update(
+        @Param("id") id: string,
+        @Body() data: UpdateArticleDto,
+    ): Promise<Article> {
+        return await this.articlesService.update(id, data);
     }
 
     @Delete(":id")

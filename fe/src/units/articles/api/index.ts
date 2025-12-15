@@ -12,7 +12,7 @@ const api: ArticleApi = {
 
     update: async (updateData: DtoUpdateArticle): Promise<Article> => {
         const {id, ...data} = updateData;
-        const response = await query.put<Article>(`articles/${id}`, data);
+        const response = await query.patch<Article>(`articles/${id}`, data);
         return response;
     },
 

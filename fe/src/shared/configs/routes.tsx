@@ -7,6 +7,7 @@ import {todosRoutes} from '@/todos/pages';
 
 import {AuthLayout} from '../components/AuthLayout';
 import {Layout} from '../components/Layout';
+import {sharedPagesRoutes} from '../pages';
 
 const routes: RouteProps[] = [
     ...todosRoutes,
@@ -34,6 +35,15 @@ export const Router = () => {
                 </Route>
                 <Route element={<AuthLayout />} path='/auth'>
                     {authRoutes.map((route: RouteProps) => (
+                        <Route
+                            key={route.path}
+                            element={route.element}
+                            path={route.path}
+                        />
+                    ))}
+                </Route>
+                <Route path='/error'>
+                    {sharedPagesRoutes.map((route: RouteProps) => (
                         <Route
                             key={route.path}
                             element={route.element}

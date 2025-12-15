@@ -29,14 +29,14 @@ import {
 import '@mdxeditor/editor/style.css';
 import {Flex} from 'antd';
 import block from 'bem-cn-lite';
-import {ForwardedRef} from 'react';
+import {ForwardedRef, useEffect, useRef} from 'react';
 
 import './MdEditor.scss';
 import {imageUploadHandler} from './utils';
 
 const b = block('md-editor');
 
-export type EntityAttachmentType = 'article | todo';
+export type EntityAttachmentType = 'article' | 'todo';
 
 interface InitializedMDXEditorProps extends MDXEditorProps {
     editorRef?: ForwardedRef<MDXEditorMethods>;
@@ -47,12 +47,17 @@ interface InitializedMDXEditorProps extends MDXEditorProps {
 
 export function MdEditor({
     editorRef,
-    markdown,
+    markdown: externalMarkdown,
     editable,
     entityType,
+    onChange,
     entityId,
     ...props
 }: InitializedMDXEditorProps) {
+    // Используем ref для хранения предыдущего значения
+    const prevExternalMarkdownRef = useRef(externalMarkdown);
+    const editorInstanceRef = useRef<MDXEditorMethods>(null);
+
     const plugins = [
         headingsPlugin({allowedHeadingLevels: [1, 2, 3]}),
         linkPlugin(),
@@ -65,6 +70,7 @@ export function MdEditor({
         thematicBreakPlugin(),
         markdownShortcutPlugin(),
     ];
+
     if (editable) {
         plugins.push(
             toolbarPlugin({
@@ -93,12 +99,44 @@ export function MdEditor({
             })
         );
     }
+
+    // Обновляем редактор только когда внешний markdown изменился НЕ из-за нашего onChange
+    useEffect(() => {
+        // Проверяем, что это действительно новое значение извне
+        if (
+            externalMarkdown !== prevExternalMarkdownRef.current &&
+            editorInstanceRef.current
+        ) {
+            prevExternalMarkdownRef.current = externalMarkdown;
+
+            // Программно обновляем содержимое редактора
+            editorInstanceRef.current.setMarkdown(externalMarkdown || '');
+        }
+    }, [externalMarkdown]);
+
+    const handleChange = (newMarkdown: string) => {
+        prevExternalMarkdownRef.current = newMarkdown;
+        onChange?.(newMarkdown, true);
+    };
+
     return (
         <MDXEditor
-            ref={editorRef}
+            ref={(instance) => {
+                editorInstanceRef.current = instance;
+                if (editorRef) {
+                    if (typeof editorRef === 'function') {
+                        editorRef(instance);
+                    } else {
+                        (
+                            editorRef as React.MutableRefObject<MDXEditorMethods>
+                        ).current = instance;
+                    }
+                }
+            }}
             plugins={plugins}
+            markdown={externalMarkdown} // Используем напрямую externalMarkdown
+            onChange={handleChange}
             {...props}
-            markdown={markdown || ''}
         />
     );
 }

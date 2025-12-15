@@ -69,7 +69,7 @@ Suche nach einem passenden Radioprogramm.`,
         comments: [],
         tags: [{id: '1', name: 'react'}],
         readTime: 3,
-        image: 'https://picsum.photos/400/250?random=1',
+        image: '/assets/image-placeholder.png',
         hasLiked: true,
     };
 

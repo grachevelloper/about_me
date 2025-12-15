@@ -5,7 +5,8 @@ import {queryClient} from '@/shared/configs/api';
 import api from '../api';
 import {DtoCreateArticle, DtoUpdateArticle} from '../api/types';
 import {Article} from '../types';
-import {articleKeys} from '../utils/constants';
+
+import {articleKeys} from './constants';
 
 export const useGetAllArticles = () => {
     return useQuery<Article[], Error>({
@@ -14,11 +15,18 @@ export const useGetAllArticles = () => {
     });
 };
 
-export const useGetArticleById = (id: string | undefined) => {
+export const useGetArticleById = (id?: string) => {
     return useQuery<Article, Error>({
-        queryKey: articleKeys.detail(id || ''),
-        queryFn: () => api.getById(id!),
+        queryKey: articleKeys.detail(id!),
+        queryFn: () => {
+            if (!id) {
+                throw new Error('Article ID is required');
+            }
+            return api.getById(id);
+        },
         enabled: !!id,
+        retry: false,
+        staleTime: 5 * 60 * 1000,
     });
 };
 
@@ -43,16 +51,16 @@ export const useCreateArticle = () => {
         mutationFn: (data) => api.create(data),
         onSuccess: (data) => {
             queryClient.invalidateQueries({queryKey: articleKeys.lists()});
-            queryClient.setQueryData(articleKeys.detail(data.id!), data);
+            queryClient.setQueryData(articleKeys.detail(data.id), data);
         },
     });
 };
 
 export const useUpdateArticle = () => {
-    return useMutation<Article, Error, DtoUpdateArticle & {id: string}>({
+    return useMutation<Article, Error, DtoUpdateArticle>({
         mutationFn: (data) => api.update(data),
         onSuccess: (data, variables) => {
-            queryClient.setQueryData(articleKeys.detail(variables.id), data);
+            queryClient.setQueryData(articleKeys.detail(variables.id!), data);
             queryClient.invalidateQueries({queryKey: articleKeys.lists()});
         },
     });
