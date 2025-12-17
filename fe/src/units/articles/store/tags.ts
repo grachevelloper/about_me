@@ -4,7 +4,8 @@ import {queryClient} from '@/shared/configs/api';
 
 import api from '../api/tags';
 import {Tag} from '../types';
-import {tagsKeys} from '../utils/constants';
+
+import {tagsKeys} from './constants';
 
 export const useGetTags = () => {
     return useQuery<Tag[], Error>({

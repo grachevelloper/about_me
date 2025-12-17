@@ -1,14 +1,18 @@
 import {Tag as AntTag, theme} from 'antd';
 import block from 'bem-cn-lite';
 
+import {Tag} from '../../types';
+
 import './ArticleTag.scss';
 
 const b = block('article-tag');
 
 interface TagProps {
-    name: string;
+    tag: Tag;
+    editable?: boolean;
+    onClose?: (id: string) => void;
 }
-export const ArticleTag = ({name}: TagProps) => {
+export const ArticleTag = ({tag, editable, onClose}: TagProps) => {
     const {
         token: {colorPrimary, colorBorder, borderRadius},
     } = theme.useToken();
@@ -19,8 +23,11 @@ export const ArticleTag = ({name}: TagProps) => {
                 borderRadius,
                 border: `1px solid ${colorBorder}`,
             }}
+            className={b()}
+            closable={editable}
+            onClose={() => onClose?.(tag.id)}
         >
-            {name}
+            {tag.name}
         </AntTag>
     );
 };

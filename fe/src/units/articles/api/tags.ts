@@ -19,10 +19,5 @@ const tagsApi: TagsApi = {
         const response = await query.delete(`tags/${id}`);
         return response.status === 204 || response.status === 200;
     },
-
-    updateTag: async (id: string, newName: string): Promise<Tag> => {
-        const response = await query.patch<Tag>(`tags/${id}`, {name: newName});
-        return response;
-    },
 };
 export default tagsApi;

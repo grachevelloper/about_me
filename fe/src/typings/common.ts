@@ -20,7 +20,7 @@ export interface LikedEntity extends BaseEntity {
 }
 
 export enum Role {
-    ADMIN = 'admin',
-    WRITER = 'writer',
-    USER = 'user',
+    ADMIN = 'Admin',
+    WRITER = 'Writer',
+    USER = 'User',
 }

@@ -32,7 +32,9 @@
     "articles.form.category.label": "Категория",
     "articles.form.category.placeholder": "Выберите категорию",
     "articles.form.tags.label": "Теги",
+    "articles.form.tags.select": "Выбрать теги",
     "articles.form.tags.placeholder": "Добавьте теги через запятую",
+    "article.tags.error": "Возникла ошибка при загрузке тегов",
     "articles.form.preview": "Предпросмотр",
     "articles.form.saveDraft": "Сохранить черновик",
 

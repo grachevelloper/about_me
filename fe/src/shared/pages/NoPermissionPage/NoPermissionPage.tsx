@@ -6,8 +6,7 @@ import {useNavigate} from 'react-router-dom';
 
 import noPermission from '@/public/lottie/no-permission.json';
 
-import {ButtonAccept} from '../../components/actions';
-
+import {RevertButton} from '../../components/RevertButton';
 import './NoPermissionPage.scss';
 
 const b = block('no-permission-page');
@@ -28,10 +27,7 @@ export const NoPermissionPage = () => {
             <Typography.Title level={1}>
                 {t('page.no_permission.title')}
             </Typography.Title>
-            <ButtonAccept
-                text={t('page.no_permission.button')}
-                onClick={() => navigate(-1)}
-            />
+            <RevertButton />
         </Flex>
     );
 };

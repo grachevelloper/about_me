@@ -51,14 +51,13 @@ const imageUploadHandler = (
     entityType: EntityAttachmentType,
     entityId: string
 ) => {
-    return async (image: File) => {
+    return async (file: File) => {
         const formData = new FormData();
-        formData.append('image', image);
-        const response = await query.post(
+        formData.append('file', file);
+        const response = await query.post<string>(
             `/attachments/${entityType}/${entityId}`,
+            formData,
             {
-                data: formData,
-
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },

@@ -1,10 +1,12 @@
 import {useMutation, useQuery} from '@tanstack/react-query';
+import {useTranslation} from 'react-i18next';
 
 import {queryClient} from '@/shared/configs/api';
 
 import api from '../api';
-import {DtoCreateArticle, DtoUpdateArticle} from '../api/types';
+import {DtoUpdateArticle} from '../api/types';
 import {Article} from '../types';
+import {EMPTY_ARTICLE_BASE} from '../utils/constants';
 
 import {articleKeys} from './constants';
 
@@ -46,8 +48,14 @@ export const useGetArticlesByAuthor = (authorId: string | undefined) => {
 };
 
 export const useCreateArticle = () => {
-    return useMutation<Article, Error, DtoCreateArticle>({
-        mutationFn: (data) => api.create(data),
+    const {t} = useTranslation('article');
+
+    const emptyArticle: Omit<Article, 'author' | 'image'> = {
+        ...EMPTY_ARTICLE_BASE,
+        title: t('article.new.title'),
+    };
+    return useMutation<Article, Error, void>({
+        mutationFn: () => api.create(emptyArticle),
         onSuccess: (data) => {
             queryClient.invalidateQueries({queryKey: articleKeys.lists()});
             queryClient.setQueryData(articleKeys.detail(data.id), data);

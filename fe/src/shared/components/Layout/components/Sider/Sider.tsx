@@ -1,8 +1,8 @@
 import {BulbOutlined, HomeOutlined, UserOutlined} from '@ant-design/icons';
-import {Flex, Layout, Menu, theme} from 'antd';
+import {Flex, Layout, Menu, message, notification, theme} from 'antd';
 import {MenuItemType} from 'antd/es/menu/interface';
 import block from 'bem-cn-lite';
-import {useCallback, useState} from 'react';
+import {Fragment, useCallback, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {IoIosLogOut} from 'react-icons/io';
 import {MdOutlineCreate} from 'react-icons/md';
@@ -13,6 +13,7 @@ import {useAuth, useTodoForm} from '@/shared/context';
 import {useLayout} from '@/shared/hooks';
 import {Role} from '@/typings/common';
 
+import {useCreateArticle} from '../../../../../units/articles/store';
 import {LogoutDialog} from '../LogoutDialog';
 
 import './Sider.scss';
@@ -35,6 +36,16 @@ export const Sider = ({isCollapsed, setCollapsed}: SiderProps) => {
     } = theme.useToken();
     const navigate = useNavigate();
     const location = useLocation();
+    const [notificationApi, contextNotificationHolder] =
+        notification.useNotification();
+    const [messageApi, contextMessageHolder] = message.useMessage();
+
+    const {
+        mutateAsync: createArticle,
+        data: newArticle,
+        error: errorCraeteArticle,
+        isPending: isPendingCreateingArticle,
+    } = useCreateArticle();
 
     const [isSignoutModalOpen, setSignoutModalOpen] = useState<boolean>(false);
 
@@ -111,7 +122,26 @@ export const Sider = ({isCollapsed, setCollapsed}: SiderProps) => {
             label: t('layout.left.create_article'),
             key: 'action-writer-0',
             onClick: () => {
-                navigate('/articles/new');
+                createArticle()
+                    .then((data) => {
+                        navigate(`/articles/draft/${data.id}`);
+                        messageApi.open({
+                            type: 'success',
+                            content: t(
+                                'layout.left.create_article.success.title'
+                            ),
+                        });
+                    })
+                    .catch(() => {
+                        notificationApi.error({
+                            message: t(
+                                'layout.left.create_article.error.title'
+                            ),
+                            description: t(
+                                'layout.left.create_article.error.description'
+                            ),
+                        });
+                    });
             },
         },
     ];
@@ -162,45 +192,53 @@ export const Sider = ({isCollapsed, setCollapsed}: SiderProps) => {
         return '20%';
     };
     return (
-        <AntSider
-            className={b()}
-            breakpoint='lg'
-            collapsedWidth={0}
-            collapsed={isCollapsed}
-            onCollapse={() => setCollapsed((prev) => !prev)}
-            theme='light'
-            width={calculateWidth()}
-            style={{
-                maxWidth: '400px',
-            }}
-        >
-            <Flex vertical justify='space-between' className={b('container')}>
-                <Menu
-                    theme='light'
-                    mode='vertical'
-                    items={navigateItems}
-                    defaultSelectedKeys={defaultNavigateItem()}
-                    rootClassName={b('menu')}
-                    style={{
-                        fontSize: fontSizeLG,
-                    }}
-                />
+        <Fragment>
+            {contextNotificationHolder}
+            {contextMessageHolder}
+            <AntSider
+                className={b()}
+                breakpoint='lg'
+                collapsedWidth={0}
+                collapsed={isCollapsed}
+                onCollapse={() => setCollapsed((prev) => !prev)}
+                theme='light'
+                width={calculateWidth()}
+                style={{
+                    maxWidth: '400px',
+                }}
+            >
+                <Flex
+                    vertical
+                    justify='space-between'
+                    className={b('container')}
+                >
+                    <Menu
+                        theme='light'
+                        mode='vertical'
+                        items={navigateItems}
+                        defaultSelectedKeys={defaultNavigateItem()}
+                        rootClassName={b('menu')}
+                        style={{
+                            fontSize: fontSizeLG,
+                        }}
+                    />
 
-                <Menu
-                    theme='light'
-                    mode='vertical'
-                    items={actionItems}
-                    selectable={false}
-                    rootClassName={b('menu')}
-                    style={{
-                        fontSize: fontSizeLG,
-                    }}
+                    <Menu
+                        theme='light'
+                        mode='vertical'
+                        items={actionItems}
+                        selectable={false}
+                        rootClassName={b('menu')}
+                        style={{
+                            fontSize: fontSizeLG,
+                        }}
+                    />
+                </Flex>
+                <LogoutDialog
+                    isOpen={isSignoutModalOpen}
+                    onCancel={() => setSignoutModalOpen(false)}
                 />
-            </Flex>
-            <LogoutDialog
-                isOpen={isSignoutModalOpen}
-                onCancel={() => setSignoutModalOpen(false)}
-            />
-        </AntSider>
+            </AntSider>
+        </Fragment>
     );
 };

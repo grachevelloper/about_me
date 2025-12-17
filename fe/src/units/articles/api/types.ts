@@ -21,5 +21,4 @@ export interface TagsApi {
     getTags: () => Promise<Tag[]>;
     createTag: (name: string) => Promise<Tag>;
     deleteTag: (id: string) => Promise<boolean>;
-    updateTag: (id: string, newName: string) => Promise<Tag>;
 }

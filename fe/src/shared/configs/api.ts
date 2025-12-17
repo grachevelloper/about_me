@@ -1,5 +1,5 @@
 import {QueryClient} from '@tanstack/react-query';
-import axios, {AxiosInstance, AxiosResponse} from 'axios';
+import axios, {AxiosInstance, AxiosRequestConfig, AxiosResponse} from 'axios';
 
 import {ApiErrorResponse, CustomAxiosError} from '@/typings/axios';
 
@@ -48,14 +48,20 @@ apiAxios.interceptors.response.use(
 );
 
 export const query = {
-    get: <T = any>(url: string) => apiAxios.get<T>(url) as Promise<T>,
-    post: <T = any>(url: string, data?: any) =>
-        apiAxios.post<T>(url, data) as Promise<T>,
-    patch: <T = any>(url: string, data?: any) =>
-        apiAxios.patch<T>(url, data) as Promise<T>,
-    put: <T = any>(url: string, data?: any) =>
-        apiAxios.put<T>(url, data) as Promise<T>,
-    delete: <T = any>(url: string) => apiAxios.delete<T>(url) as Promise<T>,
+    get: <T = any>(url: string, config?: AxiosRequestConfig) =>
+        apiAxios.get<T>(url, config) as Promise<T>,
+
+    post: <T = any>(url: string, data?: any, config?: AxiosRequestConfig) =>
+        apiAxios.post<T>(url, data, config) as Promise<T>,
+
+    patch: <T = any>(url: string, data?: any, config?: AxiosRequestConfig) =>
+        apiAxios.patch<T>(url, data, config) as Promise<T>,
+
+    put: <T = any>(url: string, data?: any, config?: AxiosRequestConfig) =>
+        apiAxios.put<T>(url, data, config) as Promise<T>,
+
+    delete: <T = any>(url: string, config?: AxiosRequestConfig) =>
+        apiAxios.delete<T>(url, config) as Promise<T>,
 };
 
 export const queryClient = new QueryClient({

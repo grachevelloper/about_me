@@ -10,7 +10,8 @@ import {useAuth} from '@/shared/context';
 import {useDebouncedCallback} from '@/shared/hooks';
 import {FIVE_SECONDS_IN_MS} from '@/shared/utils';
 
-import {ArticleTag} from '../../components/ArticleTag';
+import {TagsSelect} from '../../components/TagsSelect';
+import {TagsWrapper} from '../../components/TagsWrapper';
 import {useGetArticleById, useUpdateArticle} from '../../store';
 import {Article, Tag} from '../../types';
 
@@ -39,7 +40,7 @@ export const DraftArticlePage = () => {
     const [localArticle, setLocalArticle] = useState<Partial<Article> | null>(
         null
     );
-    const {title, content, updatedAt, tags, author, image} = serverArticle || {
+    const {title, content, updatedAt, tags, author, image} = localArticle || {
         title: '',
         content: '',
         tags: [],
@@ -129,7 +130,7 @@ export const DraftArticlePage = () => {
             <Row>
                 <Col span={24} md={16} sm={24}>
                     <Input
-                        value={localArticle?.title}
+                        value={title}
                         onChange={(e) => handleTitleChange(e.target.value)}
                         placeholder='Введите заголовок статьи'
                         variant='borderless'
@@ -158,7 +159,7 @@ export const DraftArticlePage = () => {
                 <Col span={24}>
                     <Image
                         src={image}
-                        alt={localArticle?.title}
+                        alt={title}
                         style={{
                             width: '100%',
                             maxHeight: '400px',
@@ -175,22 +176,15 @@ export const DraftArticlePage = () => {
                         {t('article.tags.title')}
                     </span>
                 </Col>
-                {localArticle?.tags?.map((tag: Tag) => (
-                    <Col key={tag.id}>
-                        <ArticleTag
-                            name={tag.name}
-                            // clsable
-                            // onClose={() => {
-                            //     const newTags =
-                            //         localArticle.tags?.filter(
-                            //             (t) => t.id !== tag.id
-                            //         ) || [];
-                            //     handleTagsChange(newTags);
-                            // }}
-                        />
-                    </Col>
-                ))}
-                <Col></Col>
+
+                <Col>
+                    <TagsSelect />
+                    <TagsWrapper
+                        tags={tags}
+                        onChange={handleTagsChange}
+                        isPending={isPending}
+                    />
+                </Col>
             </Row>
 
             <Row>
@@ -198,7 +192,7 @@ export const DraftArticlePage = () => {
                     <MdEditor
                         ref={mdRef}
                         placeholder={t('article.placeholder')}
-                        markdown={localArticle?.content || ''}
+                        markdown={content || ''}
                         onChange={handleContentChange}
                         editable
                         entityId={draftId || ''}
