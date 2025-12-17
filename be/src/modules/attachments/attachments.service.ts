@@ -19,16 +19,41 @@ export class AttachmentsService {
         entityType: EntityAttachmentType,
         entityId: string,
     ) {
-        const uploadResult = await this.s3Service.upload(file);
+        return this.attachmentsRepo.manager.transaction(
+            async (transactionalEntityManager) => {
+                let s3Key: string | null = null;
 
-        const attachment = this.attachmentsRepo.create({
-            url: uploadResult.url,
-            s3Key: uploadResult.key,
-            entityType,
-            entityId,
-        });
+                try {
+                    const uploadResult = await this.s3Service.upload(file);
+                    s3Key = uploadResult.key;
 
-        return this.attachmentsRepo.save(attachment);
+                    const attachment = this.attachmentsRepo.create({
+                        url: uploadResult.url,
+                        s3Key: uploadResult.key,
+                        entityType,
+                        entityId,
+                    });
+
+                    const savedAttachment =
+                        await transactionalEntityManager.save(attachment);
+
+                    return savedAttachment;
+                } catch (error) {
+                    if (s3Key) {
+                        try {
+                            await this.s3Service.delete(s3Key);
+                        } catch (deleteError) {
+                            console.error(
+                                "Failed to delete from S3:",
+                                deleteError,
+                            );
+                        }
+                    }
+
+                    throw error;
+                }
+            },
+        );
     }
 
     async getEntityImages(entityType: EntityAttachmentType, entityId: string) {
