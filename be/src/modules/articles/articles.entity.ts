@@ -58,7 +58,7 @@ export class Article extends BaseEntity {
     @Min(0)
     likesCount: number;
 
-    @ManyToOne(() => User)
+    @ManyToOne(() => User, {cascade: true})
     @JoinColumn({name: "authorId"})
     author: User;
 

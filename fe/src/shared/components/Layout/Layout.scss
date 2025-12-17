@@ -1,6 +1,7 @@
 @import 'animate.css';
 
 .layout {
+    min-height: 100vh;
     &__overlay {
         position: fixed;
         top: 0;

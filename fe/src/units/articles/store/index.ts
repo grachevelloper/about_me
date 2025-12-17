@@ -30,11 +30,10 @@ export const useGetArticleById = (id?: string) => {
     });
 };
 
-export const useGetAuthorDrafts = (authorId: string | undefined) => {
+export const useGetAuthorDrafts = () => {
     return useQuery<Article[], Error>({
-        queryKey: articleKeys.drafts(authorId || ''),
-        queryFn: () => api.getDrafts(authorId!),
-        enabled: !!authorId,
+        queryKey: articleKeys.drafts(),
+        queryFn: () => api.getDrafts(),
     });
 };
 

@@ -190,7 +190,6 @@
 
         filter: blur(20px);
 
-        // backdrop-filter: blur(10px);
 
         will-change: opacity, filter;
     }
@@ -293,12 +292,6 @@
         }
         100% {
             color: black;
-        }
-    }
-
-    @keyframes fade-in {
-        to {
-            opacity: 1;
         }
     }
 

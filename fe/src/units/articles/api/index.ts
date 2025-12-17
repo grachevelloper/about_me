@@ -25,15 +25,15 @@ const api: ArticleApi = {
         return response;
     },
 
-    getDrafts: async (authorId: string): Promise<Article[]> => {
-        const response = await query.get<Article[]>(
-            `articles/drafts${authorId}`
-        );
+    getDrafts: async (): Promise<Article[]> => {
+        const response = await query.get<Article[]>(`articles/drafts`);
         return response;
     },
 
     getByAuthorId: async (authorId: string): Promise<Article[]> => {
-        const response = await query.get<Article[]>(`articles/${authorId}`);
+        const response = await query.get<Article[]>(
+            `articles/author/${authorId}`
+        );
         return response;
     },
 

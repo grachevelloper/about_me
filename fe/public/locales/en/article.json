@@ -1,6 +1,6 @@
 {
     "page.title": "article",
-    "page.subtitle": "Tips, guides and news from the world of development",
+    "articles.page.subtitle": "Tips, guides and news from the world of development",
 
     "actions.filters": "Filters",
     "actions.readMore": "Read more",
@@ -10,7 +10,7 @@
     "actions.publish": "Publish",
     "actions.share": "Share",
 
-    "article.search.placeholder": "Схоластика папы Иоанна XII...",
+    "article.articles.search.placeholder": "Схоластика папы Иоанна XII...",
 
     "article.recent": "Recent article",
     "article.popular": "Popular",

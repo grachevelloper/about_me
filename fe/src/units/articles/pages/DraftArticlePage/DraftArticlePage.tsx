@@ -1,15 +1,7 @@
-import {
-    Button,
-    Col,
-    Image,
-    Input,
-    notification,
-    Row,
-    theme,
-    Typography,
-} from 'antd';
+import {MDXEditorMethods} from '@mdxeditor/editor';
+import {Col, Image, Input, notification, Row, theme, Typography} from 'antd';
 import block from 'bem-cn-lite';
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useNavigate, useParams} from 'react-router-dom';
 
@@ -35,21 +27,24 @@ export const DraftArticlePage = () => {
     const {t: tCommon} = useTranslation('common');
     const navigate = useNavigate();
     const {id: draftId} = useParams();
+    // Use for mutate
     const {error, isPending, mutateAsync: updateArticle} = useUpdateArticle();
+    //Use for first initial query
     const {
         data: serverArticle,
         isLoading: isArticleLoading,
         error: articleError,
     } = useGetArticleById(draftId);
+    //Use for temporary state, between update by client and mutate
+    const [localArticle, setLocalArticle] = useState<Partial<Article> | null>(
+        null
+    );
     const {title, content, updatedAt, tags, author, image} = serverArticle || {
         title: '',
         content: '',
         tags: [],
         id: '',
     };
-    const [localArticle, setLocalArticle] = useState<Partial<Article> | null>(
-        null
-    );
 
     useEffect(() => {
         if (!isArticleLoading && serverArticle) {
@@ -105,6 +100,14 @@ export const DraftArticlePage = () => {
         },
         [debouncedUpdate]
     );
+    const mdRef = useRef<MDXEditorMethods>(null);
+
+    useEffect(() => {
+        if (!isArticleLoading && serverArticle?.content) {
+            console.log(serverArticle.content);
+            mdRef.current?.setMarkdown(serverArticle?.content || '');
+        }
+    }, [isArticleLoading, serverArticle?.content]);
 
     const handleTagsChange = useCallback(
         (tags: Tag[]) => {
@@ -120,7 +123,6 @@ export const DraftArticlePage = () => {
     if (user?.id && author?.id && user?.id !== author?.id) {
         navigate('/error/no-permission');
     }
-    console.log(localArticle?.content);
 
     return (
         <div className={b()} style={{padding}}>
@@ -170,7 +172,7 @@ export const DraftArticlePage = () => {
             <Row style={{marginBottom: '24px'}} align='middle' gutter={[8, 8]}>
                 <Col>
                     <span style={{marginRight: '8px', color: '#666'}}>
-                        Теги:
+                        {t('article.tags.title')}
                     </span>
                 </Col>
                 {localArticle?.tags?.map((tag: Tag) => (
@@ -188,33 +190,13 @@ export const DraftArticlePage = () => {
                         />
                     </Col>
                 ))}
-                <Col>
-                    <Button
-                        size='small'
-                        type='dashed'
-                        onClick={() => {
-                            const newTagName = prompt('Введите название тега:');
-                            if (newTagName) {
-                                const newTag: Tag = {
-                                    id: Date.now().toString(),
-                                    name: newTagName,
-                                };
-                                const newTags = [
-                                    ...(localArticle?.tags || []),
-                                    newTag,
-                                ];
-                                handleTagsChange(newTags);
-                            }
-                        }}
-                    >
-                        + Добавить тег
-                    </Button>
-                </Col>
+                <Col></Col>
             </Row>
 
             <Row>
                 <Col span={24}>
                     <MdEditor
+                        ref={mdRef}
                         placeholder={t('article.placeholder')}
                         markdown={localArticle?.content || ''}
                         onChange={handleContentChange}

@@ -110,8 +110,18 @@ export class ArticlesService {
         if (tags) {
             const tagArray = Array.isArray(tags) ? tags : [tags];
             queryBuilder
-                .innerJoin("article.tags", "tag")
-                .andWhere("tag.name IN (:...tags)", {tags: tagArray});
+                .andWhere((qb) => {
+                    const subQuery = qb
+                        .subQuery()
+                        .select("1")
+                        .from("article_tags", "at")
+                        .innerJoin("at.tag", "t")
+                        .where("at.articleId = article.id")
+                        .andWhere("t.name IN (:...tags)")
+                        .getQuery();
+                    return `EXISTS (${subQuery})`;
+                })
+                .setParameter("tags", tagArray);
         }
         if (minLikes) {
             queryBuilder.andWhere("article.likesCount >= :minLikes", {
@@ -123,6 +133,14 @@ export class ArticlesService {
                 createdAfter: new Date(createdAfter),
             });
         }
+
+        const validSortFields = [
+            "createdAt",
+            "updatedAt",
+            "likesCount",
+            "title",
+            "readTime",
+        ];
 
         queryBuilder.orderBy(`article.${sortBy}`, order as "ASC" | "DESC");
 

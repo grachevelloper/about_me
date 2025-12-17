@@ -4,8 +4,7 @@ export const articleKeys = {
     list: (filters?: any) => [...articleKeys.lists(), {filters}] as const,
     details: () => [...articleKeys.all, 'detail'] as const,
     detail: (id: string) => [...articleKeys.details(), id] as const,
-    drafts: (authorId: string) =>
-        [...articleKeys.all, 'drafts', authorId] as const,
+    drafts: () => [...articleKeys.all, 'drafts'] as const,
     byAuthor: (authorId: string) =>
         [...articleKeys.all, 'author', authorId] as const,
 };

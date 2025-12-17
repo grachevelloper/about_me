@@ -1,17 +1,14 @@
 import {Col, Flex, Input, Row, theme, Typography} from 'antd';
 import block from 'bem-cn-lite';
 import {useTranslation} from 'react-i18next';
-import {useNavigate} from 'react-router-dom';
 
 import {useAuth} from '@/shared/context';
 import {Role} from '@/typings/common';
 
-import imagePlaceholder from '@/public/assets/image-placeholder.png';
-
-import {ArticleCard} from '../../components/ArticleCard';
+import {ArticlesList} from '../../components/ArticlesList';
 import {CreateNewArticleButton} from '../../components/CreateNewArticleButton';
 import {SearchPanel} from '../../components/SearchPanel';
-import {Article} from '../../types';
+import {useGetAllArticles} from '../../store';
 
 import './ArticlesListPage.scss';
 
@@ -27,30 +24,9 @@ export const ArticlesListPage = () => {
     } = theme.useToken();
     const {user} = useAuth();
     const role = user?.role || Role.USER;
-
-    const navigate = useNavigate();
+    const {data: articles, isPending, error} = useGetAllArticles();
 
     const canWriteArticle = role === Role.WRITER || role === Role.ADMIN;
-    const mockArticles: Article[] = [
-        {
-            id: '1',
-            title: 'Древний рим в новое время',
-            createdAt: new Date(Date.now()),
-            author: user!,
-            isDraft: false,
-            likesCount: 89,
-            content: 'ПОПОАОАО',
-            comments: [],
-            tags: [{id: '1', name: 'react'}],
-            readTime: 3,
-            hasLiked: true,
-            image: imagePlaceholder,
-        },
-    ];
-
-    const handleArticleClick = (id: string) => {
-        navigate(`/articles/${id}`);
-    };
 
     const handleSearch = (value: string) => {
         console.log('Search:', value);
@@ -69,9 +45,9 @@ export const ArticlesListPage = () => {
             <Row>
                 <Col xs={24} md={16}>
                     <Title level={1} style={{marginBottom: '8px'}}>
-                        {t('page.title')}
+                        {t('articles.page.title')}
                     </Title>
-                    <Text type='secondary'>{t('page.subtitle')}</Text>
+                    <Text type='secondary'>{t('articles.page.subtitle')}</Text>
                 </Col>
                 <Col xs={16} sm={8} className={b('create-article-button-row')}>
                     {renderNewArticleButton()}
@@ -84,16 +60,11 @@ export const ArticlesListPage = () => {
                 </Col>
             </Row>
 
-            <Row gutter={[24, 24]}>
-                {mockArticles.map((article) => (
-                    <Col key={article.id} xs={24} sm={12} lg={8}>
-                        <ArticleCard
-                            article={article}
-                            onClick={() => handleArticleClick(article.id)}
-                        />
-                    </Col>
-                ))}
-            </Row>
+            <ArticlesList
+                articles={articles}
+                isPending={isPending}
+                error={error}
+            />
         </Flex>
     );
 };

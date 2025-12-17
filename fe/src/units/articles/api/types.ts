@@ -11,7 +11,7 @@ export interface ArticleApi {
     update: (updateData: DtoUpdateArticle) => Promise<Article>;
     delete: (id: string) => Promise<void>;
     getById: (id: string) => Promise<Article>;
-    getDrafts: (authorId: string) => Promise<Article[]>;
+    getDrafts: () => Promise<Article[]>;
     getByAuthorId: (authorId: string) => Promise<Article[]>;
     getAll: () => Promise<Article[]>;
     publish: (id: string) => Promise<boolean>;

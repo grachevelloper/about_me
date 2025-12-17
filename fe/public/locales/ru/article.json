@@ -1,11 +1,14 @@
 {
-    "page.title": "Статьи",
-    "page.subtitle": "Советы, руководства и новости из мира разработки",
+    "articles.page.title": "Статьи",
+    "articles.page.subtitle": "Советы, руководства и новости из мира разработки",
+    "articles.drafts.page.title": "Мои черновики",
 
-    "search.placeholder": "Поиск статей...",
-    "search.button": "Найти",
+    "articles.search.placeholder": "Поиск статей...",
+    "articles.search.button": "Найти",
 
-    "article.search.placeholder": "Схоластика папы Иоанна XII...",
+    "aritcle.void_container.description": "Здесь пока ничего нет",
+
+    "article.articles.search.placeholder": "Схоластика папы Иоанна XII...",
 
     "articles.create": "Написать статью",
     "articles.filters": "Фильтры",

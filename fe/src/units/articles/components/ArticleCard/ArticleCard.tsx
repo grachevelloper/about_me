@@ -25,7 +25,7 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({article, onClick}) => {
     return (
         <Card
             hoverable
-            className={b()}
+            className={b({'is-loaded': true})}
             onClick={onClick}
             size='default'
             style={{

@@ -2,12 +2,12 @@ import {BulbOutlined, HomeOutlined, UserOutlined} from '@ant-design/icons';
 import {Flex, Layout, Menu, theme} from 'antd';
 import {MenuItemType} from 'antd/es/menu/interface';
 import block from 'bem-cn-lite';
-import {useState} from 'react';
+import {useCallback, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {IoIosLogOut} from 'react-icons/io';
 import {MdOutlineCreate} from 'react-icons/md';
-import {RiArticleLine, RiDraftLine} from 'react-icons/ri';
-import {useNavigate} from 'react-router-dom';
+import {RiArticleLine, RiDraftLine, RiTodoLine} from 'react-icons/ri';
+import {useLocation, useNavigate} from 'react-router-dom';
 
 import {useAuth, useTodoForm} from '@/shared/context';
 import {useLayout} from '@/shared/hooks';
@@ -34,11 +34,13 @@ export const Sider = ({isCollapsed, setCollapsed}: SiderProps) => {
         token: {fontSizeLG},
     } = theme.useToken();
     const navigate = useNavigate();
+    const location = useLocation();
 
     const [isSignoutModalOpen, setSignoutModalOpen] = useState<boolean>(false);
 
+    const isWriter = user?.role === Role.WRITER;
     const isAdmin = user?.role === Role.ADMIN;
-    const adminNaviage: MenuItemType[] = [
+    const writerNavigate: MenuItemType[] = [
         {
             icon: <RiArticleLine />,
             label: t('layout.top.drafts'),
@@ -48,6 +50,8 @@ export const Sider = ({isCollapsed, setCollapsed}: SiderProps) => {
             },
         },
     ];
+
+    const adminNavigate: MenuItemType[] = [];
 
     const navigateItems: MenuItemType[] = [
         {
@@ -66,8 +70,29 @@ export const Sider = ({isCollapsed, setCollapsed}: SiderProps) => {
                 navigate('/articles');
             },
         },
-        ...(isAdmin ? adminNaviage : []),
     ];
+
+    if (isAdmin) {
+        navigateItems.push(...adminNavigate, ...writerNavigate);
+    } else if (isWriter) {
+        navigateItems.push(...writerNavigate);
+    }
+
+    const defaultNavigateItem = useCallback(() => {
+        const path = location.pathname.split('/').at(-1);
+        switch (path) {
+            case 'todos':
+                return ['nav-0'];
+            case 'articles':
+                return ['nav-1'];
+            case 'user':
+                return ['nav-2'];
+            case 'drafts':
+                return ['nav-3'];
+            default:
+                return [''];
+        }
+    }, [location]);
 
     const userActions: MenuItemType[] = [
         {
@@ -80,20 +105,30 @@ export const Sider = ({isCollapsed, setCollapsed}: SiderProps) => {
         },
     ];
 
-    const adminActions: MenuItemType[] = [
+    const writerActions: MenuItemType[] = [
         {
             icon: <MdOutlineCreate />,
             label: t('layout.left.create_article'),
-            key: 'action-admin-0',
+            key: 'action-writer-0',
             onClick: () => {
                 navigate('/articles/new');
             },
         },
     ];
 
+    const adminActions: MenuItemType[] = [
+        {
+            icon: <RiTodoLine />,
+            label: t('layout.left.create_todo'),
+            key: 'action-admin-0',
+            onClick: () => {
+                navigate('/todos/new');
+            },
+        },
+    ];
+
     const actionItems: MenuItemType[] = user
         ? [
-              ...(isAdmin ? adminActions : userActions),
               {
                   icon: <IoIosLogOut className={b('logout-icon')} />,
                   label: t('logout'),
@@ -113,12 +148,19 @@ export const Sider = ({isCollapsed, setCollapsed}: SiderProps) => {
               },
           ];
 
+    if (isAdmin) {
+        actionItems.unshift(...adminActions, ...writerActions);
+    } else if (isWriter) {
+        actionItems.unshift(...writerActions);
+    } else {
+        actionItems.unshift(...userActions);
+    }
+
     const calculateWidth = () => {
         if (isTablet) return '25%';
         if (isMobile) return '250px';
         return '20%';
     };
-    console.log(user);
     return (
         <AntSider
             className={b()}
@@ -137,7 +179,7 @@ export const Sider = ({isCollapsed, setCollapsed}: SiderProps) => {
                     theme='light'
                     mode='vertical'
                     items={navigateItems}
-                    defaultSelectedKeys={['nav-0']}
+                    defaultSelectedKeys={defaultNavigateItem()}
                     rootClassName={b('menu')}
                     style={{
                         fontSize: fontSizeLG,

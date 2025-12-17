@@ -38,6 +38,12 @@ export class ArticlesController {
         return await this.articlesService.create(authorId, createArticleData);
     }
 
+    @Get("drafts")
+    async findAllDrafts(@Req() req: Request): Promise<Article[]> {
+        const authorId = req.user.id;
+        return await this.articlesService.findAllByAuthorId(authorId, true);
+    }
+
     @Get(":id")
     async findOne(
         @Req() req: Request,
@@ -82,7 +88,7 @@ export class ArticlesController {
         await this.articlesService.decrementLikesCount(id);
     }
 
-    @Get(":authorId")
+    @Get("author/:authorId")
     async findAllByAuthorId(
         @Param("authorId") authorId: string,
     ): Promise<Article[]> {
@@ -105,12 +111,5 @@ export class ArticlesController {
             tags: query.tags ? query.tags.split(",") : undefined,
         };
         return await this.articlesService.findAll(filters);
-    }
-
-    @Get("drafts/:authorId")
-    async findAllDrafts(
-        @Param("authorId") authorId: string,
-    ): Promise<Article[]> {
-        return await this.articlesService.findAllByAuthorId(authorId, true);
     }
 }

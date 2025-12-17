@@ -1,7 +1,7 @@
 import {Flex, Statistic, StatisticProps} from 'antd';
 import {valueType} from 'antd/es/statistic/utils';
 import block from 'bem-cn-lite';
-import {useRef} from 'react';
+import {useRef, useState} from 'react';
 import CountUp from 'react-countup';
 
 import {CURRENT_TIME, formatTime} from '@/shared/utils';
@@ -32,7 +32,8 @@ const formatter: StatisticProps['formatter'] = (_value: valueType) => (
 );
 
 export const Animation = () => {
-    const animatedRef = useRef<HTMLDivElement>(null);
+    const [isStopped, setStopped] = useState<boolean>(false);
+    const animateFillRef = useRef<HTMLDivElement>(null);
     const pathLength = 400;
     let strokeDashoffset = pathLength - ((pathLength * progress) / 100) * 0.65;
     if (strokeDashoffset < 170) strokeDashoffset += 15;
@@ -43,7 +44,8 @@ export const Animation = () => {
     const heightWindow = window.innerHeight;
 
     const hours = new Date().getHours();
-    const animatedObject = hours > 5 && hours < 18 ? true : false;
+
+    const isDay = hours > 5 && hours < 18 ? true : false;
 
     const styleMods = ['style1', 'style2', 'style3', 'style4'];
     const sizeMods = ['size1', 'size1', 'size1', 'size2', 'size3'];
@@ -57,7 +59,7 @@ export const Animation = () => {
     ];
 
     for (let i = 0; i < qtdeEstrelas; i++) {
-        if (animatedObject) break;
+        if (isDay) break;
 
         const styleClass = b('star', {
             style: styleMods[getRandomArbitrary(0, 4)],
@@ -76,65 +78,75 @@ export const Animation = () => {
             `top: ${getRandomArbitrary(0, heightWindow)}px;"></span>`;
     }
 
-    if (animatedRef.current && !animatedObject) {
-        animatedRef.current.innerHTML = `<div class="${b(
+    if (animateFillRef.current && !isDay) {
+        animateFillRef.current.innerHTML = `<div class="${b(
             'stars'
         )}">${estrela}</div>`;
     }
 
+    const handleClick = () => {
+        setStopped(true);
+    };
+
     return (
-        <Flex
-            vertical
-            justify='center'
-            align='center'
-            rootClassName={b({night: !animatedObject, day: animatedObject})}
-            gap={16}
-        >
-            <div
-                ref={animatedRef}
-                className={b('animated-object', {
-                    stars: !animatedObject,
-                    sun: animatedObject,
-                })}
+        !isStopped && (
+            <Flex
+                vertical
+                justify='center'
+                align='center'
+                rootClassName={b({night: !isDay, day: isDay})}
+                gap={16}
+                onClick={handleClick}
             >
-                <div className={b('light')} />
-            </div>
-            <Statistic formatter={formatter} value={minutesSinceStartOfDay} />
-
-            <svg
-                className={b('animated-arc')}
-                viewBox='0 20 200 80'
-                preserveAspectRatio='xMidYMid meet'
-            >
-                <defs>
-                    <linearGradient
-                        id='dayNightGradient'
-                        x1='0%'
-                        y1='0%'
-                        x2='100%'
-                        y2='0%'
-                    >
-                        <stop offset='0%' stopColor='#1a237e' />
-                        <stop offset='20%' stopColor='#3949ab' />
-                        <stop offset='40%' stopColor='#15bcd2ff' />
-                        <stop offset='60%' stopColor='#1e92eaff' />
-                        <stop offset='80%' stopColor='#3b0948ff' />
-                        <stop offset='100%' stopColor='#090f4bff' />
-                    </linearGradient>
-                </defs>
-
-                <path
-                    className={b('arc-path')}
-                    d='M 0,100 A 105,90 0 0,1 200,100'
-                    fill='none'
-                    style={
-                        {
-                            '--path-length': pathLength,
-                            '--stroke-dashoffset': strokeDashoffset,
-                        } as React.CSSProperties
-                    }
+                <div
+                    ref={animateFillRef}
+                    className={b('animated-object', {
+                        stars: !isDay,
+                        sun: isDay,
+                    })}
+                >
+                    <div className={b('light')} />
+                </div>
+                <Statistic
+                    formatter={formatter}
+                    value={minutesSinceStartOfDay}
                 />
-            </svg>
-        </Flex>
+
+                <svg
+                    className={b('animated-arc')}
+                    viewBox='0 20 200 80'
+                    preserveAspectRatio='xMidYMid meet'
+                >
+                    <defs>
+                        <linearGradient
+                            id='dayNightGradient'
+                            x1='0%'
+                            y1='0%'
+                            x2='100%'
+                            y2='0%'
+                        >
+                            <stop offset='0%' stopColor='#1a237e' />
+                            <stop offset='20%' stopColor='#3949ab' />
+                            <stop offset='40%' stopColor='#15bcd2ff' />
+                            <stop offset='60%' stopColor='#1e92eaff' />
+                            <stop offset='80%' stopColor='#3b0948ff' />
+                            <stop offset='100%' stopColor='#090f4bff' />
+                        </linearGradient>
+                    </defs>
+
+                    <path
+                        className={b('arc-path')}
+                        d='M 0,100 A 105,90 0 0,1 200,100'
+                        fill='none'
+                        style={
+                            {
+                                '--path-length': pathLength,
+                                '--stroke-dashoffset': strokeDashoffset,
+                            } as React.CSSProperties
+                        }
+                    />
+                </svg>
+            </Flex>
+        )
     );
 };

@@ -11,7 +11,7 @@ export const SearchPanel = () => {
         <Flex className={b()} justify='start' align='start' vertical gap={8}>
             <Input.Search
                 variant='filled'
-                placeholder={t('article.search.placeholder')}
+                placeholder={t('article.articles.search.placeholder')}
                 size='large'
             />
             <Flex justify='start' align='center' gap={2}></Flex>

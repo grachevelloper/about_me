@@ -14,6 +14,7 @@ import {NewTodoForm} from '../NewTodoForm';
 import {isMe} from './api';
 import {Animation} from './components/Animation';
 import {CookieMessage} from './components/CookieMessage';
+import {OfflineOverlay} from './components/OfflineOverlay';
 import {Sider} from './components/Sider';
 
 import './Layout.scss';
@@ -29,6 +30,8 @@ export const Layout = () => {
 
     const {value} = useCookie('cookie-accept');
     const [isCollapsed, setCollapsed] = useState<boolean>(!isDesktop);
+
+    const isOffline = !window.navigator.onLine;
 
     const {
         token: {colorBgContainer, borderRadiusLG},
@@ -66,6 +69,7 @@ export const Layout = () => {
                         </div>
                     )}
                 >
+                    {isOffline && <OfflineOverlay />}
                     <Animation />
                     <AntLayout className={b()} hasSider>
                         {!isCollapsed && !isDesktop && (

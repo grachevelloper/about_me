@@ -47,6 +47,7 @@ export const Nowadays = () => {
             style={{
                 padding: paddingSM,
             }}
+            autoplay
         >
             {data.map((one) => (
                 <Flex
