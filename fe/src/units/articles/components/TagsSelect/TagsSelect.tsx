@@ -1,6 +1,6 @@
 import {message, Select, theme} from 'antd';
 import block from 'bem-cn-lite';
-import {Fragment, useMemo} from 'react';
+import {Fragment, useCallback, useMemo} from 'react';
 import {useTranslation} from 'react-i18next';
 
 import {useGetTags} from '../../store/tags';
@@ -10,7 +10,12 @@ import './TagsSelect.scss';
 
 const b = block('tags-select');
 
-export const TagsSelect = () => {
+interface TagsSelectProps {
+    onChange: (tags: Tag[]) => void;
+    value?: Tag[];
+}
+
+export const TagsSelect = ({onChange, value}: TagsSelectProps) => {
     const {
         token: {},
     } = theme.useToken();
@@ -21,9 +26,26 @@ export const TagsSelect = () => {
 
     const mappedTags = useMemo(() => {
         return (tags || []).map((tag: Tag) => {
-            return {value: tag.name, label: tag.name};
+            return {value: tag.name, label: tag.name, data: tag};
         });
     }, [tags]);
+
+    const selectedValues = useMemo(() => {
+        return (value || []).map((tag) => tag.name);
+    }, [value]);
+
+    const handleChange = useCallback(
+        (selectedIds: string[]) => {
+            if (!tags) return;
+
+            const selectedTags = selectedIds
+                .map((id) => tags.find((tag) => tag.id === id))
+                .filter((tag): tag is Tag => tag !== undefined);
+
+            onChange(selectedTags);
+        },
+        [onChange, tags]
+    );
 
     if (error) {
         messageApi.open({
@@ -37,10 +59,23 @@ export const TagsSelect = () => {
             {messageContextHolder}
 
             <Select
+                allowClear
+                mode='multiple'
+                placeholder={t('articles.tags.select.placeholder')}
                 loading={isPending}
+                showSearch
+                size='middle'
                 className={b()}
                 options={mappedTags}
+                onChange={handleChange}
+                value={selectedValues}
                 title={t('articles.form.tags.select')}
+                optionFilterProp='label'
+                filterOption={(input, option) =>
+                    ((option?.label as string) ?? '')
+                        .toLowerCase()
+                        .includes(input.toLowerCase())
+                }
             />
         </Fragment>
     );

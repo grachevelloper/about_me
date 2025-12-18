@@ -1,1 +1,16 @@
-.tags-wrapper{}
+.tags-wrapper {
+    &__create-button {
+        justify-self: flex-end;
+    }
+
+    &__skeleton {
+        width: 150px;
+    }
+
+    &__create-tag-popover {
+        min-width: 280px;
+    }
+
+    &__create-tag-name-field {
+    }
+}

@@ -10,6 +10,7 @@ export interface User extends BaseEntity {
     nowWatch?: string;
     nowReading?: string;
     newListening?: string;
+    nowBeingIn?: string;
 }
 
 export interface SubmitData {

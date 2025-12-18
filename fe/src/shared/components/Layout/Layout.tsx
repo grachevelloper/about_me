@@ -27,7 +27,7 @@ export const Layout = () => {
     const {setUserData} = useAuth();
     const location = useLocation();
     const {isTablet, isMobile, isDesktop} = useLayout();
-
+    console.log(isTablet, isMobile, isDesktop, window.innerWidth);
     const {value} = useCookie('cookie-accept');
     const [isCollapsed, setCollapsed] = useState<boolean>(!isDesktop);
 
@@ -78,6 +78,7 @@ export const Layout = () => {
                                 onClick={handleCollapse}
                             />
                         )}
+
                         <NewTodoForm />
                         {!value && <CookieMessage />}
 

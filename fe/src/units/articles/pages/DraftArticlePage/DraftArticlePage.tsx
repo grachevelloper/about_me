@@ -21,6 +21,7 @@ const b = block('draft-article-page');
 
 export const DraftArticlePage = () => {
     const {user} = useAuth();
+    const mdRef = useRef<MDXEditorMethods>(null);
     const {
         token: {padding},
     } = theme.useToken();
@@ -101,14 +102,6 @@ export const DraftArticlePage = () => {
         },
         [debouncedUpdate]
     );
-    const mdRef = useRef<MDXEditorMethods>(null);
-
-    useEffect(() => {
-        if (!isArticleLoading && serverArticle?.content) {
-            console.log(serverArticle.content);
-            mdRef.current?.setMarkdown(serverArticle?.content || '');
-        }
-    }, [isArticleLoading, serverArticle?.content]);
 
     const handleTagsChange = useCallback(
         (tags: Tag[]) => {
@@ -120,6 +113,13 @@ export const DraftArticlePage = () => {
         },
         [debouncedUpdate]
     );
+
+    useEffect(() => {
+        if (!isArticleLoading && serverArticle?.content) {
+            console.log(serverArticle.content);
+            mdRef.current?.setMarkdown(serverArticle?.content || '');
+        }
+    }, [isArticleLoading, serverArticle?.content]);
 
     if (user?.id && author?.id && user?.id !== author?.id) {
         navigate('/error/no-permission');
@@ -170,23 +170,21 @@ export const DraftArticlePage = () => {
                 </Col>
             </Row>
 
-            <Row style={{marginBottom: '24px'}} align='middle' gutter={[8, 8]}>
+            <Row align='middle' gutter={[8, 8]} style={{marginBottom: '12px'}}>
+                <Col>{t('articles.form.tags.label')}</Col>
                 <Col>
-                    <span style={{marginRight: '8px', color: '#666'}}>
-                        {t('article.tags.title')}
-                    </span>
+                    <TagsSelect onChange={handleTagsChange} value={tags} />
                 </Col>
-
+            </Row>
+            <Row style={{marginBottom: '24px'}}>
                 <Col>
-                    <TagsSelect />
                     <TagsWrapper
                         tags={tags}
-                        onChange={handleTagsChange}
+                        editable={{onCreate: handleTagsChange}}
                         isPending={isPending}
                     />
                 </Col>
             </Row>
-
             <Row>
                 <Col span={24}>
                     <MdEditor

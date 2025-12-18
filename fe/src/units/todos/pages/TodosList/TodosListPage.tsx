@@ -2,6 +2,7 @@ import {Col, Row} from 'antd';
 
 import {useTodosQuery} from '@/todos/store';
 
+import {AboutMe} from './components/AboutMe';
 import {HelloTitle} from './components/HelloTitle';
 import {Nowadays} from './components/Nowadays';
 import {TodoListTable} from './components/TodoListTable';
@@ -21,6 +22,7 @@ export const TodosListPage = () => {
                     <Nowadays />
                 </Col>
             </Row>
+            <AboutMe />
         </Row>
     );
 };

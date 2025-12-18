@@ -8,7 +8,7 @@
     overflow: auto;
     height: 100vh;
 
-    @media (max-width: 992px) {
+    @media (max-width: 991px) {
         position: fixed;
         z-index: 1000;
     }

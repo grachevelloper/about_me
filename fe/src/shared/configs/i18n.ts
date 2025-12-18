@@ -10,7 +10,7 @@ import ruAuth from '@/public/locales/ru/auth.json';
 import ruCommon from '@/public/locales/ru/common.json';
 import ruTodo from '@/public/locales/ru/todo.json';
 
-const resources = {
+export const resources = {
     en: {
         common: enCommon,
         todo: enTodo,

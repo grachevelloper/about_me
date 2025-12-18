@@ -33,6 +33,9 @@ export class User extends BaseEntity {
     nowWatch?: string;
 
     @Column({nullable: true})
+    nowBeingIn?: string;
+
+    @Column({nullable: true})
     nowListening?: string;
 
     @Column({nullable: true})

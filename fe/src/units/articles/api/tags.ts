@@ -17,7 +17,7 @@ const tagsApi: TagsApi = {
 
     deleteTag: async (id: string): Promise<boolean> => {
         const response = await query.delete(`tags/${id}`);
-        return response.status === 204 || response.status === 200;
+        return response;
     },
 };
 export default tagsApi;

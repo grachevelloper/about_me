@@ -26,6 +26,15 @@
     "logout-modal.title": "Вы точно хотите выйти из аккаунта?",
     "logout-modal.deny": "Пока останусь",
 
+    "about.title": "Обо мне",
+    "about.description": "Привет! Я фуллстек-разработчик (с упором на фронт).\n loremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremlorem lorem",
+    "about.timeline.uni.date": "Сентябрь 2024",
+    "about.timeline.uni.content": "Поступление в РТУ МИРЭА",
+    "about.timeline.ya.date": "Июль 2025 - Ноябрь 2025",
+    "about.timeline.ya.content": "Стажировка в Yandex Cloud",
+    "about.timeline.avi.date": "Январь 2026 - наст. время",
+    "about.timeline.avi.content": "Стажировка в Avito Tech",
+
     "comments": "Комментарии",
     "comments.placeholder": "Оставьте комментарий...",
     "comments.submit": "Отправить",

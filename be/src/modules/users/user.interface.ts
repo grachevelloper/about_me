@@ -75,4 +75,8 @@ export class UpdateUserDto {
     @IsString()
     @IsOptional()
     nowListening: string;
+
+    @IsString()
+    @IsOptional()
+    nowBeingIn: string;
 }

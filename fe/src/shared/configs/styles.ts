@@ -1,4 +1,4 @@
-import {ThemeConfig} from 'antd';
+import { ThemeConfig } from 'antd';
 
 export interface CustomThemeConfig extends ThemeConfig {
     name: 'light' | 'dark';
@@ -23,6 +23,10 @@ const BUTTON_PADDING = {
     paddingInline: 20,
     paddingInlineLG: 20,
     paddingInlineSM: 10,
+};
+
+const TIMELINE = {
+    dotSize: 15,
 };
 
 const lightTheme: CustomThemeConfig = {
@@ -130,6 +134,9 @@ const lightTheme: CustomThemeConfig = {
             itemSelectedColor: '#4f46e5',
             inkBarColor: '#4f46e5',
         },
+        Timeline: {
+            ...TIMELINE,
+        },
     },
 };
 
@@ -229,6 +236,9 @@ const darkTheme: CustomThemeConfig = {
             colorBorderSecondary: '#374151',
             itemSelectedColor: '#818cf8',
             inkBarColor: '#818cf8',
+        },
+        Timeline: {
+            ...TIMELINE,
         },
     },
 };
