@@ -4,6 +4,7 @@ import {queryClient} from '@/shared/configs/api';
 import {Router} from '@/shared/configs/routes';
 import {AuthProvider, ThemeProvider, TodoFormProvider} from '@/shared/context';
 
+import {SidebarProvider} from '../shared/context/Sidebar';
 import './App.scss';
 
 function AppRouter() {
@@ -11,9 +12,11 @@ function AppRouter() {
         <ThemeProvider>
             <QueryClientProvider client={queryClient}>
                 <AuthProvider>
-                    <TodoFormProvider>
-                        <Router />
-                    </TodoFormProvider>
+                    <SidebarProvider>
+                        <TodoFormProvider>
+                            <Router />
+                        </TodoFormProvider>
+                    </SidebarProvider>
                 </AuthProvider>
             </QueryClientProvider>
         </ThemeProvider>

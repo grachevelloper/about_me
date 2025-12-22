@@ -58,8 +58,8 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({article, onClick}) => {
                     {article.title}
                 </Title>
                 <Flex justify='start' align='center' gap={4} wrap>
-                    {article.tags.slice(0, 3).map((tag) => (
-                        <Tag key={tag.id} bordered={false} className={b('tag')}>
+                    {article.tags?.slice(0, 3).map((tag) => (
+                        <Tag key={tag.id} className={b('tag')}>
                             {tag.name}
                         </Tag>
                     ))}

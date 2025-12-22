@@ -1,16 +1,26 @@
 .tags-wrapper {
-    &__create-button {
-        justify-self: flex-end;
-    }
+    max-width: 320px;
+    position: relative;
+    height: auto;
 
-    &__skeleton {
-        width: 150px;
+    &__content {
+        display: inline-flex;
+        transition: max-height 0.3s ease;
+        position: relative;
     }
 
     &__create-tag-popover {
         min-width: 280px;
     }
 
-    &__create-tag-name-field {
+    &__create-button {
+        width: 100%;
+        margin-top: 8px;
+    }
+
+    &__expand-icon {
+        cursor: pointer;
+        align-self: flex-start;
+        justify-self: flex-end;
     }
 }

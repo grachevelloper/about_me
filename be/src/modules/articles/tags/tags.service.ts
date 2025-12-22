@@ -1,8 +1,9 @@
-import {Injectable, NotFoundException} from "@nestjs/common";
-import {InjectRepository} from "@nestjs/typeorm";
-import {Repository} from "typeorm";
+import { Injectable, NotFoundException } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
 
-import {Tag} from "./tags.entity";
+import { CreateTagDto } from "./tags.contoroller";
+import { Tag } from "./tags.entity";
 
 @Injectable()
 export class TagsService {
@@ -11,8 +12,8 @@ export class TagsService {
         private readonly tagRepository: Repository<Tag>,
     ) {}
 
-    async create(name: string): Promise<Tag> {
-        const tag = this.tagRepository.create({name});
+    async create(data: CreateTagDto): Promise<Tag> {
+        const tag = this.tagRepository.create(data);
         return await this.tagRepository.save(tag);
     }
 

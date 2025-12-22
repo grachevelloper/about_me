@@ -14,8 +14,17 @@ export interface Article extends LikedEntity {
     author: User;
     isDraft: boolean;
 }
+export type UpdatableArticle = Omit<
+    Article,
+    'comments' | 'likesCount' | 'author' | 'hasLiked' | 'createdAt'
+>;
 
 export interface Tag {
     id: string;
     name: string;
 }
+
+export type UpdateDraftField = keyof Pick<
+    Article,
+    'content' | 'readTime' | 'tags' | 'title' | 'image' | 'isDraft'
+>;

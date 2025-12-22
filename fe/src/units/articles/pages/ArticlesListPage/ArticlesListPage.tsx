@@ -60,11 +60,7 @@ export const ArticlesListPage = () => {
                 </Col>
             </Row>
 
-            <ArticlesList
-                articles={articles}
-                isPending={isPending}
-                error={error}
-            />
+            <ArticlesList isPending={isPending} data={articles} error={error} />
         </Flex>
     );
 };

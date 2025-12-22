@@ -1,13 +1,6 @@
 import {useMemo} from 'react';
 import {useTranslation} from 'react-i18next';
 
-type TimelineItem = {
-    title: string;
-    content: string;
-    rail: string;
-    index: number;
-};
-
 export const useTimeline = () => {
     const {t} = useTranslation('common');
 

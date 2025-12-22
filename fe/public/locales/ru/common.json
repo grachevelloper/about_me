@@ -27,7 +27,7 @@
     "logout-modal.deny": "Пока останусь",
 
     "about.title": "Обо мне",
-    "about.description": "Привет! Я фуллстек-разработчик (с упором на фронт).\n loremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremlorem lorem",
+    "about.subtitle": "Здравствуй! Меня зовут Николай и я фуллстек-разработчик.\nСпециализация:\n Javascript - React, Node.js, Typescript\n ",
     "about.timeline.uni.date": "Сентябрь 2024",
     "about.timeline.uni.content": "Поступление в РТУ МИРЭА",
     "about.timeline.ya.date": "Июль 2025 - Ноябрь 2025",

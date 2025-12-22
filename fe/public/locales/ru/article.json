@@ -45,6 +45,9 @@
     "article.tags.error": "Возникла ошибка при загрузке тегов",
     "articles.form.preview": "Предпросмотр",
     "articles.form.saveDraft": "Сохранить черновик",
+    "article.draft.pushlish": "Опубликовать",
+
+    "articles.draft.message.saved": "Черновик сохранён",
 
     "articles.status.draft": "Черновик",
     "articles.status.published": "Опубликовано",
@@ -71,5 +74,27 @@
     "notifications.articleSaved": "Статья сохранена в черновиках",
     "notifications.articleDeleted": "Статья удалена",
     "notifications.commentAdded": "Комментарий добавлен",
-    "notifications.commentDeleted": "Комментарий удален"
+    "notifications.commentDeleted": "Комментарий удален",
+
+    "articles.draft.pushlish": "Опубликовать",
+    "article.draft.error.generic": "Произошла ошибка при сохранении",
+    "article.draft.error.generic.title": "Ошибка сохранения",
+    "article.draft.error.generic.description": "Не удалось сохранить изменения",
+    "article.draft.error.multiple.title": "Ошибки в нескольких полях",
+    "article.draft.error.multiple.description": "Обнаружены ошибки в полях: {{fields}}",
+    "article.draft.error.content.title": "Ошибка сохранения контента",
+    "article.draft.error.content.description": "Не удалось сохранить содержимое статьи",
+    "article.draft.error.title.title": "Ошибка сохранения заголовка",
+    "article.draft.error.title.description": "Не удалось сохранить заголовок",
+    "article.draft.error.tags.title": "Ошибка сохранения тегов",
+    "article.draft.error.tags.description": "Не удалось сохранить теги",
+    "article.draft.error.image.title": "Ошибка сохранения изображения",
+    "article.draft.error.image.description": "Не удалось сохранить изображение",
+    "article.draft.error.readTime.title": "Ошибка сохранения времени чтения",
+    "article.draft.error.readTime.description": "Не удалось сохранить время чтения",
+    "article.draft.error.publish.title": "Ошибка публикации",
+    "article.draft.error.publish.description": "Не удалось опубликовать статью",
+    "updated-at": "Обновлено: {{date}}",
+    "error.no-permission": "У вас нет доступа к этой странице",
+    "error/no-permission": "Страница не найдена или у вас нет прав доступа"
 }

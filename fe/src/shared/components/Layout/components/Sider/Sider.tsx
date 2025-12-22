@@ -14,6 +14,7 @@ import {useLayout} from '@/shared/hooks';
 import {Role} from '@/typings/common';
 
 import {useCreateArticle} from '../../../../../units/articles/store';
+import {useSidebar} from '../../../../context/Sidebar';
 import {LogoutDialog} from '../LogoutDialog';
 
 import './Sider.scss';
@@ -22,14 +23,11 @@ const b = block('sider');
 
 const {Sider: AntSider} = Layout;
 
-interface SiderProps {
-    isCollapsed: boolean;
-    setCollapsed: () => void;
-}
-export const Sider = ({isCollapsed, setCollapsed}: SiderProps) => {
+export const Sider = () => {
     const {t} = useTranslation('common');
     const {user} = useAuth();
     const {isTablet, isMobile} = useLayout();
+    const {isCollapsed, toggleCollapsed} = useSidebar();
     const {setIsOpen} = useTodoForm();
     const {
         token: {fontSizeLG},
@@ -42,7 +40,6 @@ export const Sider = ({isCollapsed, setCollapsed}: SiderProps) => {
 
     const {
         mutateAsync: createArticle,
-        data: newArticle,
         error: errorCraeteArticle,
         isPending: isPendingCreateingArticle,
     } = useCreateArticle();
@@ -191,6 +188,7 @@ export const Sider = ({isCollapsed, setCollapsed}: SiderProps) => {
         if (isMobile) return '250px';
         return '20%';
     };
+
     return (
         <Fragment>
             {contextNotificationHolder}
@@ -200,7 +198,7 @@ export const Sider = ({isCollapsed, setCollapsed}: SiderProps) => {
                 breakpoint='lg'
                 collapsedWidth={0}
                 collapsed={isCollapsed}
-                onCollapse={() => setCollapsed((prev) => !prev)}
+                onCollapse={toggleCollapsed}
                 theme='light'
                 width={calculateWidth()}
                 style={{

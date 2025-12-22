@@ -1,4 +1,6 @@
-import { ThemeConfig } from 'antd';
+import {ThemeConfig} from 'antd';
+import {StepsToken} from 'antd/es/steps/style';
+import {TimelineToken} from 'antd/es/timeline/style';
 
 export interface CustomThemeConfig extends ThemeConfig {
     name: 'light' | 'dark';
@@ -25,10 +27,16 @@ const BUTTON_PADDING = {
     paddingInlineSM: 10,
 };
 
-const TIMELINE = {
-    dotSize: 15,
+const TIMELINE: Partial<TimelineToken> = {
+    dotSize: 18,
+    tailWidth: 3,
+    colorIcon: '#4f46e5',
 };
 
+const STEPS: Partial<StepsToken> = {
+    dotCurrentSize: 18,
+    dotSize: 18,
+};
 const lightTheme: CustomThemeConfig = {
     name: 'light',
     token: {
@@ -50,6 +58,7 @@ const lightTheme: CustomThemeConfig = {
 
         colorTextBase: '#1f2937',
         colorTextSecondary: '#4b5563',
+
         colorTextTertiary: '#6b7280',
         colorTextQuaternary: '#9ca3af',
 
@@ -136,6 +145,8 @@ const lightTheme: CustomThemeConfig = {
         },
         Timeline: {
             ...TIMELINE,
+            dotBg: '#ffffff',
+            tailColor: '#4f46e5',
         },
     },
 };
@@ -158,7 +169,6 @@ const darkTheme: CustomThemeConfig = {
         colorTextSecondary: '#d1d5db',
         colorTextTertiary: '#9ca3af',
         colorTextQuaternary: '#6b7280',
-
         colorBorder: '#374151',
         colorBorderSecondary: '#4b5563',
 
@@ -239,6 +249,11 @@ const darkTheme: CustomThemeConfig = {
         },
         Timeline: {
             ...TIMELINE,
+            dotBg: '#111827',
+            tailColor: '#818cf8',
+        },
+        Steps: {
+            ...STEPS,
         },
     },
 };

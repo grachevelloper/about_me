@@ -31,6 +31,6 @@ INTERFACE_BODY=$(echo "$INTERFACE_CONTENT" | sed '1d;$d')
     echo "}"
 } > "$DTS_FILE"
 
-rm "${RESOURCES_FILE}
+rm "${RESOURCES_FILE}"
 
 echo "✅ Готово! $DTS_FILE"

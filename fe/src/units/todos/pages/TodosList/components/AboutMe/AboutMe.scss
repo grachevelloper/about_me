@@ -3,24 +3,81 @@
 .about-me {
     width: 100%;
 
-    &__title {
-        justify-self: center;
-    }
+    &__item-wrapper {
+        opacity: 0;
+        margin-bottom: 4px;
 
-    &__timeline-item-icon {
-        &_first {
-            background-color: var(--ant-color-primary) !important;
+        @for $i from 0 through 3 {
+            &[data-index='#{$i}'] {
+                animation-delay: #{$i * 3 + 1}s;
+            }
         }
-        animation: fadeIn 0.5 ease-in-out forwards;
-        width: 20px !important;
-        height: 20px !important;
+        &_visible {
+            animation: fadeInUp 1.5s ease forwards;
+        }
     }
 
-    &__timeline-item-rail {
-        width: 300px;
+    &__item-icon {
+        opacity: 0;
+        animation: fadeIn 1s ease forwards !important;
+        animation-play-state: paused !important;
+
+        @for $i from 0 through 3 {
+            &_delay-#{$i} {
+                animation-delay: #{$i * 3 + 1}s !important;
+            }
+        }
+        &_visible {
+            animation-play-state: running !important;
+        }
     }
 
-    &__timeline-item-content {
-        background-color: red;
+    &__item-rail {
+        max-height: 0 !important;
+        overflow: hidden;
+        transition: max-height 2s ease-in-out !important;
+
+        @for $i from 0 through 3 {
+            &_delay-#{$i} {
+                transition-delay: #{$i * 3}s !important;
+            }
+        }
+
+        &_visible {
+            max-height: 100px !important;
+        }
     }
+
+    &__item-title {
+        font-size: 24px;
+        font-weight: bold;
+        color: var(--ant-color-primary);
+    }
+
+    &__item-content {
+        opacity: 0;
+
+        @for $i from 0 through 3 {
+            &[data-index='#{$i}'] {
+                animation-delay: #{$i * 3 + 2}s !important;
+            }
+        }
+
+        &_visible {
+            animation: fadeInLeft 1s ease forwards !important;
+        }
+    }
+
+    &__subtitle {
+        white-space: pre;
+        text-wrap: wrap;
+    }
+
+    &__title {
+        text-align: center;
+    }
+}
+
+.ant-steps.ant-steps-dot .ant-steps-item-active .ant-steps-item-icon {
+    --steps-icon-size: 18px;
 }

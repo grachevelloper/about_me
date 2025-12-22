@@ -3,6 +3,7 @@ import {useMutation, useQuery} from '@tanstack/react-query';
 import {queryClient} from '@/shared/configs/api';
 
 import api from '../api/tags';
+import {DtoCreateTag} from '../api/types';
 import {Tag} from '../types';
 
 import {tagsKeys} from './constants';
@@ -15,7 +16,7 @@ export const useGetTags = () => {
 };
 
 export const useCreateTag = () => {
-    return useMutation<Tag, Error, string>({
+    return useMutation<Tag, Error, DtoCreateTag>({
         mutationFn: (name) => api.createTag(name),
         onSuccess: (newTag) => {
             queryClient.setQueryData<Tag[]>(
@@ -24,21 +25,6 @@ export const useCreateTag = () => {
             );
 
             queryClient.setQueryData(tagsKeys.detail(newTag.id), newTag);
-        },
-    });
-};
-
-export const useUpdateTag = () => {
-    return useMutation<Tag, Error, {id: string; name: string}>({
-        mutationFn: ({id, name}) => api.updateTag(id, name),
-        onSuccess: (updatedTag, variables) => {
-            queryClient.setQueryData(tagsKeys.detail(variables.id), updatedTag);
-
-            queryClient.setQueryData<Tag[]>(tagsKeys.lists(), (oldTags = []) =>
-                oldTags.map((tag) =>
-                    tag.id === variables.id ? updatedTag : tag
-                )
-            );
         },
     });
 };

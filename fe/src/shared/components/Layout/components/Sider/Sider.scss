@@ -4,9 +4,9 @@
     position: sticky;
     inset-inline-start: 0;
     top: 0;
-    bottom: 0;
     overflow: auto;
     height: 100vh;
+    transition: all 1s cubic-bezier(0.2, 0, 0, 1);
 
     @media (max-width: 991px) {
         position: fixed;

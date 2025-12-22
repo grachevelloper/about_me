@@ -1,8 +1,6 @@
 import {
     BoldItalicUnderlineToggles,
     CreateLink,
-    DirectiveNode,
-    EditorInFocus,
     HighlightToggle,
     InsertCodeBlock,
     InsertImage,
@@ -15,12 +13,12 @@ import {
     UndoRedo,
 } from '@mdxeditor/editor';
 import '@mdxeditor/editor/style.css';
-import {Flex} from 'antd';
+import { Flex } from 'antd';
 import block from 'bem-cn-lite';
-import {ForwardedRef, memo} from 'react';
+import { ForwardedRef, memo } from 'react';
 
 import './MdEditor.scss';
-import {readPlugins, writePlugins} from './plugins';
+import { readPlugins, writePlugins } from './plugins';
 
 const b = block('md-editor');
 
@@ -45,6 +43,7 @@ export function MdEditor({
     return (
         <MDXEditor
             className={b()}
+            contentEditableClassName={b('markdown')}
             ref={ref}
             plugins={
                 editable
@@ -59,16 +58,6 @@ export function MdEditor({
             onChange={onChange}
             {...props}
         />
-    );
-}
-function whenInAdmonition(editorInFocus: EditorInFocus | null) {
-    const node = editorInFocus?.rootNode;
-    if (!node || node.getType() !== 'directive') {
-        return false;
-    }
-
-    return ['note', 'tip', 'danger', 'info', 'caution'].includes(
-        (node as DirectiveNode).getMdastNode().name
     );
 }
 

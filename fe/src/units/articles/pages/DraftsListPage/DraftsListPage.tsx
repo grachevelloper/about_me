@@ -18,7 +18,7 @@ export const DraftsListPage = () => {
     } = theme.useToken();
     const {t} = useTranslation('article');
 
-    const {data, error, isPending} = useGetAuthorDrafts();
+    const {data: articles, error, isPending} = useGetAuthorDrafts();
 
     return (
         <Flex vertical gap='large' className={b()}>
@@ -31,7 +31,7 @@ export const DraftsListPage = () => {
                 </Col>
             </Row>
             <SearchPanel />
-            <ArticlesList isPending={isPending} data={data} error={error} />
+            <ArticlesList isPending={isPending} data={articles} error={error} />
         </Flex>
     );
 };

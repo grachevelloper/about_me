@@ -1,12 +1,13 @@
 import {QueryErrorResetBoundary} from '@tanstack/react-query';
 import {Layout as AntLayout, Button, theme} from 'antd';
 import block from 'bem-cn-lite';
-import {useEffect, useState} from 'react';
+import {useEffect} from 'react';
 import {ErrorBoundary} from 'react-error-boundary';
 import {MdOutlineMenuOpen} from 'react-icons/md';
 import {Outlet, useLocation} from 'react-router-dom';
 
 import {useAuth} from '../../context';
+import {useSidebar} from '../../context/Sidebar';
 import {useCookie} from '../../hooks/useCookie';
 import {useLayout} from '../../hooks/useLayout';
 import {NewTodoForm} from '../NewTodoForm';
@@ -27,19 +28,14 @@ export const Layout = () => {
     const {setUserData} = useAuth();
     const location = useLocation();
     const {isTablet, isMobile, isDesktop} = useLayout();
-    console.log(isTablet, isMobile, isDesktop, window.innerWidth);
     const {value} = useCookie('cookie-accept');
-    const [isCollapsed, setCollapsed] = useState<boolean>(!isDesktop);
+    const {isCollapsed, toggleCollapsed, setCollapsed} = useSidebar();
 
     const isOffline = !window.navigator.onLine;
 
     const {
-        token: {colorBgContainer, borderRadiusLG},
+        token: {colorBgContainer, colorPrimaryText},
     } = theme.useToken();
-
-    const handleCollapse = () => {
-        setCollapsed((prev) => !prev);
-    };
 
     useEffect(() => {
         const getUser = async () => {
@@ -53,7 +49,7 @@ export const Layout = () => {
         if (!isCollapsed && !isDesktop) {
             setCollapsed(true);
         }
-    }, [location.pathname]);
+    }, [location.pathname, isDesktop]);
 
     return (
         <QueryErrorResetBoundary>
@@ -75,7 +71,7 @@ export const Layout = () => {
                         {!isCollapsed && !isDesktop && (
                             <div
                                 className={b('overlay')}
-                                onClick={handleCollapse}
+                                onClick={toggleCollapsed}
                             />
                         )}
 
@@ -84,15 +80,15 @@ export const Layout = () => {
 
                         {isCollapsed && (
                             <MdOutlineMenuOpen
-                                size={30}
+                                size={40}
                                 className={b('sider-collapse-button')}
-                                onClick={handleCollapse}
+                                onClick={toggleCollapsed}
+                                style={{
+                                    backgroundColor: colorPrimaryText,
+                                }}
                             />
                         )}
-                        <Sider
-                            setCollapsed={handleCollapse}
-                            isCollapsed={isCollapsed}
-                        />
+                        <Sider />
                         <Content className={b('content')}>
                             <Outlet />
                         </Content>

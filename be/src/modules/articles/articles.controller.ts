@@ -23,6 +23,7 @@ import {
 } from "./article.interface";
 import {Article} from "./articles.entity";
 import {ArticlesService} from "./articles.service";
+import {Tag} from "./tags/tags.entity";
 
 @Controller("articles")
 export class ArticlesController {
@@ -34,7 +35,6 @@ export class ArticlesController {
         @Body() createArticleData: CreateArticleDto,
     ): Promise<ResponseArticle> {
         const authorId = req.user.id;
-
         return await this.articlesService.create(authorId, createArticleData);
     }
 
@@ -59,6 +59,54 @@ export class ArticlesController {
         @Body() data: UpdateArticleDto,
     ): Promise<Article> {
         return await this.articlesService.update(id, data);
+    }
+
+    @Patch(":id/title")
+    async updateTitle(
+        @Param("id") id: string,
+        @Body("title") title: string,
+    ): Promise<Article> {
+        return await this.articlesService.updateTitle(id, title);
+    }
+
+    @Patch(":id/content")
+    async updateContent(
+        @Param("id") id: string,
+        @Body("content") content: string,
+    ): Promise<Article> {
+        return await this.articlesService.updateContent(id, content);
+    }
+
+    @Patch(":id/image")
+    async updateImage(
+        @Param("id") id: string,
+        @Body("image") image: string,
+    ): Promise<Article> {
+        return await this.articlesService.updateImage(id, image);
+    }
+
+    @Patch(":id/read-time")
+    async updateReadTime(
+        @Param("id") id: string,
+        @Body("readTime") readTime: number,
+    ): Promise<Article> {
+        return await this.articlesService.updateReadTime(id, readTime);
+    }
+
+    @Patch(":id/tags")
+    async updateTags(
+        @Param("id") id: string,
+        @Body("tags") tags: Tag[],
+    ): Promise<Article> {
+        return await this.articlesService.updateTags(id, tags);
+    }
+
+    @Patch(":id/draft-status")
+    async updateDraftStatus(
+        @Param("id") id: string,
+        @Body("isDraft") isDraft: boolean,
+    ): Promise<Article> {
+        return await this.articlesService.updateDraftStatus(id, isDraft);
     }
 
     @Delete(":id")

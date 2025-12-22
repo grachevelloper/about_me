@@ -2,7 +2,7 @@ import {query} from '@/shared/configs/api';
 
 import {Tag} from '../types';
 
-import {TagsApi} from './types';
+import {DtoCreateTag, TagsApi} from './types';
 
 const tagsApi: TagsApi = {
     getTags: async (): Promise<Tag[]> => {
@@ -10,8 +10,8 @@ const tagsApi: TagsApi = {
         return response;
     },
 
-    createTag: async (name: string): Promise<Tag> => {
-        const response = await query.post<Tag>('tags', {name});
+    createTag: async (data: DtoCreateTag): Promise<Tag> => {
+        const response = await query.post<Tag>('tags', data);
         return response;
     },
 

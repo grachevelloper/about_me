@@ -1,184 +1,213 @@
 declare module 'i18next' {
     interface CustomTypeOptions {
         resources: {
-            article: {
-                'aritcle.void_container.description': 'Здесь пока ничего нет';
-                'article.articles.search.placeholder': 'Схоластика папы Иоанна XII...';
-                'article.new.description.error': 'Сообщите, пожалуйста, мне об ошибке';
-                'article.new.title': 'Моя новая статья';
-                'article.new.title.error': 'Что-то пошло не так';
-                'article.placeholder': 'Всё с чего-то начинается...😉';
-                'article.tags.error': 'Возникла ошибка при загрузке тегов';
-                'article.tags.name.min': 'Минимум 2 символа';
-                'article.tags.name.required': 'Введите корректное название тега';
-                'articles.create': 'Написать статью';
-                'articles.drafts.page.title': 'Мои черновики';
-                'articles.featured': 'Рекомендуемые';
-                'articles.filters': 'Фильтры';
-                'articles.form.category.label': 'Категория';
-                'articles.form.category.placeholder': 'Выберите категорию';
-                'articles.form.content.label': 'Содержание';
-                'articles.form.content.placeholder': 'Начните писать статью...';
-                'articles.form.preview': 'Предпросмотр';
-                'articles.form.saveDraft': 'Сохранить черновик';
-                'articles.form.tags.label': 'Теги';
-                'articles.form.tags.placeholder': 'Добавьте теги через запятую';
-                'articles.form.tags.select': 'Выбрать теги';
-                'articles.form.title.label': 'Заголовок статьи';
-                'articles.form.title.placeholder': 'Введите заголовок';
-                'articles.page.subtitle': 'Советы, руководства и новости из мира разработки';
-                'articles.page.title': 'Статьи';
-                'articles.popular': 'Популярные';
-                'articles.read_more': 'Читать далее';
-                'articles.read_time': '{{minutes}} мин. чтения';
-                'articles.recent': 'Недавние статьи';
-                'articles.search.button': 'Найти';
-                'articles.search.placeholder': 'Поиск статей...';
-                'articles.status.archived': 'В архиве';
-                'articles.status.draft': 'Черновик';
-                'articles.status.pending': 'На модерации';
-                'articles.status.published': 'Опубликовано';
-                'articles.tags.create.button': 'Создать новый тег';
-                "articles.tags.create.error.message'": 'Возникла ошибка при создании тега! Пожалуйста,попробуй ещё раз или обратитесь в поддержку';
-                'articles.tags.create.label': 'Название тега ';
-                'articles.tags.create.placeholder': 'Новый тег...';
-                'articles.tags.delete.error.title': 'Возникла ошибка при удалении тега';
-                'articles.tags.select.placeholder': 'Выбрать тег';
-                'articles.trending': 'В тренде';
-                'author.articlesCount': '{{count}} статей';
-                'author.bio': 'Об авторе';
-                'author.expertise': 'Специализация';
-                'author.follow': 'Подписаться';
-                'author.following': 'Вы подписаны';
-                'author.profile': 'Профиль автора';
-                'empty.button': 'Написать первую статью';
-                'empty.description': 'Попробуйте изменить критерии поиска или создать новую статью';
-                'empty.title': 'Статьи не найдены';
-                'notifications.articleDeleted': 'Статья удалена';
-                'notifications.articlePublished': 'Статья успешно опубликована!';
-                'notifications.articleSaved': 'Статья сохранена в черновиках';
-                'notifications.commentAdded': 'Комментарий добавлен';
-                'notifications.commentDeleted': 'Комментарий удален';
-                'validation.categoryRequired': 'Выберите категорию';
-                'validation.contentRequired': 'Содержание обязательно';
-                'validation.minTags': 'Добавьте хотя бы один тег';
-                'validation.titleRequired': 'Заголовок обязателен';
-            };
-            auth: {
-                'auth.confirmPassword.label': 'Подтверждение пароля';
-                'auth.confirmPassword.mismatch': 'Пароли не совпадают!';
-                'auth.confirmPassword.placeholder': 'Повторите пароль';
-                'auth.confirmPassword.required': 'Пожалуйста, подтвердите пароль!';
-                'auth.email.invalid': 'Пожалуйста, введите корректный email адрес!';
-                'auth.email.label': 'Электронная почта';
-                'auth.email.placeholder': 'Введите вашу почту';
-                'auth.email.required': 'Пожалуйста, введите вашу почту!';
-                'auth.end.content.alt': 'Урааа!';
-                'auth.end.title': 'Давай уже начинать вместе получать добрые вайбы!!';
-                'auth.init.content': 'Рад приветствовать тебя на моём сайте.\n Предлагаю пройти регистрацию для твоих проспективных возможностей\n Начнём?';
-                'auth.init.title': 'Здравствуй, путник! ';
-                'auth.name.username.title': 'Как тебя зовут, друг?';
-                'auth.password.label': 'Пароль';
-                'auth.password.placeholder': 'Введите ваш пароль';
-                'auth.password.required': 'Пожалуйста, введите пароль!';
-                'auth.sign.incorrect_password': 'Неверный пароль';
-                'auth.sign.invalid_credentials': 'Пользователь не найден';
-                'auth.signin.notification.description': 'Зарегистрироваться';
-                'auth.signin.notification.title': 'Нет аккаунта?';
-                'auth.signin.submit': 'Войти';
-                'auth.signin.title': 'Вход';
-                'auth.signup.end-apply': 'Завершить регистрацию';
-                'auth.signup.notification.description': 'Войти в систему';
-                'auth.signup.notification.title': 'Уже есть аккаунт?';
-                'auth.signup.submit': 'Зарегистрироваться';
-                'auth.signup.title': 'Регистрация';
-                'auth.signup.way.email': 'По-старинке';
-                'auth.signup.way.title': 'Какими путём пойдём с тобой?';
-                'auth.signup.way.yandex': 'Войти с Яндекс ID';
-                'auth.username.label': 'Имя пользователя';
-                'auth.username.placeholder': 'Введите ваше имя';
-                'auth.username.required': 'Пожалуйста, введите ваше имя!';
-            };
-            common: {
-                'about.description': 'Фронтенд-разработчик';
-                'about.title': 'Обо мне';
-                accept: 'Принять';
-                'button.back': 'Назад';
-                'button.continue': 'Далее';
-                cancel: 'Отменить';
-                comments: 'Комментарии';
-                'comments.beFirst': 'Будьте первым!';
-                'comments.delete': 'Удалить';
-                'comments.edit': 'Редактировать';
-                'comments.noComments': 'Комментариев пока нет';
-                'comments.placeholder': 'Оставьте комментарий...';
-                'comments.reply': 'Ответить';
-                'comments.submit': 'Отправить';
-                create: 'Создать';
-                'created-at': 'Создано {{date}}';
-                edit: 'Изменить';
-                'layout.cookie.accept': 'Мы используем куки 😊\nВы ведь не на диете?';
-                'layout.left.create_article': 'Создать статью';
-                'layout.left.create_article.error.description': 'Не удалось содать статью, пожалуйста, попробуйте позже или обратитесь в поддержку';
-                'layout.left.create_article.error.title': 'Ошибка!';
-                'layout.left.create_article.success.title': 'Черновик создан!';
-                'layout.left.create_todo': 'Создать задачу';
-                'layout.left.suggest': 'Предложить ежедневку';
-                'layout.top.articles': 'Статьи';
-                'layout.top.drafts': 'Мои черновики';
-                'layout.top.main': 'Главная';
-                'layout.top.user': 'Моя страница';
-                'layout.top.user.signup': 'Зарегистрироваться';
-                like: 'Поставить лайк';
-                logout: 'Выйти из аккаунта';
-                'logout-modal.deny': 'Пока останусь';
-                'logout-modal.title': 'Вы точно хотите выйти из аккаунта?';
-                'no_internet.description': 'Возвращайся сюда, когда он появится ☺️';
-                'no_internet.title': 'У тебя нет интернета!';
-                'page.no_permission.title': 'Упс... У тебя нет доступа к этой странице(';
-                'page.not_found.title': 'Упс... Страница не найдена';
-                'page.revert.button': 'Вернуться назад';
-                'pagination.items': 'элементов';
-                'pagination.next': 'Далее';
-                'pagination.of': 'из';
-                'pagination.page': 'Страница';
-                'pagination.previous': 'Назад';
-                'pagination.show': 'Показать';
-                'updated-at': 'Изменено: {{date}}';
-                'validation.email': 'Пожалуйста, введите корректный email';
-                'validation.maxLength': 'Должно быть не более {{count}} символов';
-                'validation.minLength': 'Должно быть не менее {{count}} символов';
-                'validation.required': 'Это поле обязательно для заполнения';
-            };
-            todo: {
-                'new-todo-form.close': 'Отмена';
-                'new-todo-form.ok': 'Предложить';
-                'new-todo-form.title': 'Предложи свою идею';
-                'new-todo-form.your-content.placeholder': 'Твоё описание...';
-                'new-todo-form.your-title.placeholder': 'Название...';
-                'todo.change.content': 'Изменить описание';
-                'todo.change.priority': 'Изменить приоритет';
-                'todo.change.state': 'Изменить статус';
-                'todo.change.title': 'Изменить название';
-                'todo.nowadays.book.title': 'Сегодня читаю';
-                'todo.nowadays.music.title': 'Сегодня слушаю';
-                'todo.nowadays.series.title': 'Сегодня смотрю';
-                'todo.priority.high': 'Высокий';
-                'todo.priority.low': 'Низкий';
-                'todo.priority.medium': 'Средний';
-                'todo.priority.super': 'Супер';
-                'todo.state.canceled': 'Отменено';
-                'todo.state.finished': 'Закончено';
-                'todo.state.in_work': 'В работе';
-                'todo.state.planning': 'Планируется';
-                'todo.table.col.content': 'Описание';
-                'todo.table.col.created-at': 'Создано';
-                'todo.table.col.priority': 'Приоритет';
-                'todo.table.col.state': 'Статус';
-                'todo.table.col.todo': 'Название';
-                'todo.table.col.updated-at': 'Обновлено';
-                'todo.table.title': 'Моя жизнь сегодня';
-            };
+  "article": {
+    "aritcle.void_container.description": "Здесь пока ничего нет",
+    "article.articles.search.placeholder": "Схоластика папы Иоанна XII...",
+    "article.draft.error.content.description": "Не удалось сохранить содержимое статьи",
+    "article.draft.error.content.title": "Ошибка сохранения контента",
+    "article.draft.error.generic": "Произошла ошибка при сохранении",
+    "article.draft.error.generic.description": "Не удалось сохранить изменения",
+    "article.draft.error.generic.title": "Ошибка сохранения",
+    "article.draft.error.image.description": "Не удалось сохранить изображение",
+    "article.draft.error.image.title": "Ошибка сохранения изображения",
+    "article.draft.error.multiple.description": "Обнаружены ошибки в полях: {{fields}}",
+    "article.draft.error.multiple.title": "Ошибки в нескольких полях",
+    "article.draft.error.publish.description": "Не удалось опубликовать статью",
+    "article.draft.error.publish.title": "Ошибка публикации",
+    "article.draft.error.readTime.description": "Не удалось сохранить время чтения",
+    "article.draft.error.readTime.title": "Ошибка сохранения времени чтения",
+    "article.draft.error.tags.description": "Не удалось сохранить теги",
+    "article.draft.error.tags.title": "Ошибка сохранения тегов",
+    "article.draft.error.title.description": "Не удалось сохранить заголовок",
+    "article.draft.error.title.title": "Ошибка сохранения заголовка",
+    "article.draft.pushlish": "Опубликовать",
+    "article.new.description.error": "Сообщите, пожалуйста, мне об ошибке",
+    "article.new.title": "Моя новая статья",
+    "article.new.title.error": "Что-то пошло не так",
+    "article.placeholder": "Всё с чего-то начинается...😉",
+    "article.tags.error": "Возникла ошибка при загрузке тегов",
+    "article.tags.name.min": "Минимум 2 символа",
+    "article.tags.name.required": "Введите корректное название тега",
+    "articles.create": "Написать статью",
+    "articles.draft.message.saved": "Черновик сохранён",
+    "articles.draft.pushlish": "Опубликовать",
+    "articles.drafts.page.title": "Мои черновики",
+    "articles.featured": "Рекомендуемые",
+    "articles.filters": "Фильтры",
+    "articles.form.category.label": "Категория",
+    "articles.form.category.placeholder": "Выберите категорию",
+    "articles.form.content.label": "Содержание",
+    "articles.form.content.placeholder": "Начните писать статью...",
+    "articles.form.preview": "Предпросмотр",
+    "articles.form.saveDraft": "Сохранить черновик",
+    "articles.form.tags.label": "Теги",
+    "articles.form.tags.placeholder": "Добавьте теги через запятую",
+    "articles.form.tags.select": "Выбрать теги",
+    "articles.form.title.label": "Заголовок статьи",
+    "articles.form.title.placeholder": "Введите заголовок",
+    "articles.page.subtitle": "Советы, руководства и новости из мира разработки",
+    "articles.page.title": "Статьи",
+    "articles.popular": "Популярные",
+    "articles.read_more": "Читать далее",
+    "articles.read_time": "{{minutes}} мин. чтения",
+    "articles.recent": "Недавние статьи",
+    "articles.search.button": "Найти",
+    "articles.search.placeholder": "Поиск статей...",
+    "articles.status.archived": "В архиве",
+    "articles.status.draft": "Черновик",
+    "articles.status.pending": "На модерации",
+    "articles.status.published": "Опубликовано",
+    "articles.tags.create.button": "Создать новый тег",
+    "articles.tags.create.error.message'": "Возникла ошибка при создании тега! Пожалуйста,попробуй ещё раз или обратитесь в поддержку",
+    "articles.tags.create.label": "Название тега ",
+    "articles.tags.create.placeholder": "Новый тег...",
+    "articles.tags.delete.error.title": "Возникла ошибка при удалении тега",
+    "articles.tags.select.placeholder": "Выбрать тег",
+    "articles.trending": "В тренде",
+    "author.articlesCount": "{{count}} статей",
+    "author.bio": "Об авторе",
+    "author.expertise": "Специализация",
+    "author.follow": "Подписаться",
+    "author.following": "Вы подписаны",
+    "author.profile": "Профиль автора",
+    "empty.button": "Написать первую статью",
+    "empty.description": "Попробуйте изменить критерии поиска или создать новую статью",
+    "empty.title": "Статьи не найдены",
+    "error.no-permission": "У вас нет доступа к этой странице",
+    "error/no-permission": "Страница не найдена или у вас нет прав доступа",
+    "notifications.articleDeleted": "Статья удалена",
+    "notifications.articlePublished": "Статья успешно опубликована!",
+    "notifications.articleSaved": "Статья сохранена в черновиках",
+    "notifications.commentAdded": "Комментарий добавлен",
+    "notifications.commentDeleted": "Комментарий удален",
+    "updated-at": "Обновлено: {{date}}",
+    "validation.categoryRequired": "Выберите категорию",
+    "validation.contentRequired": "Содержание обязательно",
+    "validation.minTags": "Добавьте хотя бы один тег",
+    "validation.titleRequired": "Заголовок обязателен"
+  },
+  "auth": {
+    "auth.confirmPassword.label": "Подтверждение пароля",
+    "auth.confirmPassword.mismatch": "Пароли не совпадают!",
+    "auth.confirmPassword.placeholder": "Повторите пароль",
+    "auth.confirmPassword.required": "Пожалуйста, подтвердите пароль!",
+    "auth.email.invalid": "Пожалуйста, введите корректный email адрес!",
+    "auth.email.label": "Электронная почта",
+    "auth.email.placeholder": "Введите вашу почту",
+    "auth.email.required": "Пожалуйста, введите вашу почту!",
+    "auth.end.content.alt": "Урааа!",
+    "auth.end.title": "Давай уже начинать вместе получать добрые вайбы!!",
+    "auth.init.content": "Рад приветствовать тебя на моём сайте.\n Предлагаю пройти регистрацию для твоих проспективных возможностей\n Начнём?",
+    "auth.init.title": "Здравствуй, путник! ",
+    "auth.name.username.title": "Как тебя зовут, друг?",
+    "auth.password.label": "Пароль",
+    "auth.password.placeholder": "Введите ваш пароль",
+    "auth.password.required": "Пожалуйста, введите пароль!",
+    "auth.sign.incorrect_password": "Неверный пароль",
+    "auth.sign.invalid_credentials": "Пользователь не найден",
+    "auth.signin.notification.description": "Зарегистрироваться",
+    "auth.signin.notification.title": "Нет аккаунта?",
+    "auth.signin.submit": "Войти",
+    "auth.signin.title": "Вход",
+    "auth.signup.end-apply": "Завершить регистрацию",
+    "auth.signup.notification.description": "Войти в систему",
+    "auth.signup.notification.title": "Уже есть аккаунт?",
+    "auth.signup.submit": "Зарегистрироваться",
+    "auth.signup.title": "Регистрация",
+    "auth.signup.way.email": "По-старинке",
+    "auth.signup.way.title": "Какими путём пойдём с тобой?",
+    "auth.signup.way.yandex": "Войти с Яндекс ID",
+    "auth.username.label": "Имя пользователя",
+    "auth.username.placeholder": "Введите ваше имя",
+    "auth.username.required": "Пожалуйста, введите ваше имя!"
+  },
+  "common": {
+    "about.description": "Привет! Я фуллстек-разработчик (с упором на фронт).\n loremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremloremlorem lorem",
+    "about.timeline.avi.content": "Стажировка в Avito Tech",
+    "about.timeline.avi.date": "Январь 2026 - наст. время",
+    "about.timeline.uni.content": "Поступление в РТУ МИРЭА",
+    "about.timeline.uni.date": "Сентябрь 2024",
+    "about.timeline.ya.content": "Стажировка в Yandex Cloud",
+    "about.timeline.ya.date": "Июль 2025 - Ноябрь 2025",
+    "about.title": "Обо мне",
+    "accept": "Принять",
+    "button.back": "Назад",
+    "button.continue": "Далее",
+    "cancel": "Отменить",
+    "comments": "Комментарии",
+    "comments.beFirst": "Будьте первым!",
+    "comments.delete": "Удалить",
+    "comments.edit": "Редактировать",
+    "comments.noComments": "Комментариев пока нет",
+    "comments.placeholder": "Оставьте комментарий...",
+    "comments.reply": "Ответить",
+    "comments.submit": "Отправить",
+    "create": "Создать",
+    "created-at": "Создано {{date}}",
+    "edit": "Изменить",
+    "layout.cookie.accept": "Мы используем куки 😊\nВы ведь не на диете?",
+    "layout.left.create_article": "Создать статью",
+    "layout.left.create_article.error.description": "Не удалось содать статью, пожалуйста, попробуйте позже или обратитесь в поддержку",
+    "layout.left.create_article.error.title": "Ошибка!",
+    "layout.left.create_article.success.title": "Черновик создан!",
+    "layout.left.create_todo": "Создать задачу",
+    "layout.left.suggest": "Предложить ежедневку",
+    "layout.top.articles": "Статьи",
+    "layout.top.drafts": "Мои черновики",
+    "layout.top.main": "Главная",
+    "layout.top.user": "Моя страница",
+    "layout.top.user.signup": "Зарегистрироваться",
+    "like": "Поставить лайк",
+    "logout": "Выйти из аккаунта",
+    "logout-modal.deny": "Пока останусь",
+    "logout-modal.title": "Вы точно хотите выйти из аккаунта?",
+    "no_internet.description": "Возвращайся сюда, когда он появится ☺️",
+    "no_internet.title": "У тебя нет интернета!",
+    "page.no_permission.title": "Упс... У тебя нет доступа к этой странице(",
+    "page.not_found.title": "Упс... Страница не найдена",
+    "page.revert.button": "Вернуться назад",
+    "pagination.items": "элементов",
+    "pagination.next": "Далее",
+    "pagination.of": "из",
+    "pagination.page": "Страница",
+    "pagination.previous": "Назад",
+    "pagination.show": "Показать",
+    "updated-at": "Изменено: {{date}}",
+    "validation.email": "Пожалуйста, введите корректный email",
+    "validation.maxLength": "Должно быть не более {{count}} символов",
+    "validation.minLength": "Должно быть не менее {{count}} символов",
+    "validation.required": "Это поле обязательно для заполнения"
+  },
+  "todo": {
+    "new-todo-form.close": "Отмена",
+    "new-todo-form.ok": "Предложить",
+    "new-todo-form.title": "Предложи свою идею",
+    "new-todo-form.your-content.placeholder": "Твоё описание...",
+    "new-todo-form.your-title.placeholder": "Название...",
+    "todo.change.content": "Изменить описание",
+    "todo.change.priority": "Изменить приоритет",
+    "todo.change.state": "Изменить статус",
+    "todo.change.title": "Изменить название",
+    "todo.nowadays.book.title": "Сегодня читаю",
+    "todo.nowadays.music.title": "Сегодня слушаю",
+    "todo.nowadays.series.title": "Сегодня смотрю",
+    "todo.priority.high": "Высокий",
+    "todo.priority.low": "Низкий",
+    "todo.priority.medium": "Средний",
+    "todo.priority.super": "Супер",
+    "todo.state.canceled": "Отменено",
+    "todo.state.finished": "Закончено",
+    "todo.state.in_work": "В работе",
+    "todo.state.planning": "Планируется",
+    "todo.table.col.content": "Описание",
+    "todo.table.col.created-at": "Создано",
+    "todo.table.col.priority": "Приоритет",
+    "todo.table.col.state": "Статус",
+    "todo.table.col.todo": "Название",
+    "todo.table.col.updated-at": "Обновлено",
+    "todo.table.title": "Моя жизнь сегодня"
+  }
         };
     }
 }

@@ -11,8 +11,14 @@ export const ArticleCardSkeleton = () => {
             <Skeleton.Image
                 active
                 style={{
-                    width: 'clamp(285px, 272.86px + 3.79vw, 370px)',
-                    height: 400,
+                    display: 'flex',
+                    width: '100%',
+                    height: 370,
+                }}
+                styles={{
+                    root: {
+                        width: '100%',
+                    },
                 }}
             />
             <Skeleton

@@ -35,13 +35,12 @@ export const TagsSelect = ({onChange, value}: TagsSelectProps) => {
     }, [value]);
 
     const handleChange = useCallback(
-        (selectedIds: string[]) => {
+        (selectedNames: string[]) => {
             if (!tags) return;
 
-            const selectedTags = selectedIds
-                .map((id) => tags.find((tag) => tag.id === id))
+            const selectedTags = selectedNames
+                .map((name) => tags.find((tag) => tag.name === name))
                 .filter((tag): tag is Tag => tag !== undefined);
-
             onChange(selectedTags);
         },
         [onChange, tags]
@@ -60,7 +59,7 @@ export const TagsSelect = ({onChange, value}: TagsSelectProps) => {
 
             <Select
                 allowClear
-                mode='multiple'
+                mode='tags'
                 placeholder={t('articles.tags.select.placeholder')}
                 loading={isPending}
                 showSearch
@@ -70,12 +69,6 @@ export const TagsSelect = ({onChange, value}: TagsSelectProps) => {
                 onChange={handleChange}
                 value={selectedValues}
                 title={t('articles.form.tags.select')}
-                optionFilterProp='label'
-                filterOption={(input, option) =>
-                    ((option?.label as string) ?? '')
-                        .toLowerCase()
-                        .includes(input.toLowerCase())
-                }
             />
         </Fragment>
     );

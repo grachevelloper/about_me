@@ -2,6 +2,7 @@
     position: relative;
     height: 470px;
     width: clamp(285px, 272.86px + 3.79vw, 370px);
+    max-width: 100%;
     flex: 1;
 
     transition: transform 0.3s ease-in-out;
@@ -75,14 +76,6 @@
 
     &__content {
         margin-bottom: 16px;
-    }
-
-    &__tag {
-        cursor: pointer;
-
-        &:hover {
-            opacity: 0.8;
-        }
     }
 
     &__footer {

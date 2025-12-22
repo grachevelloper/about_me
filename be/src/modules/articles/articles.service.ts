@@ -17,6 +17,7 @@ import {
     UpdateArticleDto,
 } from "./article.interface";
 import {Article} from "./articles.entity";
+import {Tag} from "./tags/tags.entity";
 
 type FindAll = Omit<RequestGetArticles, "tags"> & {
     tags?: string[];
@@ -55,28 +56,73 @@ export class ArticlesService {
 
     async update(id: string, updateArticleData: UpdateArticleDto) {
         const article = await this.findOneForUpdate(id);
-
         Object.assign(article, updateArticleData);
-
         return await this.articlesRepository.save(article);
     }
 
-    async findOne(id: string, userId: string): Promise<ResponseArticle> {
-        const article = await this.articlesRepository.findOne({
+    async updateTags(id: string, tags: Tag[]): Promise<Article> {
+        const article = await this.findOneForUpdate(id);
+        article.tags = tags;
+        await this.articlesRepository.save(article);
+        return (await this.articlesRepository.findOne({
             where: {id},
-            relations: ["author", "tags"],
-        });
-        if (!article) {
-            throw new NotFoundException("Article not found");
-        }
+            relations: ["tags"],
+        }))!;
+    }
 
-        const likedArticle = await this.likesService.hasLiked({
-            entityId: id,
-            userId,
-            entityType: "article",
-        });
+    async updateTitle(id: string, title: string): Promise<Article> {
+        const article = await this.findOneForUpdate(id);
+        article.title = title;
+        await this.articlesRepository.save(article);
 
-        return {...article, hasLiked: Boolean(likedArticle)};
+        return (await this.articlesRepository.findOne({
+            where: {id},
+            relations: ["tags"],
+        }))!;
+    }
+
+    async updateContent(id: string, content: string): Promise<Article> {
+        const article = await this.findOneForUpdate(id);
+        article.content = content;
+        await this.articlesRepository.save(article);
+
+        return (await this.articlesRepository.findOne({
+            where: {id},
+            relations: ["tags"],
+        }))!;
+    }
+
+    async updateImage(id: string, image: string): Promise<Article> {
+        const article = await this.findOneForUpdate(id);
+        article.image = image;
+        await this.articlesRepository.save(article);
+
+        return (await this.articlesRepository.findOne({
+            where: {id},
+            relations: ["tags"],
+        }))!;
+    }
+
+    async updateReadTime(id: string, readTime: number): Promise<Article> {
+        const article = await this.findOneForUpdate(id);
+        article.readTime = readTime;
+        await this.articlesRepository.save(article);
+
+        return (await this.articlesRepository.findOne({
+            where: {id},
+            relations: ["tags"],
+        }))!;
+    }
+
+    async updateDraftStatus(id: string, isDraft: boolean): Promise<Article> {
+        const article = await this.findOneForUpdate(id);
+        article.isDraft = isDraft;
+        await this.articlesRepository.save(article);
+
+        return (await this.articlesRepository.findOne({
+            where: {id},
+            relations: ["tags"],
+        }))!;
     }
 
     async findAll(filters: FindAll): Promise<ResponseGetArticles> {
@@ -134,14 +180,6 @@ export class ArticlesService {
             });
         }
 
-        const validSortFields = [
-            "createdAt",
-            "updatedAt",
-            "likesCount",
-            "title",
-            "readTime",
-        ];
-
         queryBuilder.orderBy(`article.${sortBy}`, order as "ASC" | "DESC");
 
         queryBuilder.skip(skip).take(limit + 1);
@@ -158,6 +196,24 @@ export class ArticlesService {
             limit,
             next,
         };
+    }
+
+    async findOne(id: string, userId: string): Promise<ResponseArticle> {
+        const article = await this.articlesRepository.findOne({
+            where: {id},
+            relations: ["author", "tags"],
+        });
+        if (!article) {
+            throw new NotFoundException("Article not found");
+        }
+
+        const likedArticle = await this.likesService.hasLiked({
+            entityId: id,
+            userId,
+            entityType: "article",
+        });
+
+        return {...article, hasLiked: Boolean(likedArticle)};
     }
 
     private async findOneForUpdate(id: string): Promise<Article> {

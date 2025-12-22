@@ -1,3 +1,6 @@
+import api from '../api';
+import {UpdatableArticle} from '../types';
+
 export const articleKeys = {
     all: ['articles'] as const,
     lists: () => [...articleKeys.all, 'list'] as const,
@@ -15,4 +18,18 @@ export const tagsKeys = {
     list: () => [...tagsKeys.lists()] as const,
     details: () => [...tagsKeys.all, 'detail'] as const,
     detail: (id: string) => [...tagsKeys.details(), id] as const,
+};
+
+export const fieldUpdateConfig: Record<
+    keyof UpdatableArticle,
+    (data: any) => Promise<unknown>
+> = {
+    title: (data) => api.updateTitle(data),
+    content: (data) => api.updateContent(data),
+    image: (data) => api.updateImage(data),
+    readTime: (data) => api.updateReadTime(data),
+    tags: (data) => api.updateTags(data),
+    isDraft: (data) => api.updateDraftStatus(data),
+    id: (data) => api.update(data),
+    updatedAt: (data) => api.update(data),
 };

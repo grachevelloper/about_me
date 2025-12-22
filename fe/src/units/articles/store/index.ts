@@ -4,11 +4,10 @@ import {useTranslation} from 'react-i18next';
 import {queryClient} from '@/shared/configs/api';
 
 import api from '../api';
-import {DtoUpdateArticle} from '../api/types';
-import {Article} from '../types';
+import {Article, UpdatableArticle} from '../types';
 import {EMPTY_ARTICLE_BASE} from '../utils/constants';
 
-import {articleKeys} from './constants';
+import {articleKeys, fieldUpdateConfig} from './constants';
 
 export const useGetAllArticles = () => {
     return useQuery<Article[], Error>({
@@ -64,13 +63,79 @@ export const useCreateArticle = () => {
 };
 
 export const useUpdateArticle = () => {
-    return useMutation<Article, Error, DtoUpdateArticle>({
-        mutationFn: (data) => api.update(data),
-        onSuccess: (data, variables) => {
-            queryClient.setQueryData(articleKeys.detail(variables.id!), data);
-            queryClient.invalidateQueries({queryKey: articleKeys.lists()});
-        },
-    });
+    const createMutation = <T extends keyof UpdatableArticle>(field: T) => {
+        const mutation = useMutation({
+            mutationFn: (
+                variables: {id: string} & Record<T, UpdatableArticle[T]>
+            ) => {
+                const updateFunction = fieldUpdateConfig[field];
+
+                if (!updateFunction) {
+                    throw new Error(
+                        `No update function configured for field: ${field}`
+                    );
+                }
+
+                return updateFunction(variables);
+            },
+            onMutate: async (variables) => {
+                await queryClient.cancelQueries({
+                    queryKey: articleKeys.detail(variables.id),
+                });
+                const previous = queryClient.getQueryData<Article>(
+                    articleKeys.detail(variables.id)
+                );
+                if (previous) {
+                    queryClient.setQueryData(articleKeys.detail(variables.id), {
+                        ...previous,
+                        [field]: variables[field],
+                    });
+                }
+                return {previous};
+            },
+            onError: (_err, variables, context) => {
+                if (context?.previous) {
+                    queryClient.setQueryData(
+                        articleKeys.detail(variables.id),
+                        context.previous
+                    );
+                }
+            },
+            onSuccess: (data, variables) => {
+                queryClient.setQueryData(
+                    articleKeys.detail(variables.id),
+                    data
+                );
+                queryClient.invalidateQueries({queryKey: articleKeys.lists()});
+            },
+        });
+
+        return {
+            mutate: (id: string, value: Article[T]) =>
+                mutation.mutate({id, [field]: value} as any),
+            mutateAsync: (id: string, value: Article[T]) =>
+                mutation.mutateAsync({id, [field]: value} as any),
+            isPending: mutation.isPending,
+            isError: mutation.isError,
+            error: mutation.error,
+        };
+    };
+
+    const updateTitle = createMutation('title');
+    const updateContent = createMutation('content');
+    const updateImage = createMutation('image');
+    const updateReadTime = createMutation('readTime');
+    const updateTags = createMutation('tags');
+    const updateDraftStatus = createMutation('isDraft');
+
+    return {
+        updateTitle,
+        updateContent,
+        updateImage,
+        updateReadTime,
+        updateTags,
+        updateDraftStatus,
+    };
 };
 
 export const useDeleteArticle = () => {

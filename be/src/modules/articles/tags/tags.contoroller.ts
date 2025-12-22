@@ -9,17 +9,23 @@ import {
     Patch,
     Post,
 } from "@nestjs/common";
+import {IsString} from "class-validator";
 
 import {Tag} from "./tags.entity";
 import {TagsService} from "./tags.service";
+
+export class CreateTagDto {
+    @IsString()
+    name: string;
+}
 
 @Controller("tags")
 export class TagsController {
     constructor(private readonly tagsService: TagsService) {}
 
     @Post()
-    async create(@Body() name: string): Promise<Tag> {
-        return await this.tagsService.create(name);
+    async create(@Body() data: CreateTagDto): Promise<Tag> {
+        return await this.tagsService.create(data);
     }
 
     @Get()
