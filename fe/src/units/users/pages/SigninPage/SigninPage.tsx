@@ -37,7 +37,7 @@ export const SigninPage = () => {
         await mutateAsync(userData);
         if (user) {
             setUserData(user);
-            navigate('/todos');
+            navigate('/');
         }
     };
     const signInFields = useSignInFields(form);

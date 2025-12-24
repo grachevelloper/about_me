@@ -187,7 +187,7 @@ export const DraftArticlePage = () => {
     const isSaving = false;
 
     if (user?.id && author?.id && user?.id !== author?.id) {
-        navigate('/error/no-permission');
+        navigate('/no-permission');
     }
 
     return (

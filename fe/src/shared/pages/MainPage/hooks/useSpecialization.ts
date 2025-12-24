@@ -1,4 +1,4 @@
-import {useTranslation} from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 
 export type Specialization = {
     segment: Skill[];
@@ -17,15 +17,15 @@ export const useSpecialization = () => {
             segmentTitle: t('skill.env'),
             segment: [
                 {
-                    icon: '/assets/env/ts.svg',
+                    icon: '/assets/skills/ts.svg',
                     title: t('skill.env.ts'),
                 },
                 {
-                    icon: '/assets/env/react.svg',
+                    icon: '/assets/skills/react.svg',
                     title: t('skill.env.react'),
                 },
                 {
-                    icon: '/assets/env/nest.svg',
+                    icon: '/assets/skills/nest.svg',
                     title: t('skill.env.express'),
                 },
             ],
@@ -51,15 +51,15 @@ export const useSpecialization = () => {
             segmentTitle: t('skill.infrastracture'),
             segment: [
                 {
-                    icon: '/assets/skills/docker',
+                    icon: '/assets/skills/docker.svg',
                     title: t('skill.infrastracture.docker'),
                 },
                 {
-                    icon: '/assets/skills/postgresql',
+                    icon: '/assets/skills/postgresql.svg',
                     title: t('skill.infrastracture.postgresql'),
                 },
                 {
-                    icon: '/assets/skills/nginx',
+                    icon: '/assets/skills/nginx.svg',
                     title: t('skill.infrastracture.nginx'),
                 },
             ],

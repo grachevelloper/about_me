@@ -1,5 +1,5 @@
 import {QueryErrorResetBoundary} from '@tanstack/react-query';
-import {Layout as AntLayout, Button, theme} from 'antd';
+import {Layout as AntLayout, Button, Flex, theme} from 'antd';
 import block from 'bem-cn-lite';
 import {useEffect} from 'react';
 import {ErrorBoundary} from 'react-error-boundary';
@@ -15,6 +15,7 @@ import {NewTodoForm} from '../NewTodoForm';
 import {isMe} from './api';
 import {Animation} from './components/Animation';
 import {CookieMessage} from './components/CookieMessage';
+import {Footer} from './components/Footer';
 import {OfflineOverlay} from './components/OfflineOverlay';
 import {Sider} from './components/Sider';
 
@@ -57,12 +58,12 @@ export const Layout = () => {
                 <ErrorBoundary
                     onReset={reset}
                     fallbackRender={({resetErrorBoundary}) => (
-                        <div>
-                            There was an error!
+                        <Flex>
+                            {/* <Lottie animationData={}></Lottie> */}
                             <Button onClick={() => resetErrorBoundary()}>
-                                Try again
+                                Try to refresh page
                             </Button>
-                        </div>
+                        </Flex>
                     )}
                 >
                     {isOffline && <OfflineOverlay />}
@@ -74,10 +75,6 @@ export const Layout = () => {
                                 onClick={toggleCollapsed}
                             />
                         )}
-
-                        <NewTodoForm />
-                        {!value && <CookieMessage />}
-
                         {isCollapsed && (
                             <MdOutlineMenuOpen
                                 size={40}
@@ -88,9 +85,14 @@ export const Layout = () => {
                                 }}
                             />
                         )}
+
+                        <NewTodoForm />
+                        {!value && <CookieMessage />}
+
                         <Sider />
                         <Content className={b('content')}>
                             <Outlet />
+                            <Footer />
                         </Content>
                     </AntLayout>
                 </ErrorBoundary>

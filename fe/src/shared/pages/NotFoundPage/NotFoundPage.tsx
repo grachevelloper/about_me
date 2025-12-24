@@ -1,4 +1,4 @@
-import {Space, theme, Typography} from 'antd';
+import {Flex, theme, Typography} from 'antd';
 import block from 'bem-cn-lite';
 import Lottie from 'lottie-react';
 import {useTranslation} from 'react-i18next';
@@ -15,13 +15,13 @@ export const NotFoundPage = () => {
     const {
         token: {},
     } = theme.useToken();
-    const {t} = useTranslation('todo');
+    const {t} = useTranslation('common');
     return (
-        <Space className={b()} direction='vertical'>
+        <Flex className={b()} vertical justify='center' align='center'>
             <Lottie animationData={notFound} className={b('lottie')} />
 
-            <Typography.Title>{t('not_found.page.title')}</Typography.Title>
+            <Typography.Title>{t('page.not_found.title')}</Typography.Title>
             <RevertButton />
-        </Space>
+        </Flex>
     );
 };

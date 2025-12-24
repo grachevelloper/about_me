@@ -8,6 +8,7 @@ import {todosRoutes} from '@/todos/pages';
 import {AuthLayout} from '../components/AuthLayout';
 import {Layout} from '../components/Layout';
 import {sharedPagesRoutes} from '../pages';
+import {MainPage} from '../pages/MainPage';
 
 const routes: RouteProps[] = [
     ...todosRoutes,
@@ -18,13 +19,11 @@ const routes: RouteProps[] = [
 const authRoutes: RouteProps[] = [...usersRoutes.slice(0, 2)];
 
 export const Router = () => {
-    if (window.location.pathname === '/') {
-        window.location.pathname = '/todos';
-    }
     return (
         <BrowserRouter>
             <Routes>
                 <Route element={<Layout />} path='/'>
+                    <Route index element={<MainPage />} />
                     {routes.map((route: RouteProps) => (
                         <Route
                             key={route.path}
@@ -42,12 +41,13 @@ export const Router = () => {
                         />
                     ))}
                 </Route>
-                <Route path='/error'>
+                <Route path='/'>
                     {sharedPagesRoutes.map((route: RouteProps) => (
                         <Route
                             key={route.path}
                             element={route.element}
                             path={route.path}
+                            index={route.index}
                         />
                     ))}
                 </Route>

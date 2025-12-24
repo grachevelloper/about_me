@@ -1,4 +1,5 @@
 import {ThemeConfig} from 'antd';
+import {LayoutToken} from 'antd/es/layout/style';
 import {StepsToken} from 'antd/es/steps/style';
 import {TimelineToken} from 'antd/es/timeline/style';
 
@@ -28,15 +29,20 @@ const BUTTON_PADDING = {
 };
 
 const TIMELINE: Partial<TimelineToken> = {
-    dotSize: 18,
-    tailWidth: 3,
+    dotSize: 22,
+    tailWidth: 6,
     colorIcon: '#4f46e5',
 };
 
 const STEPS: Partial<StepsToken> = {
-    dotCurrentSize: 18,
-    dotSize: 18,
+    dotCurrentSize: 22,
+    dotSize: 22,
 };
+
+const LAYOUT: Partial<LayoutToken> = {
+    footerPadding: 8,
+};
+
 const lightTheme: CustomThemeConfig = {
     name: 'light',
     token: {
@@ -74,11 +80,13 @@ const lightTheme: CustomThemeConfig = {
     },
     components: {
         Layout: {
+            ...LAYOUT,
             headerBg: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
             bodyBg: 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
             siderBg: '#f9fafb',
             triggerBg: '#e5e7eb',
             triggerColor: '#1f2937',
+            footerBg: '#d5d5d5ff',
         },
         Input: {
             colorBgContainer: '#ffffff',

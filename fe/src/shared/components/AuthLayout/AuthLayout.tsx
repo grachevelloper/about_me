@@ -31,7 +31,8 @@ export const AuthLayout = () => {
     }
 
     if (isAuthenticated) {
-        navigate('/todos');
+        navigate('/');
+        return <div>Redirecting...</div>;
     }
 
     return (

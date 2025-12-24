@@ -52,7 +52,7 @@ export const useSignUpFields = (
     }, [onSubmit, setSignStep]);
 
     const handleEndAuth = useCallback(() => {
-        navigate('/todos');
+        navigate('/');
         setSignStep(() => {
             const firstStep = 0;
             AuthEmitter.emit(SIGN_UP_EVENT, firstStep);
