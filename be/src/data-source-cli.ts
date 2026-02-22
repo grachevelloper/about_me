@@ -1,6 +1,6 @@
 import * as dotenv from "dotenv";
-import {DataSource} from "typeorm";
-import {SnakeNamingStrategy} from "typeorm-naming-strategies";
+import { DataSource } from "typeorm";
+import { SnakeNamingStrategy } from "typeorm-naming-strategies";
 
 dotenv.config();
 
@@ -13,7 +13,7 @@ const AppDataSource = new DataSource({
     database: process.env.DB_NAME,
     entities: ["src/**/*.entity.ts"],
     migrations: ["src/migrations/**/*.ts"],
-    synchronize: false,
+    synchronize: true,
     namingStrategy: new SnakeNamingStrategy(),
     logging: true,
 });

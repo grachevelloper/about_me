@@ -9,7 +9,6 @@ import {FlexibleCard} from '@/shared/components/FlexibleCard';
 import {FormInput} from '@/shared/components/FormInput';
 import {useAuth} from '@/shared/context';
 
-import {AuthNavigateButton} from '../../components/AuthNavigateButton';
 import {useSigninMutatuon} from '../../store';
 
 import {useSignInFields} from './hooks';
@@ -82,10 +81,6 @@ export const SigninPage = () => {
             password: '',
         });
     }, [form]);
-
-    useEffect(() => {
-        console.log('rjsbrogujik;drmgm', error);
-    }, [error]);
 
     return (
         <Flex className={b()} align='center' justify='center'>

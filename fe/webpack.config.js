@@ -99,6 +99,15 @@ module.exports = {
         client: {
             overlay: false,
         },
+        proxy: [
+            {
+                context: ['/api'],
+                target: 'http://localhost:3000',
+                changeOrigin: true,
+                secure: false,
+                logLevel: 'debug',
+            },
+        ],
     },
     plugins: [
         new HTMLWebpackPlugin({

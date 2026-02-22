@@ -1,26 +1,26 @@
 services:
-  db: 
+  db:
     image: postgres:16
     container_name: db
     env_file:
       - ./be/.env
     environment:
       - POSTGRES_DB=${DB_NAME:-postgres}
-      - POSTGRES_USER=${DB_USER:-postgres} 
+      - POSTGRES_USER=${DB_USER:-postgres}
       - POSTGRES_PASSWORD=${DB_PASSWORD:-postgres}
       - POSTGRES_PORT=${DB_PORT:-5432}
     ports:
-      - "${DB_PORT}:5432"
+      - '${DB_PORT}:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
-  
+
   backend:
     build: ./be
     container_name: backend
     env_file:
       - .env
     ports:
-      - "${BE_PORT}:8000"
+      - '${BE_PORT}:8000'
     depends_on:
       - db
   frontend:
@@ -30,7 +30,7 @@ services:
       - .env
       - ./fe/.env
     ports:
-      - "${FE_PORT}:5173"
+      - '${FE_PORT}:5173'
     depends_on:
       - backend
       - db
@@ -41,10 +41,10 @@ services:
   #     - "80:80"
   #     - "443:443"
   #   volumes:
-  #   - ./nginx.conf:/etc/nginx/conf.d/app.conf 
+  #   - ./nginx.conf:/etc/nginx/conf.d/app.conf
   #   depends_on:
   #     - frontend
   #     - backend
 
 volumes:
-  postgres_data: 
+  postgres_data:

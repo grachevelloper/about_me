@@ -17,11 +17,11 @@ const {YANDEX_CLIENT_ID} = process.env;
 
 const Api: UserApi = {
     signIn: async (data: DtoSignInUser) => {
-        await query.post<SignResponse>(`/auth/signin`, {data});
+        await query.post<SignResponse>(`/auth/signin`, data);
     },
 
     signUp: async (data: DtoSignUpUser) => {
-        const result = await query.post<User>(`/auth/signup`, {data});
+        const result = await query.post<User>(`/auth/signup`, data);
         return result;
     },
 
@@ -45,7 +45,7 @@ const Api: UserApi = {
     },
 
     updateUserById: async ({id, ...data}: DtoUpdateUser) => {
-        const response = await query.patch<User>(`/user/${id}`, {data});
+        const response = await query.patch<User>(`/user/${id}`, data);
         return response;
     },
 };

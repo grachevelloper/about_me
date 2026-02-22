@@ -6,10 +6,7 @@
   "git.ignoreLimitWarning": true,
   "typescript.preferences.includePackageJsonAutoImports": "on",
 
-  "editor.codeActionsOnSave": [
-    "source.organizeImports",
-    "source.fixAll"
-  ],
+  "editor.codeActionsOnSave": ["source.organizeImports", "source.fixAll"],
 
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
