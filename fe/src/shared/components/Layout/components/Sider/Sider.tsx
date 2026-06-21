@@ -1,11 +1,9 @@
 import {Flex, Layout, Menu, theme} from 'antd';
 import block from 'bem-cn-lite';
 import {Fragment, useState} from 'react';
-import {useTranslation} from 'react-i18next';
 
 import {useAuth} from '@/shared/context';
 import {useSidebar} from '@/shared/context/Sidebar';
-import {useLayout} from '@/shared/hooks';
 
 import {useNavigation, useSiderActions} from '../../hooks';
 import {LogoutDialog} from '../LogoutDialog';

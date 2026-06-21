@@ -67,3 +67,7 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 nginx.conf
 */nginx.conf
 **/nginx.conf
+
+**.agents
+**docs
+skills-lock.json
