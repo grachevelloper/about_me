@@ -1,4 +1,4 @@
-import {FloatButton, theme} from 'antd';
+import {FloatButton} from 'antd';
 import block from 'bem-cn-lite';
 import {FaEyeSlash, FaRegEye} from 'react-icons/fa';
 
@@ -9,9 +9,6 @@ import './ViewModeToggle.scss';
 const b = block('view-mode-toggle');
 
 export const ViewModeToggle = () => {
-    const {
-        token: {},
-    } = theme.useToken();
     const {isCollapsed, toggleCollapsed} = useSidebar();
 
     const {isDesktop} = useLayout();

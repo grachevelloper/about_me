@@ -1,4 +1,4 @@
-import {Flex, Table, Typography} from 'antd';
+import {Table, Typography} from 'antd';
 import {type ColumnsType} from 'antd/es/table';
 import block from 'bem-cn-lite';
 import {useTranslation} from 'react-i18next';
@@ -58,7 +58,7 @@ export const TodoListTable = ({todos}: TodoListTableProps) => {
     };
 
     return (
-        <Flex vertical rootClassName={b()}>
+        <section className={b()}>
             <Typography.Title level={3}>
                 {t('todo.table.title')}
             </Typography.Title>
@@ -69,17 +69,14 @@ export const TodoListTable = ({todos}: TodoListTableProps) => {
                 size='middle'
                 rowClassName={b('row')}
                 rowHoverable
-                onRow={(record, _rowIndex) => {
+                onRow={(record) => {
                     return {
                         onClick: () => handleRowClick(record.id),
                     };
                 }}
                 scroll={{x: 'max-content', y: 55 * 5}}
                 pagination={{pageSize: 5, simple: true}}
-                style={{
-                    overflow: 'hidden',
-                }}
             />
-        </Flex>
+        </section>
     );
 };

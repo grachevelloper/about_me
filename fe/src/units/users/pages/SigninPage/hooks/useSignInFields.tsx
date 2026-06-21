@@ -1,59 +1,28 @@
 import {FormInstance} from 'antd';
-import {useCallback, useEffect} from 'react';
 import {useTranslation} from 'react-i18next';
 
 import {ButtonAccept, ButtonDeny} from '@/shared/components/actions';
-import {useFieldValidation, useLocalStorage} from '@/shared/hooks';
+import {useFieldValidation} from '@/shared/hooks';
 import {FormField} from '@/typings/components';
 
-import {AuthEmitter, SIGN_UP_EVENT} from '../../../utils';
-import {SIGN_UP_STEP_SLUG} from '../../SignupPage/constants';
+interface SignInFieldActions {
+    onNext: () => void;
+    onPrevious: () => void;
+}
 
 export const useSignInFields = (
     form: FormInstance,
-    //     isError: boolean;
-    //     isLoading: boolean;
-    //     handleSumbit: () => void;
-    // },
     startsWith = 0,
-    withActions = true
+    actions?: SignInFieldActions
 ): FormField[] => {
     const {t} = useTranslation('auth');
-    const [signStep, setSignStep] = useLocalStorage(SIGN_UP_STEP_SLUG, 0);
     const isPasswordValid = useFieldValidation<string>(form, 'password');
     const isEmailValid = useFieldValidation<string>(form, 'email');
-
-    useEffect(() => {
-        const handleSignStepChange = (newStep: number) => {
-            if (newStep !== signStep) {
-                setSignStep(newStep);
-            }
-        };
-
-        AuthEmitter.on(SIGN_UP_EVENT, handleSignStepChange);
-
-        return () => {
-            AuthEmitter.off(SIGN_UP_EVENT, handleSignStepChange);
-        };
-    }, [signStep, setSignStep, AuthEmitter]);
-
-    const handleNextStep = useCallback(() => {
-        setSignStep((prev) => {
-            AuthEmitter.emit(SIGN_UP_EVENT, prev + 1);
-            return prev + 1;
-        });
-    }, [setSignStep, signStep]);
-
-    const handlePrevStep = useCallback(() => {
-        setSignStep((prev) => {
-            AuthEmitter.emit(SIGN_UP_EVENT, prev - 1);
-            return prev - 1;
-        });
-    }, [setSignStep]);
 
     return [
         {
             name: 'email',
+            autoComplete: actions ? 'email' : 'off',
             label: t('auth.email.label'),
             type: 'email',
             placeholder: t('auth.email.placeholder'),
@@ -62,17 +31,17 @@ export const useSignInFields = (
                 {type: 'email', message: t('auth.email.invalid')},
             ],
             index: startsWith,
-            actions: withActions
+            actions: actions
                 ? [
                       startsWith > 0 ? (
                           <ButtonDeny
-                              onClick={handlePrevStep}
+                              onClick={actions.onPrevious}
                               key='email-prev'
                           />
                       ) : null,
                       <ButtonAccept
                           key='email-next'
-                          onClick={handleNextStep}
+                          onClick={actions.onNext}
                           disabled={!isEmailValid}
                       />,
                   ]
@@ -80,20 +49,21 @@ export const useSignInFields = (
         },
         {
             name: 'password',
+            autoComplete: 'new-password',
             label: t('auth.password.label'),
             type: 'password',
             placeholder: t('auth.password.placeholder'),
             rules: [{required: true, message: t('auth.password.required')}],
             index: startsWith + 1,
-            actions: withActions
+            actions: actions
                 ? [
                       <ButtonDeny
-                          onClick={handlePrevStep}
+                          onClick={actions.onPrevious}
                           key='password-prev'
                       />,
                       <ButtonAccept
                           key='password-next'
-                          onClick={handleNextStep}
+                          onClick={actions.onNext}
                           disabled={!isPasswordValid}
                       />,
                   ]

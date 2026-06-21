@@ -15,6 +15,7 @@
     "layout.top.user.signup": "Зарегистрироваться",
     "layout.top.articles": "Статьи",
     "layout.top.drafts": "Мои черновики",
+    "layout.navigation.open": "Открыть навигацию",
     "layout.left.suggest": "Предложить ежедневку",
     "layout.left.create_article": "Создать статью",
     "layout.left.create_article.success.title": "Черновик создан!",

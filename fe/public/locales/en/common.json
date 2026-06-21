@@ -5,5 +5,6 @@
     "validation.maxLength": "Must be at most {{count}} characters",
 
     "button.continue": "Continue",
-    "button.back": "Back"
+    "button.back": "Back",
+    "layout.navigation.open": "Open navigation"
 }

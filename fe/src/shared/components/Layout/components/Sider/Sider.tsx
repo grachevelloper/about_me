@@ -4,6 +4,7 @@ import {Fragment, useState} from 'react';
 
 import {useAuth} from '@/shared/context';
 import {useSidebar} from '@/shared/context/Sidebar';
+import {useLayout} from '@/shared/hooks';
 
 import {useNavigation, useSiderActions} from '../../hooks';
 import {LogoutDialog} from '../LogoutDialog';
@@ -15,7 +16,6 @@ const b = block('sider');
 const {Sider: AntSider} = Layout;
 
 export const Sider = () => {
-    const {t} = useTranslation('common');
     const {user} = useAuth();
     const {isTablet, isMobile} = useLayout();
     const {isCollapsed, toggleCollapsed} = useSidebar();

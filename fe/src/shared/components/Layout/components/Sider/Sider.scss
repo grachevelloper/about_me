@@ -10,12 +10,16 @@
 
     @media (max-width: 991px) {
         position: fixed;
+        inset: 0 auto 0 0;
         z-index: 1000;
+        max-width: calc(100vw - 48px) !important;
+        height: 100dvh;
+        flex-basis: min(272px, calc(100vw - 48px)) !important;
     }
 
     &__container {
         height: 100%;
-        padding: 0 0 15% 0;
+        padding-bottom: 24px;
     }
 
     &__menu {

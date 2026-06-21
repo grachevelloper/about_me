@@ -18,8 +18,6 @@ import {S3Module} from "@/shared/storage/s3/s3.module";
 import {TodosModule} from "@/todos/todos.module";
 import {UsersModule} from "@/users/users.module";
 
-import {AppController} from "./app.controller";
-import {AppService} from "./app.service";
 import dataSourceOptions from "./data-source";
 
 dotenv.config();
@@ -51,9 +49,7 @@ dotenv.config();
         AttachmentModule,
         S3Module,
     ],
-    controllers: [AppController],
     providers: [
-        AppService,
         {
             provide: APP_GUARD,
             useClass: AuthGuard,

@@ -3,6 +3,7 @@ import {Layout as AntLayout, Button, Flex, theme} from 'antd';
 import block from 'bem-cn-lite';
 import {useEffect} from 'react';
 import {ErrorBoundary} from 'react-error-boundary';
+import {useTranslation} from 'react-i18next';
 import {MdOutlineMenuOpen} from 'react-icons/md';
 import {Outlet, useLocation} from 'react-router-dom';
 
@@ -26,16 +27,17 @@ const b = block('layout');
 const {Content} = AntLayout;
 
 export const Layout = () => {
+    const {t} = useTranslation('common');
     const {setUserData} = useAuth();
     const location = useLocation();
-    const {isTablet, isMobile, isDesktop} = useLayout();
+    const {isDesktop} = useLayout();
     const {value} = useCookie('cookie-accept');
     const {isCollapsed, toggleCollapsed, setCollapsed} = useSidebar();
 
     const isOffline = !window.navigator.onLine;
 
     const {
-        token: {colorBgContainer, colorPrimaryText},
+        token: {colorPrimary, colorTextLightSolid},
     } = theme.useToken();
 
     useEffect(() => {
@@ -47,10 +49,14 @@ export const Layout = () => {
     }, []);
 
     useEffect(() => {
-        if (!isCollapsed && !isDesktop) {
+        if (!isDesktop) {
             setCollapsed(true);
         }
-    }, [location.pathname, isDesktop]);
+    }, [location.pathname]);
+
+    useEffect(() => {
+        setCollapsed(!isDesktop);
+    }, [isDesktop]);
 
     return (
         <QueryErrorResetBoundary>
@@ -76,13 +82,16 @@ export const Layout = () => {
                             />
                         )}
                         {isCollapsed && (
-                            <MdOutlineMenuOpen
-                                size={40}
+                            <Button
+                                type='text'
                                 className={b('sider-collapse-button')}
                                 onClick={toggleCollapsed}
+                                aria-label={t('layout.navigation.open')}
                                 style={{
-                                    backgroundColor: colorPrimaryText,
+                                    backgroundColor: colorPrimary,
+                                    color: colorTextLightSolid,
                                 }}
+                                icon={<MdOutlineMenuOpen size={28} />}
                             />
                         )}
 

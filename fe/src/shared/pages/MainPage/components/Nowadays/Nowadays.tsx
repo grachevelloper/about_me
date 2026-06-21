@@ -20,7 +20,7 @@ type NowadaysData = {
 export const Nowadays = () => {
     const {t} = useTranslation('todo');
     const {
-        token: {colorBgSpotlight, borderRadius, paddingMD, paddingSM},
+        token: {colorBgSpotlight, borderRadius},
     } = theme.useToken();
     const data: NowadaysData[] = [
         {
@@ -44,9 +44,6 @@ export const Nowadays = () => {
             className={b()}
             draggable
             waitForAnimate
-            style={{
-                padding: paddingSM,
-            }}
             autoplay
         >
             {data.map((one) => (
@@ -72,7 +69,6 @@ export const Nowadays = () => {
                         className={b('title')}
                         level={3}
                         style={{
-                            padding: paddingMD,
                             backgroundColor: colorBgSpotlight,
                         }}
                     >
@@ -80,9 +76,6 @@ export const Nowadays = () => {
                     </Typography.Title>
                     <Typography.Text
                         className={b('content')}
-                        style={{
-                            padding: paddingMD,
-                        }}
                     >
                         {one.content}
                     </Typography.Text>

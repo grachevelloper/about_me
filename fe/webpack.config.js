@@ -69,6 +69,9 @@ module.exports = {
 
     resolve: {
         extensions: ['.js', '.json', '.ts', '.tsx', '.jsx', '.png'],
+        extensionAlias: {
+            '.js': ['.js', '.ts', '.tsx'],
+        },
         alias: {
             '@/pages': path.resolve(__dirname, './src/pages'),
             '@/todos': path.resolve(__dirname, './src/units/todos'),
@@ -84,7 +87,9 @@ module.exports = {
     },
     optimization: optimization(),
     devServer: {
+        host: '0.0.0.0',
         port: FE_PORT || 5173,
+        allowedHosts: ['fe_fullstack-app.localhost', 'localhost'],
         hot: isDev,
         historyApiFallback: true,
         static: [
@@ -98,6 +103,7 @@ module.exports = {
         ],
         client: {
             overlay: false,
+            webSocketURL: 'auto://0.0.0.0:0/ws',
         },
         proxy: [
             {

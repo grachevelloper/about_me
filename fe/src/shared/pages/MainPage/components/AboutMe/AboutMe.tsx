@@ -13,16 +13,14 @@ import block from 'bem-cn-lite';
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 
-import {useLayout} from '@/shared/hooks';
-
 import {useSpecialization, useTimeline} from '../../hooks';
+
 import './AboutMe.scss';
 
 const b = block('about-me');
 
 export const AboutMe = () => {
     const {t} = useTranslation('common');
-    const {isMobile} = useLayout();
     const {timelineItems} = useTimeline();
     const {specialization} = useSpecialization();
     const [visibleTimeineItems, setVisibleTimelineItems] = useState<number[]>(
@@ -176,18 +174,13 @@ export const AboutMe = () => {
                     <Divider orientation='horizontal' />
                 </Col>
             </Row>
-            <Row
-                justify='center'
-                style={{
-                    margin: '30px 0',
-                }}
-            >
-                <Col xl={16} md={12} sm={12}>
+            <Row justify='center' gutter={[32, 32]} className={b('intro')}>
+                <Col xl={16} md={14} xs={24}>
                     <Typography.Title level={2} className={b('subtitle')}>
                         {t('about.subtitle')}
                     </Typography.Title>
                 </Col>
-                <Col xl={8} md={12} sm={12} xs={20}>
+                <Col xl={8} md={10} xs={24} className={b('photo-column')}>
                     <Image
                         src='/assets/me.png'
                         placeholder={t('about.photo')}
@@ -224,24 +217,16 @@ export const AboutMe = () => {
                         {renderSpecializationItems()}
                     </Flex>
                 </Col>
-                <Col
-                    xl={8}
-                    md={10}
-                    sm={10}
-                    xs={24}
-                    style={{
-                        margin: isMobile ? 30 : 0,
-                    }}
-                >
+                <Col xl={8} md={10} xs={24} className={b('timeline-column')}>
                     <Flex
                         vertical
                         align='center'
                         justify='center'
                         style={{height: '100%'}}
                     >
-                        {/* <Typography.Title level={2}>
+                        <Typography.Title level={2}>
                             {t('about.work_experience')}
-                        </Typography.Title> */}
+                        </Typography.Title>
                         <Timeline items={renderTimelineItems} />
                     </Flex>
                 </Col>

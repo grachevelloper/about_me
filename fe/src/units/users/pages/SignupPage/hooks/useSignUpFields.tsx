@@ -1,79 +1,55 @@
 import {Flex, FormInstance, Image} from 'antd';
-import {useCallback, useEffect} from 'react';
+import {useCallback} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useNavigate} from 'react-router-dom';
 
 import {ButtonAccept, ButtonDeny} from '@/shared/components/actions';
-import {useFieldValidation, useLocalStorage} from '@/shared/hooks';
+import {useFieldValidation} from '@/shared/hooks';
 import {CardProps, FormField} from '@/typings/components';
 import {SubmitData} from '@/users/types';
-import {AuthEmitter, SIGN_UP_EVENT} from '@/users/utils';
 
 import {useSignInFields} from '../../SigninPage/hooks/useSignInFields';
-import {SIGN_UP_STEP_SLUG} from '../constants';
 
 export const useSignUpFields = (
     form: FormInstance,
-    sumbitData: SubmitData
+    submitData: SubmitData,
+    signStep: number,
+    onStepChange: (step: number) => void
 ): Array<FormField | CardProps> => {
-    const {isLoading, onSubmit} = sumbitData;
+    const {isLoading, onSubmit} = submitData;
     const {t} = useTranslation('auth');
     const navigate = useNavigate();
-    const [signStep, setSignStep] = useLocalStorage(SIGN_UP_STEP_SLUG, 0);
     const isConfirmPasswordValid = useFieldValidation<string>(
         form,
         'confirmPassword'
     );
     const isUsernameValid = useFieldValidation<string>(form, 'username');
-    const signInSteps = useSignInFields(form, 2);
-
     const handleNextStep = useCallback(() => {
-        setSignStep((prev) => {
-            AuthEmitter.emit(SIGN_UP_EVENT, prev + 1);
-            return prev + 1;
-        });
-    }, [setSignStep, signStep]);
+        onStepChange(signStep + 1);
+    }, [onStepChange, signStep]);
 
     const handlePrevStep = useCallback(() => {
-        setSignStep((prev) => {
-            AuthEmitter.emit(SIGN_UP_EVENT, prev - 1);
-            return prev - 1;
-        });
-    }, [setSignStep]);
+        onStepChange(Math.max(0, signStep - 1));
+    }, [onStepChange, signStep]);
 
-    const handleSubmit = useCallback(() => {
-        onSubmit();
-
-        setSignStep((prev) => {
-            const nextStep = prev + 1;
-            AuthEmitter.emit(SIGN_UP_EVENT, nextStep);
-            return nextStep;
-        });
-    }, [onSubmit, setSignStep]);
+    const handleSubmit = useCallback(async () => {
+        try {
+            await onSubmit();
+            onStepChange(signStep + 1);
+        } catch {
+            // Mutation state renders the actionable error without advancing.
+        }
+    }, [onStepChange, onSubmit, signStep]);
 
     const handleEndAuth = useCallback(() => {
+        onStepChange(0);
         navigate('/');
-        setSignStep(() => {
-            const firstStep = 0;
-            AuthEmitter.emit(SIGN_UP_EVENT, firstStep);
-            return firstStep;
-        });
-        AuthEmitter.emit(SIGN_UP_EVENT, 0);
-    }, [navigate]);
+    }, [navigate, onStepChange]);
 
-    useEffect(() => {
-        const handleSignStepChange = (newStep: number) => {
-            if (newStep !== signStep) {
-                setSignStep(newStep);
-            }
-        };
-
-        AuthEmitter.on(SIGN_UP_EVENT, handleSignStepChange);
-
-        return () => {
-            AuthEmitter.off(SIGN_UP_EVENT, handleSignStepChange);
-        };
-    }, [signStep, setSignStep]);
+    const signInSteps = useSignInFields(form, 2, {
+        onNext: handleNextStep,
+        onPrevious: handlePrevStep,
+    });
 
     return [
         {
@@ -104,6 +80,7 @@ export const useSignUpFields = (
         {
             title: t('auth.name.username.title'),
             name: 'username',
+            autoComplete: 'username',
             label: t('auth.username.label'),
             placeholder: t('auth.username.placeholder'),
             rules: [{required: true, message: t('auth.username.required')}],
@@ -120,6 +97,7 @@ export const useSignUpFields = (
         ...signInSteps,
         {
             name: 'confirmPassword',
+            autoComplete: 'new-password',
             label: t('auth.confirmPassword.label'),
             type: 'password',
             placeholder: t('auth.confirmPassword.placeholder'),
@@ -143,7 +121,9 @@ export const useSignUpFields = (
                 <ButtonDeny key='confirm-prev' onClick={handlePrevStep} />,
                 <ButtonAccept
                     key='confirm-next'
-                    onClick={handleSubmit}
+                    onClick={() => {
+                        void handleSubmit();
+                    }}
                     loading={isLoading}
                     text={t('auth.signup.end-apply')}
                     disabled={!isConfirmPasswordValid}

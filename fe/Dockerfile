@@ -1,6 +1,6 @@
 FROM node:20-alpine
 
-RUN npm install -g pnpm
+RUN corepack enable
 
 WORKDIR /app
 
@@ -8,12 +8,12 @@ WORKDIR /app
 COPY package*json ./
 COPY pnpm-lock.yaml ./
 
-RUN pnpm install
+RUN pnpm install --frozen-lockfile
 
 COPY . .
 
-RUN pnpm run build:dev
+RUN pnpm run build
 
-EXPOSE ${APP_PORT}
+EXPOSE 5173
 
-CMD ["pnpm", "dev"]
+CMD ["pnpm", "start"]

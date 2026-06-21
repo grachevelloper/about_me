@@ -23,7 +23,7 @@ export interface ResponseYandex0Auth {
 }
 
 export interface UserApi {
-    signIn: (signInData: DtoSignInUser) => Promise<void>;
+    signIn: (signInData: DtoSignInUser) => Promise<SignResponse>;
     signUp: (signUpData: DtoSignUpUser) => Promise<User>;
     logout: () => Promise<void>;
     yandexSignIn: () => Promise<ResponseYandex0Auth>;

@@ -1,15 +1,13 @@
-import {Flex, Form} from 'antd';
+import {Alert, Flex, Form} from 'antd';
 import block from 'bem-cn-lite';
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 
 import {useAuth} from '@/shared/context';
-import {useLocalStorage} from '@/shared/hooks';
 import {type CardProps, type FormField} from '@/typings/components';
 import {useSignupMutation} from '@/users/store';
-import {AuthEmitter, SIGN_UP_EVENT} from '@/users/utils';
 
 import {SignStep} from './components/SignStep';
-import {ANIMATION_FADE_OUT_IN_S, SIGN_UP_STEP_SLUG} from './constants';
 import {useSignUpFields} from './hooks/useSignUpFields';
 
 import './SignupPage.scss';
@@ -31,70 +29,45 @@ const initialSignUpData: SignUpFormData = {
 };
 
 export const SignupPage = () => {
-    const [signStep, setSignStep] = useLocalStorage(SIGN_UP_STEP_SLUG, 0);
-    const [visibleStep, setVisibleStep] = useState(signStep);
+    const {t} = useTranslation('auth');
+    const [signStep, setSignStep] = useState(0);
     const [form] = Form.useForm<SignUpFormData>();
     const {setUserData} = useAuth();
-    const [localSignUpData, setLocalSignUpData] =
-        useLocalStorage<SignUpFormData>('sign-up', initialSignUpData);
 
     const {isPending, isError, mutateAsync} = useSignupMutation();
 
-    const handleSubmit = useCallback(() => {
-        (async () => {
-            const userData = await form.validateFields([
-                'email',
-                'password',
-                'username',
-            ]);
-            const mutated = await mutateAsync(userData);
-            setLocalSignUpData(initialSignUpData);
-            setUserData(mutated);
-        })();
-    }, [form]);
+    const handleSubmit = useCallback(async () => {
+        const userData = await form.validateFields([
+            'email',
+            'password',
+            'confirmPassword',
+            'username',
+        ]);
+        const user = await mutateAsync({
+            email: userData.email,
+            password: userData.password,
+            username: userData.username,
+        });
+        form.resetFields();
+        setUserData(user);
+    }, [form, mutateAsync, setUserData]);
 
-    const signUpFields = useSignUpFields(form, {
-        isLoading: isPending,
-        onSubmit: handleSubmit,
-    });
+    const signUpFields = useSignUpFields(
+        form,
+        {
+            isLoading: isPending,
+            onSubmit: handleSubmit,
+        },
+        signStep,
+        setSignStep
+    );
 
-    const visibleStepData = signUpFields[visibleStep];
-
-    useEffect(() => {
-        const handleSignStepChange = (newStep: number) => {
-            if (newStep !== signStep) {
-                setSignStep(newStep);
-                setTimeout(
-                    () => setVisibleStep(newStep),
-                    ANIMATION_FADE_OUT_IN_S
-                );
-            }
-        };
-
-        AuthEmitter.on(SIGN_UP_EVENT, handleSignStepChange);
-
-        return () => {
-            AuthEmitter.off(SIGN_UP_EVENT, handleSignStepChange);
-        };
-    }, [signStep, setSignStep]);
+    const visibleStepData = signUpFields[signStep];
 
     if (!visibleStepData) {
         return <div>Loading...</div>;
     }
     const type = 'placeholder' in visibleStepData ? 'form' : 'text';
-
-    const handleValuesChange = (changedValues: Partial<SignUpFormData>) => {
-        setLocalSignUpData((prev) => ({
-            ...prev,
-            ...changedValues,
-        }));
-    };
-
-    useEffect(() => {
-        if (localSignUpData) {
-            form.setFieldsValue(localSignUpData);
-        }
-    }, [localSignUpData, form]);
 
     return (
         <Flex className={b()} align='center' justify='center'>
@@ -102,27 +75,30 @@ export const SignupPage = () => {
                 className={b('form')}
                 layout='vertical'
                 form={form}
-                onValuesChange={handleValuesChange}
                 initialValues={initialSignUpData}
-                onFinish={handleSubmit}
+                autoComplete='off'
             >
+                {isError && (
+                    <Alert
+                        className={b('error')}
+                        message={t('auth.signup.error')}
+                        type='error'
+                        showIcon
+                    />
+                )}
                 {type === 'form' ? (
                     <SignStep
                         content={visibleStepData as FormField}
                         type='form'
-                        key={`step-${visibleStep}`}
-                        className={b('step', {
-                            exit: signStep !== visibleStep,
-                        })}
+                        key={`step-${signStep}`}
+                        className={b('step')}
                     />
                 ) : (
                     <SignStep
                         content={visibleStepData as CardProps}
                         type='text'
-                        key={`step-${visibleStep}`}
-                        className={b('step', {
-                            exit: signStep !== visibleStep,
-                        })}
+                        key={`step-${signStep}`}
+                        className={b('step')}
                     />
                 )}
             </Form>

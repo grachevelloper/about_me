@@ -15,5 +15,5 @@ export interface User extends BaseEntity {
 
 export interface SubmitData {
     isLoading: boolean;
-    onSubmit: () => void;
+    onSubmit: () => Promise<void>;
 }

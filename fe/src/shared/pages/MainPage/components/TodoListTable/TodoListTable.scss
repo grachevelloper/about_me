@@ -1,13 +1,8 @@
 .todo-list-table {
-    overflow: visible;
+    min-width: 0;
 
     &__table {
-        padding: 10px;
         width: 100%;
-        max-height: 500px;
+        overflow: hidden;
     }
-}
-
-.ant-table-body {
-    overflow: hidden !important;
 }

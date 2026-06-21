@@ -1,8 +1,7 @@
 @import 'animate.css';
 .sign-step {
-    width: auto !important;
-    max-width: 554px;
-    min-width: 400px !important;
+    width: 100% !important;
+    min-width: 0 !important;
     padding: var(--ant-padding);
 
     &__button-back {

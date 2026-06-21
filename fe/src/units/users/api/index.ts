@@ -17,7 +17,7 @@ const {YANDEX_CLIENT_ID} = process.env;
 
 const Api: UserApi = {
     signIn: async (data: DtoSignInUser) => {
-        await query.post<SignResponse>(`/auth/signin`, data);
+        return query.post<SignResponse>(`/auth/signin`, data);
     },
 
     signUp: async (data: DtoSignUpUser) => {
