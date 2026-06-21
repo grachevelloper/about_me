@@ -5,11 +5,11 @@ import {
     Param,
     Patch,
     Post,
-    Req,
     UseGuards,
 } from "@nestjs/common";
-import {Request} from "express";
+import {CurrentUser} from "src/shared/decorators/current-user.decorator";
 import {AuthGuard} from "src/shared/guards/auth.guard";
+import {AuthenticatedUser} from "src/types";
 
 import type {CreateTodoDto, UpdateTodoDto} from "./todo.interface";
 import {TodosService} from "./todos.service";
@@ -20,18 +20,21 @@ export class TodosController {
     constructor(private readonly todosService: TodosService) {}
 
     @Post()
-    async create(@Body() createTodoData: CreateTodoDto, @Req() req: Request) {
+    async create(
+        @Body() createTodoData: CreateTodoDto,
+        @CurrentUser() user: AuthenticatedUser,
+    ) {
         const createTodoDataWithUserId: CreateTodoDto = {
             ...createTodoData,
-            authorId: req.user.id,
+            authorId: user.id,
         };
 
         return await this.todosService.create(createTodoDataWithUserId);
     }
 
     @Get()
-    async findAll(@Req() req: Request) {
-        return await this.todosService.findAll(req.user.id);
+    async findAll(@CurrentUser() user: AuthenticatedUser) {
+        return await this.todosService.findAll(user.id);
     }
 
     @Get(":id")

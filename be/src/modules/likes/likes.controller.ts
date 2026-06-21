@@ -1,7 +1,8 @@
-import {Body, Controller, Req, UseGuards} from "@nestjs/common";
-import {Request} from "express";
+import {Body, Controller, UseGuards} from "@nestjs/common";
 
+import {CurrentUser} from "../../shared/decorators/current-user.decorator";
 import {AuthGuard} from "../../shared/guards/auth.guard";
+import {AuthenticatedUser} from "../../types";
 import {CreateLikeDto, DeleteLikeDto} from "./likes.interface";
 import {LikesService} from "./likes.service";
 
@@ -10,19 +11,25 @@ import {LikesService} from "./likes.service";
 export class LikesController {
     constructor(private readonly likesService: LikesService) {}
 
-    async create(@Req() req: Request, @Body() createLikeData: CreateLikeDto) {
+    async create(
+        @CurrentUser() user: AuthenticatedUser,
+        @Body() createLikeData: CreateLikeDto,
+    ) {
         const createLikeDataWithUserId: CreateLikeDto = {
             ...createLikeData,
-            authorId: req.user.id,
+            authorId: user.id,
         };
 
         return await this.likesService.create(createLikeDataWithUserId);
     }
 
-    async delete(@Req() req: Request, @Body() deleteLikeData: DeleteLikeDto) {
+    async delete(
+        @CurrentUser() user: AuthenticatedUser,
+        @Body() deleteLikeData: DeleteLikeDto,
+    ) {
         const createLikeDataWithUserId: CreateLikeDto = {
             ...deleteLikeData,
-            authorId: req.user.id,
+            authorId: user.id,
         };
 
         return await this.likesService.delete(createLikeDataWithUserId);

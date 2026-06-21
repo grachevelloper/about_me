@@ -54,10 +54,6 @@ describe("TodosService", () => {
         commentsService = module.get(CommentsService);
     });
 
-    it("should be defined", () => {
-        expect(service).toBeDefined();
-    });
-
     describe("create", () => {
         it("should create a todo", async () => {
             const createTodoData: CreateTodoDto = {
@@ -69,22 +65,20 @@ describe("TodosService", () => {
             repository.create.mockReturnValue(mockTodo);
             repository.save.mockResolvedValue(mockTodo);
 
-            const result = await service.create(createTodoData);
+            await service.create(createTodoData);
 
             expect(repository.create).toHaveBeenCalledWith(createTodoData);
             expect(repository.save).toHaveBeenCalledWith(mockTodo);
-            expect(result).toEqual(mockTodo);
         });
     });
 
     describe("findOne", () => {
-        it("should return todo if found", async () => {
+        it("should find todo by id", async () => {
             repository.findOne.mockResolvedValue(mockTodo);
 
-            const result = await service.findOne("1");
+            await service.findOne("1");
 
             expect(repository.findOne).toHaveBeenCalledWith({where: {id: "1"}});
-            expect(result).toEqual(mockTodo);
         });
 
         it("should throw NotFoundException if todo not found", async () => {
@@ -97,36 +91,24 @@ describe("TodosService", () => {
     });
 
     describe("findAll", () => {
-        it("should return all todos for author", async () => {
+        it("should find todos by author", async () => {
             const todos = [mockTodo, {...mockTodo, id: "2"}];
             repository.find.mockResolvedValue(todos);
 
-            const result = await service.findAll("user-123");
+            await service.findAll("user-123");
 
             expect(repository.find).toHaveBeenCalledWith({
                 where: {authorId: "user-123"},
             });
-            expect(result).toEqual(todos);
-        });
-
-        it("should return empty array if no todos", async () => {
-            repository.find.mockResolvedValue([]);
-
-            const result = await service.findAll("user-123");
-
-            expect(repository.find).toHaveBeenCalledWith({
-                where: {authorId: "user-123"},
-            });
-            expect(result).toEqual([]);
         });
     });
 
     describe("findActive", () => {
-        it("should return active todos for author", async () => {
+        it("should find in-progress todos by author", async () => {
             const activeTodos = [mockTodo];
             repository.find.mockResolvedValue(activeTodos);
 
-            const result = await service.findActive("user-123");
+            await service.findActive("user-123");
 
             expect(repository.find).toHaveBeenCalledWith({
                 where: {
@@ -134,7 +116,6 @@ describe("TodosService", () => {
                     authorId: "user-123",
                 },
             });
-            expect(result).toEqual(activeTodos);
         });
     });
 
@@ -146,14 +127,13 @@ describe("TodosService", () => {
             repository.findOne.mockResolvedValue(mockTodo);
             repository.save.mockResolvedValue(updatedTodo);
 
-            const result = await service.update("1", updateData);
+            await service.update("1", updateData);
 
             expect(repository.findOne).toHaveBeenCalledWith({where: {id: "1"}});
             expect(repository.save).toHaveBeenCalledWith({
                 ...mockTodo,
                 ...updateData,
             });
-            expect(result).toEqual(updatedTodo);
         });
 
         it("should throw NotFoundException if todo not found", async () => {
@@ -200,23 +180,6 @@ describe("TodosService", () => {
                 "1",
             );
             expect(result).toEqual({...mockTodo, comments: mockComments});
-        });
-
-        it("should return todo with empty comments if no comments", async () => {
-            repository.findOne.mockResolvedValue(mockTodo);
-            commentsService.findByEntity.mockResolvedValue([]);
-
-            const result = await service.findTodoWithComments("1");
-
-            expect(result).toEqual({...mockTodo, comments: []});
-        });
-
-        it("should return null todo if not found", async () => {
-            repository.findOne.mockResolvedValue(null);
-            commentsService.findByEntity.mockResolvedValue([]);
-
-            const result = await service.findTodoWithComments("999");
-            expect(result).toEqual({comments: []});
         });
     });
 

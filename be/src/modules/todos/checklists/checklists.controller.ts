@@ -7,11 +7,14 @@ import {
     Patch,
     Post,
 } from "@nestjs/common";
-import {IsString} from "class-validator";
+import {Type} from "class-transformer";
+import {IsInt, IsNotEmpty, IsString} from "class-validator";
 
 import {ChecklistService} from "./checklists.service";
 
 class AddItemDto {
+    @IsString()
+    @IsNotEmpty()
     text: string;
 }
 
@@ -21,6 +24,8 @@ class UpdateItemTextDto {
 }
 
 class UpdateProgressDto {
+    @Type(() => Number)
+    @IsInt()
     delta: number;
 }
 

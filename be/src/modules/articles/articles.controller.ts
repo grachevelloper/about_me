@@ -9,11 +9,11 @@ import {
     Patch,
     Post,
     Query,
-    Req,
     ValidationPipe,
 } from "@nestjs/common";
-import {Request} from "express";
 
+import {CurrentUser} from "../../shared/decorators/current-user.decorator";
+import {AuthenticatedUser} from "../../types";
 import {
     CreateArticleDto,
     RequestGetArticles,
@@ -31,26 +31,25 @@ export class ArticlesController {
 
     @Post()
     async create(
-        @Req() req: Request,
+        @CurrentUser() user: AuthenticatedUser,
         @Body() createArticleData: CreateArticleDto,
     ): Promise<ResponseArticle> {
-        const authorId = req.user.id;
-        return await this.articlesService.create(authorId, createArticleData);
+        return await this.articlesService.create(user.id, createArticleData);
     }
 
     @Get("drafts")
-    async findAllDrafts(@Req() req: Request): Promise<Article[]> {
-        const authorId = req.user.id;
-        return await this.articlesService.findAllByAuthorId(authorId, true);
+    async findAllDrafts(
+        @CurrentUser() user: AuthenticatedUser,
+    ): Promise<Article[]> {
+        return await this.articlesService.findAllByAuthorId(user.id, true);
     }
 
     @Get(":id")
     async findOne(
-        @Req() req: Request,
+        @CurrentUser() user: AuthenticatedUser,
         @Param("id") id: string,
     ): Promise<ResponseArticle> {
-        const authorId = req.user.id;
-        return await this.articlesService.findOne(id, authorId);
+        return await this.articlesService.findOne(id, user.id);
     }
 
     @Patch(":id")
@@ -117,11 +116,10 @@ export class ArticlesController {
 
     @Post(":id/publish")
     async publichArticle(
-        @Req() req: Request,
+        @CurrentUser() user: AuthenticatedUser,
         @Param("id") id: string,
     ): Promise<boolean> {
-        const authorId = req.user.id;
-        return await this.articlesService.publish(id, authorId);
+        return await this.articlesService.publish(id, user.id);
     }
 
     @Post(":id/like")

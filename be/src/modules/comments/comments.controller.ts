@@ -8,13 +8,12 @@ import {
     Param,
     Patch,
     Post,
-    Req,
     UseGuards,
 } from "@nestjs/common";
-import {Request} from "express";
 
+import {CurrentUser} from "../../shared/decorators/current-user.decorator";
 import {AuthGuard} from "../../shared/guards/auth.guard";
-import {Order} from "../../types";
+import {AuthenticatedUser, Order} from "../../types";
 import {CreateCommentDto, UpdateCommentDto} from "./comemnts.interface";
 import {EntityCommentType} from "./comments.entity";
 import {CommentsService} from "./comments.service";
@@ -27,12 +26,10 @@ export class CommentsController {
     @HttpCode(HttpStatus.CREATED)
     @Post()
     async create(
-        @Req() req: Request,
+        @CurrentUser() user: AuthenticatedUser,
         @Body() createCommentData: CreateCommentDto,
     ) {
-        const authorId = req.user.id;
-
-        return await this.commentsService.create(authorId, createCommentData);
+        return await this.commentsService.create(user.id, createCommentData);
     }
 
     @HttpCode(HttpStatus.OK)

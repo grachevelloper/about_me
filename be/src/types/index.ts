@@ -13,3 +13,10 @@ export enum Role {
     WRITER = "Writer",
     USER = "User",
 }
+
+export interface AuthenticatedUser {
+    id: string;
+    role: Role;
+    iat: number;
+    exp: number;
+}

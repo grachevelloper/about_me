@@ -16,7 +16,9 @@ import {Request, Response} from "express";
 import {SigninUserDto, SignupUserDto} from "@/users/user.interface";
 
 import {Public} from "../../shared/decorators/auth.decorator";
+import {CurrentUser} from "../../shared/decorators/current-user.decorator";
 import {AuthGuard} from "../../shared/guards/auth.guard";
+import {AuthenticatedUser} from "../../types";
 import {AuthService} from "./auth.service";
 import {ACCESS_TOKEN_TTL_IN_MS, REFRESH_TOKEN_TTL_IN_MS} from "./constants";
 import {RefreshTokensService} from "./refresh-token/refresh-token.service";
@@ -152,14 +154,12 @@ export class AuthController {
     @Post("/logout")
     async logout(
         @Req() req: Request,
+        @CurrentUser() user: AuthenticatedUser,
         @Res({passthrough: true}) response: Response,
     ) {
         const refreshToken = req.cookies?.refreshToken;
         if (refreshToken) {
-            await this.refreshTokensService.revokeToken(
-                req.user.id,
-                refreshToken,
-            );
+            await this.refreshTokensService.revokeToken(user.id, refreshToken);
         }
 
         response.clearCookie("accessToken", {
@@ -175,14 +175,14 @@ export class AuthController {
     @HttpCode(HttpStatus.OK)
     @Get("check")
     @UseGuards(AuthGuard)
-    check(@Req() req: Request) {
-        return !!req.user;
+    check(@CurrentUser() user: AuthenticatedUser) {
+        return !!user;
     }
 
     @HttpCode(HttpStatus.OK)
     @Get("me")
     @UseGuards(AuthGuard)
-    getMe(@Req() req: Request) {
-        return this.authService.isMe(req.user.id);
+    getMe(@CurrentUser() user: AuthenticatedUser) {
+        return this.authService.isMe(user.id);
     }
 }

@@ -189,6 +189,7 @@ After the change:
 - Controller tests should cover request mapping, guards/decorators where relevant, status behavior, and service delegation.
 - Mock repositories with `getRepositoryToken(Entity)` and mock external S3/JWT dependencies. Do not connect unit tests to real infrastructure.
 - Prefer behavior assertions. Avoid assertions coupled only to private helper structure.
+- Do not write tautological mock pass-through tests: if a dependency mock is configured to return a value, do not merely assert that an unchanged value is returned by the subject. Such an assertion is useful only when the subject transforms, filters, composes, validates, or otherwise gives the result additional observable semantics. Test meaningful dependency parameters and interactions instead.
 - Add regression coverage before or with a bug fix.
 - The declared `test:e2e` script references `test/jest-e2e.json`, which is absent. Do not report e2e tests as available until the config is added or the script is corrected.
 

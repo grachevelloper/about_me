@@ -1,4 +1,4 @@
-import {Role} from ".";
+import {AuthenticatedUser} from ".";
 
 declare global {
     type Nullable<T> = T | null;
@@ -8,7 +8,7 @@ declare global {
 
     namespace Express {
         interface Request {
-            user: AuthUser;
+            user: AuthenticatedUser;
         }
         namespace Multer {
             interface File {
@@ -24,13 +24,6 @@ declare global {
             }
         }
     }
-}
-
-interface AuthUser {
-    id: string;
-    role: Role;
-    iat: number;
-    exp: number;
 }
 
 export {};
