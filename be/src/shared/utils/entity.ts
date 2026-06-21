@@ -6,17 +6,17 @@ import {
 
 export class UnUpdatableBaseEntity {
     @PrimaryGeneratedColumn("uuid")
-    id: string;
+    id!: string;
 
     @CreateDateColumn()
-    createdAt: string;
+    createdAt!: string;
 }
 
 export class BaseEntity extends UnUpdatableBaseEntity {
     @UpdateDateColumn()
-    updatedAt: string;
+    updatedAt!: string;
 }
 
 export class LikedEntity {
-    hasLiked: boolean;
+    hasLiked!: boolean;
 }

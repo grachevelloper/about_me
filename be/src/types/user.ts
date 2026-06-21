@@ -1,1 +1,1 @@
-export enum UserStatus {}
+export type UserStatus = number;

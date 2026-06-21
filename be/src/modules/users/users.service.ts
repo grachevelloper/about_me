@@ -1,10 +1,16 @@
-import { ConflictException, Injectable, NotFoundException } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
+import {
+    ConflictException,
+    ForbiddenException,
+    Injectable,
+    NotFoundException,
+} from "@nestjs/common";
+import {InjectRepository} from "@nestjs/typeorm";
 import * as bcrypt from "bcrypt";
-import { Repository } from "typeorm";
+import {Repository} from "typeorm";
 
-import { CreateUserDto, UpdateUserDto } from "./user.interface";
-import { User } from "./users.entity";
+import {AuthenticatedUser, Role} from "../../types";
+import {CreateUserDto, UpdateUserDto} from "./user.interface";
+import {User} from "./users.entity";
 
 @Injectable()
 export class UsersService {
@@ -22,8 +28,16 @@ export class UsersService {
     }
 
     async findByEmail(email: string): Promise<User | null> {
-        const user = await this.usersRepository.findOne({where: {email}});
-        return user;
+        return this.usersRepository
+            .createQueryBuilder("user")
+            .addSelect("user.password")
+            .where("user.email = :email", {email})
+            .getOne();
+    }
+
+    async findForActor(id: string, actor: AuthenticatedUser): Promise<User> {
+        this.assertSelfOrAdmin(id, actor);
+        return this.findById(id);
     }
 
     async create(createUserDto: CreateUserDto): Promise<User> {
@@ -44,14 +58,25 @@ export class UsersService {
         return this.usersRepository.save(user);
     }
 
-    async delete(id: string): Promise<void> {
+    async delete(id: string, actor: AuthenticatedUser): Promise<void> {
+        if (actor.role !== Role.ADMIN) {
+            throw new ForbiddenException("Administrator access required");
+        }
         const result = await this.usersRepository.delete(id);
         if (result.affected === 0) {
-            throw new NotFoundException("Article not found");
+            throw new NotFoundException("User not found!");
         }
     }
 
-    async update(id: string, updateData: UpdateUserDto) {
+    async update(
+        id: string,
+        updateData: UpdateUserDto,
+        actor: AuthenticatedUser,
+    ): Promise<User> {
+        this.assertSelfOrAdmin(id, actor);
+        if (updateData.role !== undefined && actor.role !== Role.ADMIN) {
+            throw new ForbiddenException("Only an administrator can change roles");
+        }
         const user = await this.findById(id);
 
         Object.assign(user, updateData);
@@ -59,9 +84,22 @@ export class UsersService {
         return this.usersRepository.save(user);
     }
 
-    async changePassword(id: string, password: string): Promise<void> {
+    async changePassword(
+        id: string,
+        password: string,
+        actor: AuthenticatedUser,
+    ): Promise<void> {
+        if (id !== actor.id) {
+            throw new ForbiddenException("You can only change your own password");
+        }
         await this.findById(id);
         const hashedPassword = await bcrypt.hash(password, 10);
         await this.usersRepository.update(id, {password: hashedPassword});
+    }
+
+    private assertSelfOrAdmin(id: string, actor: AuthenticatedUser): void {
+        if (id !== actor.id && actor.role !== Role.ADMIN) {
+            throw new ForbiddenException("Access to this user is forbidden");
+        }
     }
 }

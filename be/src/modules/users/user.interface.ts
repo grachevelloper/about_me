@@ -2,6 +2,7 @@ import {ApiProperty, ApiPropertyOptional} from "@nestjs/swagger";
 import {
     IsEmail,
     IsEnum,
+    IsInt,
     IsOptional,
     IsString,
     Length,
@@ -17,7 +18,7 @@ import {Role} from "../../types";
 export class SigninUserDto {
     @IsEmail()
     @MaxLength(255)
-    email: string;
+    email!: string;
 
     @ApiProperty({
         example: "StrongPassword123!",
@@ -29,17 +30,17 @@ export class SigninUserDto {
     @Matches(/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])/, {
         message: "Пароль должен содержать заглавные, строчные буквы и цифры",
     })
-    password: string;
+    password!: string;
 }
 export class SignupUserDto extends SigninUserDto {
     @IsString()
     @Length(1, 50)
-    username: string;
+    username!: string;
 }
 
 export class CreateUserDto extends SignupUserDto {
     @IsEnum(Role)
-    role: Role;
+    role!: Role;
 }
 
 export class UpdateUserDto {
@@ -60,7 +61,7 @@ export class UpdateUserDto {
     @IsOptional()
     avatar?: string;
 
-    @IsEnum(UserStatus)
+    @IsInt()
     @IsOptional()
     status?: UserStatus;
 
@@ -74,9 +75,17 @@ export class UpdateUserDto {
 
     @IsString()
     @IsOptional()
-    nowListening: string;
+    nowListening?: string;
 
     @IsString()
     @IsOptional()
-    nowBeingIn: string;
+    nowBeingIn?: string;
+}
+
+export class ChangePasswordDto {
+    @ApiProperty({example: "StrongPassword123!"})
+    @IsString()
+    @MinLength(8)
+    @MaxLength(72)
+    password!: string;
 }

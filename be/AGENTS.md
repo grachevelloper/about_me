@@ -16,7 +16,6 @@ When a choice is genuinely debatable from an engineering perspective and the rep
 - Keep the change focused. Do not mix feature work with broad renaming, formatting, dependency upgrades, or cleanup.
 - Never read, print, copy, or commit secrets from `.env`. Use `.env.example` only as a list of expected variable names, and keep example values non-sensitive.
 - Do not run destructive database or storage operations without explicit approval. This includes dropping schemas, truncating tables, deleting buckets, and reverting shared migrations.
-- Do not enable TypeORM `synchronize`. Schema changes go through migrations.
 - Do not silence failing checks, weaken types, disable guards, or add blanket lint suppressions merely to make validation pass.
 
 ## Backend at a glance
@@ -233,15 +232,15 @@ Before using a migration command, confirm environment variables, inspect its com
 
 ## Validation matrix
 
-| Change | Minimum validation |
-|---|---|
-| Markdown/instructions only | `git diff --check` and manual path/command verification |
-| Pure TypeScript helper/type | targeted Jest test, non-mutating ESLint, `pnpm run build` |
-| Controller/service behavior | targeted controller/service tests, non-mutating ESLint, build |
-| Entity/repository/query | targeted tests, migration review, build; integration test when infrastructure is available |
-| Auth/roles/cookies | targeted positive and negative tests, build, manual contract review |
-| S3/attachments | mocked unit tests, build, failure/cleanup-path review |
-| Cross-project API contract | backend tests/build plus frontend type-check/build |
+| Change                      | Minimum validation                                                                         |
+| --------------------------- | ------------------------------------------------------------------------------------------ |
+| Markdown/instructions only  | `git diff --check` and manual path/command verification                                    |
+| Pure TypeScript helper/type | targeted Jest test, non-mutating ESLint, `pnpm run build`                                  |
+| Controller/service behavior | targeted controller/service tests, non-mutating ESLint, build                              |
+| Entity/repository/query     | targeted tests, migration review, build; integration test when infrastructure is available |
+| Auth/roles/cookies          | targeted positive and negative tests, build, manual contract review                        |
+| S3/attachments              | mocked unit tests, build, failure/cleanup-path review                                      |
+| Cross-project API contract  | backend tests/build plus frontend type-check/build                                         |
 
 If a command fails because of an existing unrelated issue, capture the exact failure and distinguish it from regressions introduced by the current diff.
 
@@ -303,7 +302,6 @@ Do not silently normalize these into new code:
 
 - The requested behavior is implemented with no unrelated edits.
 - Module wiring, runtime validation, authorization, persistence, and external-storage effects are correct for the changed area.
-- Database changes include reviewed migrations; `synchronize` remains disabled.
 - Tests cover the changed behavior and meaningful failure paths.
 - Applicable validation passes, or exact pre-existing blockers are reported.
 - The final diff contains no secret, debug output, broad suppression, generated junk, or accidental formatting churn.

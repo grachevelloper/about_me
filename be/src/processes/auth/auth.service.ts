@@ -1,4 +1,5 @@
 import {Injectable, UnauthorizedException} from "@nestjs/common";
+import bcrypt from "bcrypt";
 
 import {User} from "../../modules/users/users.entity";
 import {UsersService} from "../../modules/users/users.service";
@@ -29,8 +30,8 @@ export class AuthService {
         if (!user) {
             throw new UnauthorizedException("Invalid credentials");
         }
-        if (user?.password !== pass) {
-            throw new UnauthorizedException("Password incorrect");
+        if (!(await bcrypt.compare(pass, user.password))) {
+            throw new UnauthorizedException("Invalid credentials");
         }
         return user;
     }

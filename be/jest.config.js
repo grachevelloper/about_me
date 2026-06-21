@@ -2,6 +2,8 @@ module.exports = {
     clearMocks: true,
     moduleFileExtensions: ["ts", "js", "json"],
     moduleNameMapper: {
+        "^@/auth/(.*)$": "<rootDir>/src/processes/auth/$1",
+        "^@/users/(.*)$": "<rootDir>/src/modules/users/$1",
         "^@/(.*)$": "<rootDir>/src/$1",
         "^src/(.*)$": "<rootDir>/src/$1",
     },
