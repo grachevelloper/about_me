@@ -71,3 +71,4 @@ nginx.conf
 **.agents
 **docs
 skills-lock.json
+be/BACKEND_COMPLETION_DESIGN.md

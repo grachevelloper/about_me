@@ -1,14 +1,14 @@
+import {beforeEach, describe, expect, it, jest} from "@jest/globals";
 import {NotFoundException} from "@nestjs/common";
 import {Test, TestingModule} from "@nestjs/testing";
 import {getRepositoryToken} from "@nestjs/typeorm";
+import {CommentsService} from "src/modules/comments/comments.service";
+import {Todo} from "src/modules/todos/todos.entity";
+import {TodosService} from "src/modules/todos/todos.service";
 import {Repository} from "typeorm";
 
 import {CreateTodoDto, UpdateTodoDto} from "@/todos/todo.interface";
 import {TodoState} from "@/types/todo";
-import {beforeEach, describe, expect, it, jest} from "@jest/globals";
-import {CommentsService} from "src/modules/comments/comments.service";
-import {Todo} from "src/modules/todos/todos.entity";
-import {TodosService} from "src/modules/todos/todos.service";
 
 describe("TodosService", () => {
     let service: TodosService;

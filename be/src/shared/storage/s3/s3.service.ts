@@ -88,8 +88,11 @@ export class S3StorageService {
                 buffer,
                 contentType: response.ContentType,
             };
-        } catch (error) {
-            if (error.name === "NoSuchKey" || error.name === "NotFound") {
+        } catch (error: unknown) {
+            if (
+                error instanceof Error &&
+                (error.name === "NoSuchKey" || error.name === "NotFound")
+            ) {
                 throw new NotFoundException(`File with key "${key}" not found`);
             }
             throw error;

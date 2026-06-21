@@ -2,11 +2,11 @@ import {beforeEach, describe, expect, it, jest} from "@jest/globals";
 import {NotFoundException} from "@nestjs/common";
 import {Test, TestingModule} from "@nestjs/testing";
 import {Request} from "express";
-
 import {TodosController} from "src/modules/todos/todos.controller";
 import {Todo} from "src/modules/todos/todos.entity";
 import {TodosService} from "src/modules/todos/todos.service";
 import {AuthGuard} from "src/shared/guards/auth.guard";
+
 import {Role} from "../../../src/types";
 
 const mockTodo: Todo = {

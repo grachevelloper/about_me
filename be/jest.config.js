@@ -1,24 +1,20 @@
 module.exports = {
-    preset: "ts-jest",
-    testEnvironment: "node",
-    moduleFileExtensions: ["ts", "tsx", "js", "jsx"],
-    transform: {
-        "^.+\\.(t|j)s$": "ts-jest",
-    },
-    testMatch: [
-        "**/__tests__/**/*.test.(ts|js)",
-        "**/*.spec.ts",
-        "**/*.test.ts",
-        "**/*.e2e-spec.ts",
-    ],
-    testPathIgnorePatterns: ["/node_modules/", "/dist/", "/coverage/"],
     clearMocks: true,
+    moduleFileExtensions: ["ts", "js", "json"],
     moduleNameMapper: {
         "^@/(.*)$": "<rootDir>/src/$1",
+        "^src/(.*)$": "<rootDir>/src/$1",
     },
-    globals: {
-        "ts-jest": {
-            tsconfig: "tsconfig.spec.json",
-        },
+    rootDir: ".",
+    testEnvironment: "node",
+    testMatch: ["<rootDir>/test/**/*.spec.ts", "<rootDir>/src/**/*.spec.ts"],
+    testPathIgnorePatterns: ["\\.integration-spec\\.ts$", "\\.e2e-spec\\.ts$"],
+    transform: {
+        "^.+\\.ts$": [
+            "ts-jest",
+            {
+                tsconfig: "tsconfig.spec.json",
+            },
+        ],
     },
 };

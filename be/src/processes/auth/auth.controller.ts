@@ -44,7 +44,12 @@ export class AuthController {
             signUpDto.password,
         );
 
-        const payload = {sub: result.id, email: result.email};
+        const payload = {
+            sub: result.id,
+            email: result.email,
+            role: result.role,
+        };
+
         const refreshToken = await this.refreshTokensService.createToken(
             result.id,
         );
