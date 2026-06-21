@@ -1,8 +1,10 @@
-import {Layout} from 'antd';
+import {Layout, Spin, theme} from 'antd';
 import {Content} from 'antd/es/layout/layout';
 import block from 'bem-cn-lite';
 import {useEffect, useState} from 'react';
-import {Outlet, useNavigate} from 'react-router-dom';
+import {Navigate, Outlet} from 'react-router-dom';
+
+import authBackground from '@/public/assets/auth.jpeg';
 
 import {checkAuth} from './api';
 import {AuthNavigateButton} from './components/AuthNavigateButton';
@@ -10,12 +12,18 @@ import {AuthNavigateButton} from './components/AuthNavigateButton';
 import './AuthLayout.scss';
 
 const b = block('auth-layout');
+const authBackgroundUrl =
+    process.env.NODE_ENV === 'development'
+        ? '/assets/auth.jpeg'
+        : authBackground;
 
 export const AuthLayout = () => {
+    const {
+        token: {colorBgMask},
+    } = theme.useToken();
     const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(
         null
     );
-    const navigate = useNavigate();
 
     useEffect(() => {
         const verifyAuth = async () => {
@@ -27,16 +35,25 @@ export const AuthLayout = () => {
     }, []);
 
     if (isAuthenticated === null) {
-        return <div>Loading...</div>;
+        return (
+            <div className={b('loader')}>
+                <Spin size='large' />
+            </div>
+        );
     }
 
     if (isAuthenticated) {
-        navigate('/');
-        return <div>Redirecting...</div>;
+        return <Navigate to='/' replace />;
     }
 
     return (
-        <Layout rootClassName={b()}>
+        <Layout className={b()}>
+            <img className={b('background')} src={authBackgroundUrl} alt='' />
+            <div
+                aria-hidden='true'
+                className={b('backdrop')}
+                style={{backgroundColor: colorBgMask}}
+            />
             <Content className={b('content')}>
                 <Outlet />
             </Content>

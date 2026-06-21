@@ -1,6 +1,6 @@
-import {Flex, Form, theme} from 'antd';
+import {Flex, Form, theme, Typography} from 'antd';
 import block from 'bem-cn-lite';
-import {useCallback, useEffect} from 'react';
+import {useCallback} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useNavigate} from 'react-router-dom';
 
@@ -29,16 +29,19 @@ export const SigninPage = () => {
     const {t} = useTranslation('auth');
     const [form] = Form.useForm<SignInForm>();
     const navigate = useNavigate();
-    const {isPending, error, mutateAsync, user} = useSigninMutatuon();
+    const {isPending, error, mutateAsync} = useSigninMutatuon();
     const {setUserData} = useAuth();
-    const handleSubmit = async () => {
-        const userData = await form.validateFields(['email', 'password']);
-        await mutateAsync(userData);
-        if (user) {
+    const handleSubmit = useCallback(async () => {
+        try {
+            const userData = await form.validateFields(['email', 'password']);
+            const user = await mutateAsync(userData);
+            form.resetFields();
             setUserData(user);
             navigate('/');
+        } catch {
+            form.setFieldValue('password', '');
         }
-    };
+    }, [form, mutateAsync, navigate, setUserData]);
     const signInFields = useSignInFields(form);
 
     const renderSignInFields = useCallback(() => {
@@ -48,7 +51,7 @@ export const SigninPage = () => {
                 key={field.name}
             />
         ));
-    }, [signInFields]);
+    }, [paddingSM, signInFields]);
 
     const renderErrors = useCallback(() => {
         const errorText = () => {
@@ -73,26 +76,35 @@ export const SigninPage = () => {
                 {errorText()}
             </span>
         );
-    }, [error]);
-
-    useEffect(() => {
-        form.setFieldsValue({
-            email: '',
-            password: '',
-        });
-    }, [form]);
+    }, [colorError, error, paddingSM, t]);
 
     return (
         <Flex className={b()} align='center' justify='center'>
-            <Form form={form} onFinish={handleSubmit}>
+            <Form
+                className={b('form')}
+                form={form}
+                layout='vertical'
+                autoComplete='off'
+                onFinish={() => {
+                    void handleSubmit();
+                }}
+                initialValues={{email: '', password: ''}}
+            >
                 <FlexibleCard
                     className={b('container')}
+                    title={
+                        <Typography.Title level={2} className={b('title')}>
+                            {t('auth.signin.title')}
+                        </Typography.Title>
+                    }
                     actionsAlign='end'
                     actions={[
                         <ButtonAccept
                             text={t('auth.signin.submit')}
                             key={'accept-signin'}
-                            onClick={handleSubmit}
+                            htmlType='submit'
+                            loading={isPending}
+                            disabled={isPending}
                         />,
                     ]}
                 >

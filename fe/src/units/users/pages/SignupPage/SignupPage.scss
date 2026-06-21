@@ -1,22 +1,36 @@
 .sign-up-page {
-    width: 100vw;
-    height: 100vh;
-    overflow: hidden;
+    width: 100%;
+    min-height: 100dvh;
+    padding: 24px;
+    box-sizing: border-box;
 
     &__form {
-        width: 100vw;
-        height: 100vh;
+        width: min(100%, 554px);
+        min-height: calc(100dvh - 48px);
         display: flex;
         justify-content: center;
         align-items: center;
+        position: relative;
     }
 
     &__step {
         opacity: 0;
-        animation: fadeInUp 0.5s ease-in-out 0.3s forwards; //ANIMATION_FADE_OUT_IN_S
+        animation: fadeInUp 0.35s ease-out forwards;
+        width: 100%;
+    }
 
-        &_exit {
-            animation: fadeOutUp 0.5s ease-in-out forwards; //ANIMATION_FADE_OUT_IN_S
+    &__error {
+        position: absolute;
+        z-index: 1;
+        top: 16px;
+        width: 100%;
+    }
+
+    @media (max-width: 576px) {
+        padding: 16px;
+
+        &__form {
+            min-height: calc(100dvh - 32px);
         }
     }
 }

@@ -1,14 +1,11 @@
 import {Typography} from 'antd';
 import block from 'bem-cn-lite';
-import React, {useEffect} from 'react';
+import React from 'react';
 
 import {FlexibleCard} from '@/shared/components/FlexibleCard';
 import {FormInput} from '@/shared/components/FormInput';
-import {useLocalStorage} from '@/shared/hooks/useLocalStorage';
 import {CardProps, FormField} from '@/typings/components';
-import {AuthEmitter, SIGN_UP_EVENT} from '@/users/utils';
 
-import {SIGN_UP_STEP_SLUG} from '../../constants';
 import './SignStep.scss';
 
 const b = block('sign-step');
@@ -30,20 +27,7 @@ interface TextStep extends SignStepBaseProps {
 type SignStepProps = FormStep | TextStep;
 
 export const SignStep = (props: SignStepProps) => {
-    const [, setSignStep] = useLocalStorage(SIGN_UP_STEP_SLUG, 0);
     const {type, content, className} = props;
-
-    useEffect(() => {
-        const handleSignStepChange = (newStep: number) => {
-            setSignStep(newStep);
-        };
-
-        AuthEmitter.on(SIGN_UP_EVENT, handleSignStepChange);
-
-        return () => {
-            AuthEmitter.off(SIGN_UP_EVENT, handleSignStepChange);
-        };
-    }, [setSignStep]);
 
     const renderBody = () => {
         switch (type) {
@@ -61,7 +45,7 @@ export const SignStep = (props: SignStepProps) => {
     return (
         <FlexibleCard
             key={content.index}
-            rootClassName={b(null, className)}
+            rootClassName={b(undefined, className)}
             title={content?.title}
             actions={content.actions ? content.actions : []}
         >

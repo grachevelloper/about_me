@@ -16,6 +16,7 @@ export function FormInput({field}: FormInputProps) {
         dependencies,
         rules,
         type,
+        autoComplete,
         style,
         placeholder,
         className,
@@ -23,6 +24,7 @@ export function FormInput({field}: FormInputProps) {
     } = field;
 
     const formInputBaseProps: InputProps = {
+        autoComplete,
         placeholder,
         variant: 'underlined',
         className: rootClassName,

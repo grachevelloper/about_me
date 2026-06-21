@@ -2,6 +2,20 @@
 
 .about-me {
     width: 100%;
+    padding-top: clamp(24px, 5vw, 72px);
+
+    &__intro {
+        margin: 24px 0 48px;
+    }
+
+    &__photo-column {
+        display: flex;
+        justify-content: center;
+    }
+
+    &__timeline-column {
+        padding-top: 48px;
+    }
 
     &__timeline-item-wrapper {
         opacity: 0;
@@ -74,6 +88,8 @@
 
     &__skills-wrapper {
         width: 100%;
+        flex-wrap: wrap;
+        gap: 20px;
     }
 
     &__spec {
@@ -161,6 +177,29 @@
     &__specialization-title {
         width: 100%;
         text-align: center;
+    }
+
+    @media (max-width: 767px) {
+        &__intro {
+            margin: 8px 0 32px;
+        }
+
+        &__subtitle {
+            text-align: center;
+        }
+
+        &__timeline-column {
+            padding-top: 24px;
+        }
+
+        &__skill {
+            width: 76px;
+        }
+
+        &__image-skill-root {
+            width: 64px !important;
+            height: 64px !important;
+        }
     }
 }
 

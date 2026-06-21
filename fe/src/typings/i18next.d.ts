@@ -152,6 +152,7 @@ declare module 'i18next' {
     "layout.left.create_article.error.title": "Ошибка!",
     "layout.left.create_article.success.title": "Черновик создан!",
     "layout.left.create_todo": "Создать задачу",
+    "layout.navigation.open": "Открыть навигацию",
     "layout.left.suggest": "Предложить ежедневку",
     "layout.top.articles": "Статьи",
     "layout.top.drafts": "Мои черновики",

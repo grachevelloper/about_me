@@ -23,7 +23,7 @@ type NavigateData = {
 export const AuthNavigateButton = () => {
     const {t} = useTranslation('auth');
     const {
-        token: {padding, borderRadius},
+        token: {borderRadius, colorPrimary, padding},
     } = theme.useToken();
     const [isPrevVisited, setPrevVisited] = useSessionStorage<boolean>(
         PREV_AUTH_PAGE_VISITED,
@@ -41,14 +41,14 @@ export const AuthNavigateButton = () => {
         switch (endOfPath) {
             case 'signin':
                 return {
-                    icon: <VscAccount />,
+                    icon: <VscAccount color={colorPrimary} />,
                     link: '/auth/signup',
                     title: t('auth.signin.notification.title'),
                     text: t('auth.signin.notification.description'),
                 };
             case 'signup':
                 return {
-                    icon: <RiLoginCircleLine />,
+                    icon: <RiLoginCircleLine color={colorPrimary} />,
                     link: '/auth/signin',
                     text: t('auth.signup.notification.description'),
                     title: t('auth.signup.notification.title'),
@@ -61,7 +61,7 @@ export const AuthNavigateButton = () => {
                     title: '',
                 };
         }
-    }, [location, t]);
+    }, [colorPrimary, location, t]);
 
     const {link, text, title, icon} = getLinkData();
 
@@ -132,7 +132,9 @@ export const AuthNavigateButton = () => {
                     trigger='hover'
                     content={
                         <Typography.Link
-                            onClick={() => navigate(link)}
+                            onClick={() => {
+                                void navigate(link);
+                            }}
                             style={{fontWeight: 500}}
                         >
                             {text}
@@ -144,6 +146,7 @@ export const AuthNavigateButton = () => {
                 >
                     <FloatButton
                         icon={icon}
+                        aria-label={text}
                         style={{
                             transition: 'opacity 0.3s ease-in-out',
                             animation: 'floatButtonAppear 0.5s ease-out',
@@ -151,21 +154,6 @@ export const AuthNavigateButton = () => {
                     />
                 </Popover>
             )}
-
-            <style>
-                {`
-                    @keyframes floatButtonAppear {
-                        from {
-                            opacity: 0;
-                            transform: translateY(20px);
-                        }
-                        to {
-                            opacity: 1;
-                            transform: translateY(0);
-                        }
-                    }
-                `}
-            </style>
         </>
     );
 };
