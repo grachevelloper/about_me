@@ -1,6 +1,7 @@
 import {Module} from "@nestjs/common";
 import {TypeOrmModule} from "@nestjs/typeorm";
 
+import {AttachmentModule} from "../attachments/attachments.module";
 import {CommentsModule} from "../comments/comments.module";
 import {ChecklistsModule} from "./checklists/checklist.module";
 import {TodosController} from "./todos.controller";
@@ -10,6 +11,7 @@ import {TodosService} from "./todos.service";
 @Module({
     imports: [
         TypeOrmModule.forFeature([Todo]),
+        AttachmentModule,
         ChecklistsModule,
         CommentsModule,
     ],

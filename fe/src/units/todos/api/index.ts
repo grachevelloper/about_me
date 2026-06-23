@@ -17,11 +17,11 @@ const Api: TodoApi = {
         return todoData;
     },
     createTodo: async (data: DtoCreateTodo) => {
-        const response = await query.post<Todo>(`/todos`, {data});
+        const response = await query.post<Todo>(`/todos`, data);
         return response;
     },
     updateTodoById: async ({id, ...data}: DtoUpdateTodo) => {
-        const response = await query.patch<Todo>(`/todos/${id}`, {data});
+        const response = await query.patch<Todo>(`/todos/${id}`, data);
         return response;
     },
 };

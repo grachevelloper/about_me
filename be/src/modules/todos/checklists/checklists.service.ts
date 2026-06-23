@@ -1,14 +1,69 @@
-import {Injectable, NotFoundException} from "@nestjs/common";
+import {
+    ConflictException,
+    ForbiddenException,
+    Injectable,
+    NotFoundException,
+} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
+import {AuthenticatedUser, Role} from "src/types";
 import {Repository} from "typeorm";
 
+import {Todo} from "../todos.entity";
 import {CheckList} from "./checklists.entity";
+
+interface AddChecklistItemCommand {
+    actor: AuthenticatedUser;
+    text: string;
+    todoId: string;
+}
+
+interface CreateChecklistCommand {
+    actor: AuthenticatedUser;
+    initialText?: string[];
+    todoId: string;
+}
+
+interface DeleteChecklistCommand {
+    actor: AuthenticatedUser;
+    todoId: string;
+}
+
+interface FindChecklistCommand {
+    actor: AuthenticatedUser;
+    todoId: string;
+}
+
+interface FindTodoForActorCommand {
+    actor: AuthenticatedUser;
+    todoId: string;
+}
+
+interface RemoveChecklistItemCommand {
+    actor: AuthenticatedUser;
+    itemIndex: number;
+    todoId: string;
+}
+
+interface UpdateChecklistItemTextCommand {
+    actor: AuthenticatedUser;
+    itemIndex: number;
+    text: string;
+    todoId: string;
+}
+
+interface UpdateChecklistProgressCommand {
+    actor: AuthenticatedUser;
+    delta: number;
+    todoId: string;
+}
 
 @Injectable()
 export class ChecklistService {
     constructor(
         @InjectRepository(CheckList)
         private checklistRepo: Repository<CheckList>,
+        @InjectRepository(Todo)
+        private todosRepository: Repository<Todo>,
     ) {}
 
     private async getChecklistById(checklistId: string): Promise<CheckList> {
@@ -25,10 +80,20 @@ export class ChecklistService {
         return checklist;
     }
 
-    async create(
-        todoId: string,
-        initialText: string[] = [],
-    ): Promise<CheckList> {
+    async create({
+        todoId,
+        initialText = [],
+        actor,
+    }: CreateChecklistCommand): Promise<CheckList> {
+        await this.findTodoForActor({todoId, actor});
+        const existingChecklist = await this.checklistRepo.findOne({
+            where: {todo: {id: todoId}},
+        });
+
+        if (existingChecklist) {
+            throw new ConflictException(`Checklist for todo ${todoId} exists`);
+        }
+
         const checklist = this.checklistRepo.create({
             text: initialText,
             progress: 0,
@@ -38,14 +103,22 @@ export class ChecklistService {
         return await this.checklistRepo.save(checklist);
     }
 
-    async addItem(todoId: string, itemText: string): Promise<CheckList> {
-        const checklist = await this.getChecklistByTodoId(todoId);
-        checklist.text.push(itemText);
+    async addItem({
+        todoId,
+        text,
+        actor,
+    }: AddChecklistItemCommand): Promise<CheckList> {
+        const checklist = await this.getChecklistByTodoId({todoId, actor});
+        checklist.text.push(text);
         return await this.checklistRepo.save(checklist);
     }
 
-    async updateProgress(todoId: string, delta: number): Promise<CheckList> {
-        const checklist = await this.getChecklistByTodoId(todoId);
+    async updateProgress({
+        todoId,
+        delta,
+        actor,
+    }: UpdateChecklistProgressCommand): Promise<CheckList> {
+        const checklist = await this.getChecklistByTodoId({todoId, actor});
         const newProgress = checklist.progress + delta;
         checklist.progress = Math.max(
             0,
@@ -54,8 +127,11 @@ export class ChecklistService {
         return await this.checklistRepo.save(checklist);
     }
 
-    async deleteChecklist(todoId: string): Promise<void> {
-        const checklist = await this.getChecklistByTodoId(todoId);
+    async deleteChecklist({
+        todoId,
+        actor,
+    }: DeleteChecklistCommand): Promise<void> {
+        const checklist = await this.getChecklistByTodoId({todoId, actor});
         const result = await this.checklistRepo.delete(checklist.id);
 
         if (result.affected === 0) {
@@ -65,12 +141,13 @@ export class ChecklistService {
         }
     }
 
-    async updateItemText(
-        todoId: string,
-        itemIndex: number,
-        newText: string,
-    ): Promise<CheckList> {
-        const checklist = await this.getChecklistByTodoId(todoId);
+    async updateItemText({
+        todoId,
+        itemIndex,
+        text,
+        actor,
+    }: UpdateChecklistItemTextCommand): Promise<CheckList> {
+        const checklist = await this.getChecklistByTodoId({todoId, actor});
 
         if (itemIndex < 0 || itemIndex >= checklist.text.length) {
             throw new NotFoundException(
@@ -78,12 +155,16 @@ export class ChecklistService {
             );
         }
 
-        checklist.text[itemIndex] = newText;
+        checklist.text[itemIndex] = text;
         return await this.checklistRepo.save(checklist);
     }
 
-    async removeItem(todoId: string, itemIndex: number): Promise<CheckList> {
-        const checklist = await this.getChecklistByTodoId(todoId);
+    async removeItem({
+        todoId,
+        itemIndex,
+        actor,
+    }: RemoveChecklistItemCommand): Promise<CheckList> {
+        const checklist = await this.getChecklistByTodoId({todoId, actor});
 
         if (itemIndex < 0 || itemIndex >= checklist.text.length) {
             throw new NotFoundException(
@@ -100,19 +181,42 @@ export class ChecklistService {
         return await this.checklistRepo.save(checklist);
     }
 
-    async getByTodoId(todoId: string): Promise<CheckList | null> {
+    async getByTodoId({
+        todoId,
+        actor,
+    }: FindChecklistCommand): Promise<CheckList | null> {
+        await this.findTodoForActor({todoId, actor});
         return await this.checklistRepo.findOne({
             where: {todo: {id: todoId}},
         });
     }
 
-    private async getChecklistByTodoId(todoId: string): Promise<CheckList> {
-        const checklist = await this.getByTodoId(todoId);
+    private async getChecklistByTodoId({
+        todoId,
+        actor,
+    }: FindChecklistCommand): Promise<CheckList> {
+        const checklist = await this.getByTodoId({todoId, actor});
         if (!checklist) {
             throw new NotFoundException(
                 `Checklist for todo ${todoId} not found`,
             );
         }
         return checklist;
+    }
+
+    private async findTodoForActor({
+        todoId,
+        actor,
+    }: FindTodoForActorCommand): Promise<Todo> {
+        const todo = await this.todosRepository.findOne({where: {id: todoId}});
+        if (!todo) {
+            throw new NotFoundException(`Todo with ID ${todoId} not found`);
+        }
+
+        if (todo.authorId !== actor.id && actor.role !== Role.ADMIN) {
+            throw new ForbiddenException("You do not have access to this todo");
+        }
+
+        return todo;
     }
 }

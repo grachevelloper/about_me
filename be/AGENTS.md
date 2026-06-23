@@ -134,6 +134,7 @@ After the change:
 
 - Use the shared base classes in `src/shared/utils/entity.ts` for UUID and timestamp columns when their semantics fit.
 - Keep TypeORM decorators explicit for column type, nullability, defaults, uniqueness, joins, cascade behavior, and delete behavior.
+- In strict TypeScript mode, TypeORM-populated entity fields, including relations and database-defaulted columns, must either have a real TypeScript initializer or use definite assignment (`!`). Do not add required entity properties that trigger `ts(2564)` strict-property-initialization errors.
 - Treat cascade and eager loading as high-impact choices. Add them only after checking write ownership, deletion behavior, query volume, and serialization.
 - Follow the configured snake-case database naming strategy, but use explicit join/table names where the existing schema or API requires stability.
 - Prevent unbounded or negative counters in database updates.

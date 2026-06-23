@@ -1,12 +1,48 @@
-import {Injectable, NotFoundException} from "@nestjs/common";
+import {
+    ForbiddenException,
+    Injectable,
+    NotFoundException,
+} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
-import {Repository} from "typeorm";
+import {Attachment} from "src/modules/attachments/attachments.entity";
+import {AttachmentsService} from "src/modules/attachments/attachments.service";
+import {Comment} from "src/modules/comments/comments.entity";
+import {Like} from "src/modules/likes/likes.entity";
+import {AuthenticatedUser, Role} from "src/types";
+import {In, Repository} from "typeorm";
 
 import {TodoState} from "@/types/todo";
 
 import {CommentsService} from "../comments/comments.service";
+import {CheckList} from "./checklists/checklists.entity";
 import {CreateTodoDto, UpdateTodoDto} from "./todo.interface";
 import {Todo} from "./todos.entity";
+
+interface CreateTodoCommand {
+    actor: AuthenticatedUser;
+    data: CreateTodoDto;
+}
+
+interface DeleteTodoCommand {
+    actor: AuthenticatedUser;
+    id: string;
+}
+
+interface FindTodoCommand {
+    actor: AuthenticatedUser;
+    id: string;
+}
+
+interface FindTodoWithCommentsCommand {
+    actor: AuthenticatedUser;
+    todoId: string;
+}
+
+interface UpdateTodoCommand {
+    actor: AuthenticatedUser;
+    data: UpdateTodoDto;
+    id: string;
+}
 
 @Injectable()
 export class TodosService {
@@ -14,28 +50,59 @@ export class TodosService {
         @InjectRepository(Todo)
         private todosRepository: Repository<Todo>,
         private commentsService: CommentsService,
+        private attachmentsService: AttachmentsService,
     ) {}
 
-    async create(createTodoData: CreateTodoDto): Promise<Todo> {
-        const todo = this.todosRepository.create(createTodoData);
+    async create({data, actor}: CreateTodoCommand): Promise<Todo> {
+        const todo = this.todosRepository.create({
+            title: data.title,
+            content: data.content,
+            priority: data.priority,
+            state: data.state,
+            authorId: actor.id,
+        });
         return await this.todosRepository.save(todo);
     }
 
-    async delete(id: string): Promise<void> {
-        const todo = await this.todosRepository.findOne({where: {id}});
-        if (!todo) {
-            throw new NotFoundException("Todo not found");
-        }
-        await this.todosRepository.delete(id);
+    async delete({id, actor}: DeleteTodoCommand): Promise<void> {
+        await this.findOne({id, actor});
+        await this.attachmentsService.deleteEntityFiles("todo", id);
+
+        await this.todosRepository.manager.transaction(async (manager) => {
+            const comments = await manager.find(Comment, {
+                select: {id: true},
+                where: {entityType: "todo", entityId: id},
+            });
+            const commentIds = comments.map((comment) => comment.id);
+
+            if (commentIds.length > 0) {
+                await manager.delete(Like, {
+                    entityType: "comment",
+                    entityId: In(commentIds),
+                });
+            }
+
+            await manager.delete(Comment, {
+                entityType: "todo",
+                entityId: id,
+            });
+            await manager.delete(Like, {
+                entityType: "todo",
+                entityId: id,
+            });
+            await manager.delete(Attachment, {
+                entityType: "todo",
+                entityId: id,
+            });
+            await manager.delete(CheckList, {todo: {id}});
+            await manager.delete(Todo, id);
+        });
     }
 
-    async update(id: string, updatedTodo: UpdateTodoDto): Promise<Todo> {
-        const todo = await this.todosRepository.findOne({where: {id}});
-        if (!todo) {
-            throw new NotFoundException("Todo not found");
-        }
+    async update({id, data, actor}: UpdateTodoCommand): Promise<Todo> {
+        const todo = await this.findOne({id, actor});
 
-        Object.assign(todo, updatedTodo);
+        Object.assign(todo, data);
         return this.todosRepository.save(todo);
     }
 
@@ -62,11 +129,12 @@ export class TodosService {
             .execute();
     }
 
-    async findOne(id: string): Promise<Todo> {
+    async findOne({id, actor}: FindTodoCommand): Promise<Todo> {
         const todo = await this.todosRepository.findOne({where: {id}});
         if (!todo) {
             throw new NotFoundException("Todo not found");
         }
+        this.assertCanAccess(todo, actor);
         return todo;
     }
 
@@ -85,11 +153,20 @@ export class TodosService {
         return todos;
     }
 
-    async findTodoWithComments(todoId: string) {
-        const [todo, comments] = await Promise.all([
-            this.todosRepository.findOne({where: {id: todoId}}),
-            this.commentsService.findByEntity("todo", todoId),
-        ]);
+    async findTodoWithComments({todoId, actor}: FindTodoWithCommentsCommand) {
+        const todo = await this.findOne({id: todoId, actor});
+        const comments = await this.commentsService.findByEntity(
+            "todo",
+            todoId,
+        );
         return {...todo, comments};
+    }
+
+    private assertCanAccess(todo: Todo, actor: AuthenticatedUser): void {
+        if (todo.authorId === actor.id || actor.role === Role.ADMIN) {
+            return;
+        }
+
+        throw new ForbiddenException("You do not have access to this todo");
     }
 }

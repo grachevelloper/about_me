@@ -1,8 +1,12 @@
 import {
     Body,
     Controller,
+    Delete,
     Get,
+    HttpCode,
+    HttpStatus,
     Param,
+    ParseUUIDPipe,
     Patch,
     Post,
     UseGuards,
@@ -11,7 +15,7 @@ import {CurrentUser} from "src/shared/decorators/current-user.decorator";
 import {AuthGuard} from "src/shared/guards/auth.guard";
 import {AuthenticatedUser} from "src/types";
 
-import type {CreateTodoDto, UpdateTodoDto} from "./todo.interface";
+import {CreateTodoDto, UpdateTodoDto} from "./todo.interface";
 import {TodosService} from "./todos.service";
 
 @UseGuards(AuthGuard)
@@ -24,12 +28,10 @@ export class TodosController {
         @Body() createTodoData: CreateTodoDto,
         @CurrentUser() user: AuthenticatedUser,
     ) {
-        const createTodoDataWithUserId: CreateTodoDto = {
-            ...createTodoData,
-            authorId: user.id,
-        };
-
-        return await this.todosService.create(createTodoDataWithUserId);
+        return await this.todosService.create({
+            data: createTodoData,
+            actor: user,
+        });
     }
 
     @Get()
@@ -38,11 +40,28 @@ export class TodosController {
     }
 
     @Get(":id")
-    async findOne(@Param("id") id: string) {
-        return this.todosService.findTodoWithComments(id);
+    async findOne(
+        @Param("id", ParseUUIDPipe) id: string,
+        @CurrentUser() user: AuthenticatedUser,
+    ) {
+        return this.todosService.findOne({id, actor: user});
     }
+
     @Patch(":id")
-    async update(@Param("id") id: string, updateTodo: UpdateTodoDto) {
-        return this.todosService.update(id, updateTodo);
+    async update(
+        @Param("id", ParseUUIDPipe) id: string,
+        @Body() updateTodo: UpdateTodoDto,
+        @CurrentUser() user: AuthenticatedUser,
+    ) {
+        return this.todosService.update({id, data: updateTodo, actor: user});
+    }
+
+    @Delete(":id")
+    @HttpCode(HttpStatus.NO_CONTENT)
+    async delete(
+        @Param("id", ParseUUIDPipe) id: string,
+        @CurrentUser() user: AuthenticatedUser,
+    ) {
+        await this.todosService.delete({id, actor: user});
     }
 }

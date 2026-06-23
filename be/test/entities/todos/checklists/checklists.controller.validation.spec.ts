@@ -1,9 +1,11 @@
 import {afterEach, beforeEach, describe, expect, it, jest} from "@jest/globals";
 import {INestApplication} from "@nestjs/common";
 import {Test} from "@nestjs/testing";
+import {NextFunction, Request, Response} from "express";
 import {configureApplication} from "src/app/application-setup";
 import {ChecklistController} from "src/modules/todos/checklists/checklists.controller";
 import {ChecklistService} from "src/modules/todos/checklists/checklists.service";
+import {AuthenticatedUser, Role} from "src/types";
 import request from "supertest";
 
 describe("ChecklistController validation", () => {
@@ -12,7 +14,12 @@ describe("ChecklistController validation", () => {
     const checklistService = {
         addItem: jest.fn(),
         updateProgress: jest.fn(),
+        updateItemText: jest.fn(),
     };
+    const actor = {
+        id: "82c130b1-1c47-4a0c-8a1c-e79cc39282ad",
+        role: Role.USER,
+    } as AuthenticatedUser;
 
     beforeEach(async () => {
         const moduleRef = await Test.createTestingModule({
@@ -26,6 +33,10 @@ describe("ChecklistController validation", () => {
         }).compile();
 
         app = moduleRef.createNestApplication();
+        app.use((req: Request, _res: Response, next: NextFunction) => {
+            req.user = actor;
+            next();
+        });
         configureApplication(app);
         await app.init();
         jest.clearAllMocks();
@@ -43,7 +54,11 @@ describe("ChecklistController validation", () => {
             .send({text: "read"})
             .expect(201);
 
-        expect(checklistService.addItem).toHaveBeenCalledWith("todo-1", "read");
+        expect(checklistService.addItem).toHaveBeenCalledWith({
+            todoId: "todo-1",
+            text: "read",
+            actor,
+        });
     });
 
     it("transforms a valid progress delta", async () => {
@@ -54,9 +69,26 @@ describe("ChecklistController validation", () => {
             .send({delta: "1"})
             .expect(200);
 
-        expect(checklistService.updateProgress).toHaveBeenCalledWith(
-            "todo-1",
-            1,
-        );
+        expect(checklistService.updateProgress).toHaveBeenCalledWith({
+            todoId: "todo-1",
+            delta: 1,
+            actor,
+        });
+    });
+
+    it("transforms item indexes to numbers", async () => {
+        checklistService.updateItemText.mockResolvedValue(undefined as never);
+
+        await request(app.getHttpServer())
+            .patch("/api/todos/todo-1/checklist/items/2")
+            .send({text: "updated"})
+            .expect(200);
+
+        expect(checklistService.updateItemText).toHaveBeenCalledWith({
+            todoId: "todo-1",
+            itemIndex: 2,
+            text: "updated",
+            actor,
+        });
     });
 });

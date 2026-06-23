@@ -29,7 +29,6 @@ export const BaseDetails = ({initialData}: BaseDetailsProps) => {
         updateTitle,
         updatePriority,
         updateState,
-        updateChecklist,
         updateContent,
         isPending,
     } = useTodoMutations();
@@ -47,9 +46,6 @@ export const BaseDetails = ({initialData}: BaseDetailsProps) => {
                 break;
             case 'state':
                 updateState(initialData.id, newValue as TodoState);
-                break;
-            case 'checklist':
-                updateChecklist(initialData.id, newValue as any[]);
                 break;
             case 'content':
                 updateContent(initialData.id, newValue as string);

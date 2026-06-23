@@ -2,13 +2,11 @@ import type {Todo} from '../types';
 
 export type DtoUpdateTodo = {
     id: string;
-} & Partial<
-    Pick<Todo, 'content' | 'state' | 'priority' | 'title' | 'checklist'>
->;
+} & Partial<Pick<Todo, 'content' | 'state' | 'priority' | 'title'>>;
 
 export type DtoCreateTodo = PartialFields<
-    Pick<Todo, 'content' | 'state' | 'priority' | 'title' | 'checklist'>,
-    'state' | 'priority' | 'checklist'
+    Pick<Todo, 'content' | 'state' | 'priority' | 'title'>,
+    'state' | 'priority'
 >;
 export interface TodoApi {
     listTodos: () => Promise<Todo[]>;

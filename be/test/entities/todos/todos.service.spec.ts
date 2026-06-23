@@ -1,11 +1,17 @@
 import {beforeEach, describe, expect, it, jest} from "@jest/globals";
-import {NotFoundException} from "@nestjs/common";
+import {ForbiddenException, NotFoundException} from "@nestjs/common";
 import {Test, TestingModule} from "@nestjs/testing";
 import {getRepositoryToken} from "@nestjs/typeorm";
+import {Attachment} from "src/modules/attachments/attachments.entity";
+import {AttachmentsService} from "src/modules/attachments/attachments.service";
+import {Comment} from "src/modules/comments/comments.entity";
 import {CommentsService} from "src/modules/comments/comments.service";
+import {Like} from "src/modules/likes/likes.entity";
+import {CheckList} from "src/modules/todos/checklists/checklists.entity";
 import {Todo} from "src/modules/todos/todos.entity";
 import {TodosService} from "src/modules/todos/todos.service";
-import {Repository} from "typeorm";
+import {AuthenticatedUser, Role} from "src/types";
+import {DeleteResult, EntityManager, Repository} from "typeorm";
 
 import {CreateTodoDto, UpdateTodoDto} from "@/todos/todo.interface";
 import {TodoState} from "@/types/todo";
@@ -14,6 +20,11 @@ describe("TodosService", () => {
     let service: TodosService;
     let repository: jest.Mocked<Repository<Todo>>;
     let commentsService: jest.Mocked<CommentsService>;
+    let attachmentsService: jest.Mocked<AttachmentsService>;
+    const entityManager = {
+        delete: jest.fn<EntityManager["delete"]>(),
+        find: jest.fn<EntityManager["find"]>(),
+    };
 
     const mockTodo: Todo = {
         id: "1",
@@ -24,6 +35,18 @@ describe("TodosService", () => {
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
     };
+    const owner = {
+        id: "user-123",
+        role: Role.USER,
+    } as AuthenticatedUser;
+    const stranger = {
+        id: "user-456",
+        role: Role.USER,
+    } as AuthenticatedUser;
+    const admin = {
+        id: "admin-123",
+        role: Role.ADMIN,
+    } as AuthenticatedUser;
 
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
@@ -38,6 +61,15 @@ describe("TodosService", () => {
                         find: jest.fn(),
                         delete: jest.fn(),
                         createQueryBuilder: jest.fn(),
+                        manager: {
+                            transaction: jest.fn(
+                                async (
+                                    callback: (
+                                        manager: typeof entityManager,
+                                    ) => Promise<unknown>,
+                                ) => callback(entityManager),
+                            ),
+                        },
                     },
                 },
                 {
@@ -46,12 +78,21 @@ describe("TodosService", () => {
                         findByEntity: jest.fn(),
                     },
                 },
+                {
+                    provide: AttachmentsService,
+                    useValue: {
+                        deleteEntityFiles: jest.fn(),
+                    },
+                },
             ],
         }).compile();
 
         service = module.get<TodosService>(TodosService);
         repository = module.get(getRepositoryToken(Todo));
         commentsService = module.get(CommentsService);
+        attachmentsService = module.get(AttachmentsService);
+        entityManager.delete.mockReset();
+        entityManager.find.mockReset();
     });
 
     describe("create", () => {
@@ -59,15 +100,17 @@ describe("TodosService", () => {
             const createTodoData: CreateTodoDto = {
                 title: "New Todo",
                 content: "Description",
-                authorId: "user-123",
             };
 
             repository.create.mockReturnValue(mockTodo);
             repository.save.mockResolvedValue(mockTodo);
 
-            await service.create(createTodoData);
+            await service.create({data: createTodoData, actor: owner});
 
-            expect(repository.create).toHaveBeenCalledWith(createTodoData);
+            expect(repository.create).toHaveBeenCalledWith({
+                ...createTodoData,
+                authorId: owner.id,
+            });
             expect(repository.save).toHaveBeenCalledWith(mockTodo);
         });
     });
@@ -76,7 +119,7 @@ describe("TodosService", () => {
         it("should find todo by id", async () => {
             repository.findOne.mockResolvedValue(mockTodo);
 
-            await service.findOne("1");
+            await service.findOne({id: "1", actor: owner});
 
             expect(repository.findOne).toHaveBeenCalledWith({where: {id: "1"}});
         });
@@ -84,7 +127,9 @@ describe("TodosService", () => {
         it("should throw NotFoundException if todo not found", async () => {
             repository.findOne.mockResolvedValue(null);
 
-            await expect(service.findOne("999")).rejects.toThrow(
+            await expect(
+                service.findOne({id: "999", actor: owner}),
+            ).rejects.toThrow(
                 NotFoundException,
             );
         });
@@ -127,7 +172,7 @@ describe("TodosService", () => {
             repository.findOne.mockResolvedValue(mockTodo);
             repository.save.mockResolvedValue(updatedTodo);
 
-            await service.update("1", updateData);
+            await service.update({id: "1", data: updateData, actor: owner});
 
             expect(repository.findOne).toHaveBeenCalledWith({where: {id: "1"}});
             expect(repository.save).toHaveBeenCalledWith({
@@ -140,28 +185,115 @@ describe("TodosService", () => {
             repository.findOne.mockResolvedValue(null);
 
             await expect(
-                service.update("999", {title: "Updated"}),
+                service.update({
+                    id: "999",
+                    data: {title: "Updated"},
+                    actor: owner,
+                }),
             ).rejects.toThrow(NotFoundException);
+        });
+
+        it("should forbid regular users from updating another user's todo", async () => {
+            repository.findOne.mockResolvedValue(mockTodo);
+
+            await expect(
+                service.update({
+                    id: "1",
+                    data: {title: "Updated"},
+                    actor: stranger,
+                }),
+            ).rejects.toBeInstanceOf(ForbiddenException);
+            expect(repository.save).not.toHaveBeenCalled();
+        });
+
+        it("should allow an administrator to update another user's todo", async () => {
+            const updateData: UpdateTodoDto = {title: "Admin Updated Todo"};
+            repository.findOne.mockResolvedValue(mockTodo);
+            repository.save.mockResolvedValue({...mockTodo, ...updateData});
+
+            await service.update({id: "1", data: updateData, actor: admin});
+
+            expect(repository.save).toHaveBeenCalledWith({
+                ...mockTodo,
+                ...updateData,
+            });
         });
     });
 
     describe("delete", () => {
         it("should delete todo", async () => {
             repository.findOne.mockResolvedValue(mockTodo);
-            repository.delete.mockResolvedValue({raw: [], affected: 1} as any);
+            attachmentsService.deleteEntityFiles.mockResolvedValue({
+                deleted: 0,
+            });
+            entityManager.find.mockResolvedValue([{id: "comment-1"} as Comment]);
+            entityManager.delete.mockResolvedValue({
+                raw: [],
+                affected: 1,
+            } as DeleteResult);
 
-            await service.delete("1");
+            await service.delete({id: "1", actor: owner});
 
             expect(repository.findOne).toHaveBeenCalledWith({where: {id: "1"}});
-            expect(repository.delete).toHaveBeenCalledWith("1");
+            expect(attachmentsService.deleteEntityFiles).toHaveBeenCalledWith(
+                "todo",
+                "1",
+            );
+            expect(repository.manager.transaction).toHaveBeenCalled();
+            expect(entityManager.find).toHaveBeenCalledWith(Comment, {
+                select: {id: true},
+                where: {entityType: "todo", entityId: "1"},
+            });
+            expect(entityManager.delete).toHaveBeenNthCalledWith(1, Like, {
+                entityType: "comment",
+                entityId: expect.any(Object),
+            });
+            expect(entityManager.delete).toHaveBeenNthCalledWith(2, Comment, {
+                entityType: "todo",
+                entityId: "1",
+            });
+            expect(entityManager.delete).toHaveBeenNthCalledWith(3, Like, {
+                entityType: "todo",
+                entityId: "1",
+            });
+            expect(entityManager.delete).toHaveBeenNthCalledWith(4, Attachment, {
+                entityType: "todo",
+                entityId: "1",
+            });
+            expect(entityManager.delete).toHaveBeenNthCalledWith(5, CheckList, {
+                todo: {id: "1"},
+            });
+            expect(entityManager.delete).toHaveBeenNthCalledWith(6, Todo, "1");
         });
 
         it("should throw NotFoundException if todo not found", async () => {
             repository.findOne.mockResolvedValue(null);
 
-            await expect(service.delete("999")).rejects.toThrow(
+            await expect(service.delete({id: "999", actor: owner})).rejects.toThrow(
                 NotFoundException,
             );
+        });
+
+        it("should forbid regular users from deleting another user's todo", async () => {
+            repository.findOne.mockResolvedValue(mockTodo);
+
+            await expect(
+                service.delete({id: "1", actor: stranger}),
+            ).rejects.toBeInstanceOf(ForbiddenException);
+            expect(attachmentsService.deleteEntityFiles).not.toHaveBeenCalled();
+            expect(repository.manager.transaction).not.toHaveBeenCalled();
+        });
+
+        it("should not change database if storage deletion fails", async () => {
+            repository.findOne.mockResolvedValue(mockTodo);
+            attachmentsService.deleteEntityFiles.mockRejectedValue(
+                new Error("storage failed"),
+            );
+
+            await expect(
+                service.delete({id: "1", actor: owner}),
+            ).rejects.toThrow("storage failed");
+            expect(repository.manager.transaction).not.toHaveBeenCalled();
         });
     });
 
@@ -172,7 +304,10 @@ describe("TodosService", () => {
             repository.findOne.mockResolvedValue(mockTodo);
             commentsService.findByEntity.mockResolvedValue(mockComments as any);
 
-            const result = await service.findTodoWithComments("1");
+            const result = await service.findTodoWithComments({
+                todoId: "1",
+                actor: owner,
+            });
 
             expect(repository.findOne).toHaveBeenCalledWith({where: {id: "1"}});
             expect(commentsService.findByEntity).toHaveBeenCalledWith(
@@ -180,6 +315,15 @@ describe("TodosService", () => {
                 "1",
             );
             expect(result).toEqual({...mockTodo, comments: mockComments});
+        });
+
+        it("should throw NotFoundException if todo not found", async () => {
+            repository.findOne.mockResolvedValue(null);
+
+            await expect(
+                service.findTodoWithComments({todoId: "999", actor: owner}),
+            ).rejects.toBeInstanceOf(NotFoundException);
+            expect(commentsService.findByEntity).not.toHaveBeenCalled();
         });
     });
 

@@ -66,6 +66,19 @@ export class AttachmentsService {
         entityType: EntityAttachmentType,
         entityId: string,
     ) {
+        const result = await this.deleteEntityFiles(entityType, entityId);
+        await this.attachmentsRepo.delete({
+            entityType,
+            entityId,
+        });
+
+        return result;
+    }
+
+    async deleteEntityFiles(
+        entityType: EntityAttachmentType,
+        entityId: string,
+    ) {
         const attachments = await this.getEntityImages(entityType, entityId);
 
         try {
@@ -73,12 +86,7 @@ export class AttachmentsService {
                 attachments.map((att) => this.s3Service.delete(att.s3Key)),
             );
 
-            const result = await this.attachmentsRepo.delete({
-                entityType,
-                entityId,
-            });
-
-            return {deleted: result.affected || 0};
+            return {deleted: attachments.length};
         } catch (error) {
             console.error("Failed to delete entity images", {
                 entityType,

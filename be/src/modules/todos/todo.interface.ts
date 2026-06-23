@@ -1,16 +1,41 @@
-import {User} from "src/modules/users/users.entity";
+import {IsEnum, IsNotEmpty, IsOptional, IsString} from "class-validator";
 
-import {type TodoPriority, type TodoState} from "@/types/todo";
+import {TodoPriority, TodoState} from "@/types/todo";
 
-export interface CreateTodoDto {
-    authorId: string;
-    content: string;
-    title: string;
+export class CreateTodoDto {
+    @IsString()
+    @IsNotEmpty()
+    content!: string;
+
+    @IsString()
+    @IsNotEmpty()
+    title!: string;
+
+    @IsOptional()
+    @IsEnum(TodoPriority)
     priority?: TodoPriority;
+
+    @IsOptional()
+    @IsEnum(TodoState)
     state?: TodoState;
-    likedBy?: User[];
-    likesCount?: number;
 }
-export type UpdateTodoDto = Partial<CreateTodoDto> & {
-    isActive?: boolean;
-};
+
+export class UpdateTodoDto {
+    @IsOptional()
+    @IsString()
+    @IsNotEmpty()
+    content?: string;
+
+    @IsOptional()
+    @IsString()
+    @IsNotEmpty()
+    title?: string;
+
+    @IsOptional()
+    @IsEnum(TodoPriority)
+    priority?: TodoPriority;
+
+    @IsOptional()
+    @IsEnum(TodoState)
+    state?: TodoState;
+}
