@@ -10,8 +10,8 @@ export const createMockTodo = (overrides: Partial<Todo>): Todo => {
         title: overrides.title || 'Самая важная задача',
         content: overrides.content || 'Сделать самое важное дело в жизни',
         authorId: overrides.authorId || userId,
+        hasLiked: overrides.hasLiked ?? false,
         priority: overrides.priority || TodoPriority.MEDIUM,
-        isActive: overrides.isActive || true,
         state: overrides.state || TodoState.FINISHED,
         ...overrides,
     };

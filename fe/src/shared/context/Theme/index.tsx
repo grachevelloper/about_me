@@ -1,5 +1,5 @@
 import {ConfigProvider} from 'antd';
-import React, {createContext, useContext} from 'react';
+import React, {createContext} from 'react';
 
 import {CustomThemeConfig, ThemeMode, themes} from '../../configs/styles';
 import {useLocalStorage} from '../../hooks/useLocalStorage';
@@ -33,12 +33,4 @@ export const ThemeProvider: React.FC<{children: React.ReactNode}> = ({
             <ConfigProvider theme={theme}>{children}</ConfigProvider>
         </ThemeContext.Provider>
     );
-};
-
-export const useTheme = (): ThemeContextType => {
-    const context = useContext(ThemeContext);
-    if (!context) {
-        throw new Error('useTheme must be used within a ThemeProvider');
-    }
-    return context;
 };

@@ -129,7 +129,7 @@ export const Comment = ({comment, className, isNew = false}: CommentProps) => {
                 justify='start'
                 vertical
                 align='start'
-                className={b(null, className)}
+                className={b(undefined, className)}
                 style={{
                     paddingLeft: `${20 * depth}px`,
                 }}

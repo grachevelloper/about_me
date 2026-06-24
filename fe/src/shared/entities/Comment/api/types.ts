@@ -23,10 +23,6 @@ export interface ListComments {
     entityType: EntityCommentType;
 }
 
-export interface getComment {
-    id: string;
-}
-
 export interface CommentsApi {
     createComment: (
         createCommentData: CreateCommentDto

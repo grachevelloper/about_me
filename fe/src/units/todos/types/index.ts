@@ -22,5 +22,3 @@ export enum TodoState {
     FINISHED = 'Finished',
     CANCELED = 'Canceled',
 }
-
-export type EditValue = 'state' | 'priority';

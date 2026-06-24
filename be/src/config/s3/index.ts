@@ -13,4 +13,3 @@ export default registerAs("s3", () => ({
     },
     forcePathStyle: true,
 }));
-export const BUCKET_NAME = "gracheveloper";

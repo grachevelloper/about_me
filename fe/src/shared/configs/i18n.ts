@@ -10,7 +10,7 @@ import ruAuth from '@/public/locales/ru/auth.json';
 import ruCommon from '@/public/locales/ru/common.json';
 import ruTodo from '@/public/locales/ru/todo.json';
 
-export const resources = {
+const resources = {
     en: {
         common: enCommon,
         todo: enTodo,
@@ -30,5 +30,3 @@ i18next.use(initReactI18next).init({
     lng: 'ru',
     fallbackLng: 'en',
 });
-
-export default i18next;

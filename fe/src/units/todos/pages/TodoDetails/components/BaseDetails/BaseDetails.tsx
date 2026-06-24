@@ -60,7 +60,7 @@ export const BaseDetails = ({initialData}: BaseDetailsProps) => {
 
     return (
         <div className={b()}>
-            <Divider orientation='left' orientationMargin={0}>
+            <Divider titlePlacement='start' orientationMargin={0}>
                 <TodoTitle onEnd={handleEnd} content={initialData.title} />
             </Divider>
             <Row gutter={32} justify='start'>

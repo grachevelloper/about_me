@@ -1,4 +1,5 @@
 import js from '@eslint/js';
+import i18nJsonPlugin from 'eslint-plugin-i18n-json';
 import i18nextPlugin from 'eslint-plugin-i18next';
 import importPlugin from 'eslint-plugin-import';
 import prettierPlugin from 'eslint-plugin-prettier';
@@ -23,6 +24,7 @@ export default defineConfig([
             'react-hooks': reactHooks,
             react: reactPlugin,
             i18next,
+            'i18n-json': i18nJsonPlugin,
         },
         extends: [js.configs.recommended],
         settings: {
