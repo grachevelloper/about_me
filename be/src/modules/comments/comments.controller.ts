@@ -14,7 +14,7 @@ import {
 import {CurrentUser} from "../../shared/decorators/current-user.decorator";
 import {AuthGuard} from "../../shared/guards/auth.guard";
 import {AuthenticatedUser, Order} from "../../types";
-import {CreateCommentDto, UpdateCommentDto} from "./comemnts.interface";
+import {CreateCommentDto, UpdateCommentDto} from "./comments.dto";
 import {EntityCommentType} from "./comments.entity";
 import {CommentsService} from "./comments.service";
 

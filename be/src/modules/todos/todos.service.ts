@@ -15,7 +15,7 @@ import {TodoState} from "@/types/todo";
 
 import {CommentsService} from "../comments/comments.service";
 import {CheckList} from "./checklists/checklists.entity";
-import {CreateTodoDto, UpdateTodoDto} from "./todo.interface";
+import {CreateTodoDto, UpdateTodoDto} from "./todo.dto";
 import {Todo} from "./todos.entity";
 
 interface CreateTodoCommand {

@@ -9,7 +9,7 @@ import * as bcrypt from "bcrypt";
 import {Repository} from "typeorm";
 
 import {AuthenticatedUser, Role} from "../../types";
-import {CreateUserDto, UpdateUserDto} from "./user.interface";
+import {CreateUserDto, UpdateUserDto} from "./user.dto";
 import {User} from "./users.entity";
 
 @Injectable()

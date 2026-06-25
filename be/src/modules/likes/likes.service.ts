@@ -7,8 +7,8 @@ import {
 import {InjectRepository} from "@nestjs/typeorm";
 import {EntityManager, Repository} from "typeorm";
 
+import {CreateLikeDto, DeleteLikeDto} from "./likes.dto";
 import {EntityLikeType, Like} from "./likes.entity";
-import {CreateLikeDto, DeleteLikeDto} from "./likes.interface";
 
 type HasLikedProps = {
     entityId: string;

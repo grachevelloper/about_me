@@ -1,7 +1,7 @@
 import {Column, Entity, Index} from "typeorm";
 
 import {UnUpdatableBaseEntity} from "../../shared/utils/entity";
-import {EntityAttachmentType} from "./attachments.interface";
+import {EntityAttachmentType} from "./attachments.dto";
 
 @Entity("attachments")
 @Index("IDX_attachments_entity", ["entityType", "entityId"])

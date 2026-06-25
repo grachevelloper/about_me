@@ -17,7 +17,7 @@ import {Roles} from "../../shared/decorators/role.decorator";
 import {RolesGuard} from "../../shared/guards/roles.guard";
 import {AuthenticatedUser, Role} from "../../types";
 import {UserResponseDto} from "./dto/user-response.dto";
-import {ChangePasswordDto, UpdateUserDto} from "./user.interface";
+import {ChangePasswordDto, UpdateUserDto} from "./user.dto";
 import {UsersMapper} from "./users.mapper";
 import {UsersService} from "./users.service";
 

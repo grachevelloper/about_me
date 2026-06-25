@@ -1,6 +1,7 @@
 import {Type} from "class-transformer";
 import {
     IsArray,
+    IsDateString,
     IsEnum,
     IsInt,
     IsNotEmpty,
@@ -8,28 +9,31 @@ import {
     IsOptional,
     IsString,
     IsUrl,
+    IsUUID,
     Max,
     Min,
     ValidateNested,
 } from "class-validator";
 
-import {LikedEntity} from "../../shared/utils/entity";
+import {PaginatedResponseDto} from "../../shared/dto/paginated-response.dto";
 import {Order, SortBy} from "../../types";
-import {Article} from "./articles.entity";
+import {UserResponseDto} from "../users/dto/user-response.dto";
+import {TagResponseDto} from "./tags/tags.dto";
 
 export class TagDto {
     @IsString()
     @IsNotEmpty()
-    name: string;
+    name!: string;
 }
+
 export class CreateArticleDto {
     @IsString()
     @IsNotEmpty()
-    title: string;
+    title!: string;
 
     @IsString()
     @IsNotEmpty()
-    content: string;
+    content!: string;
 
     @IsArray()
     @ValidateNested({each: true})
@@ -45,6 +49,7 @@ export class CreateArticleDto {
 
 export class UpdateArticleDto {
     @IsString()
+    @IsNotEmpty()
     @IsOptional()
     title?: string;
 
@@ -53,53 +58,61 @@ export class UpdateArticleDto {
     image?: string;
 
     @IsString()
+    @IsNotEmpty()
     @IsOptional()
     content?: string;
 
     @IsNumber()
+    @Min(1)
     @IsOptional()
     readTime?: number;
-}
 
-export type ResponseArticle = Article & LikedEntity;
-
-export class ResponseGetArticles {
-    articles: Article[];
-
-    @Type(() => Number)
-    @IsInt()
-    page: number;
-
-    @Type(() => Number)
-    @IsInt()
-    limit: number;
-
-    @Type(() => Number)
-    @IsInt()
+    @IsArray()
+    @ValidateNested({each: true})
+    @Type(() => TagDto)
     @IsOptional()
-    next?: string;
+    tags?: TagDto[];
 }
+
+export class ArticleResponseDto {
+    id!: string;
+    title!: string;
+    image!: string;
+    content!: string;
+    tags!: TagResponseDto[];
+    readTime!: number | null;
+    likesCount!: number;
+    author!: UserResponseDto;
+    isDraft!: boolean;
+    hasLiked!: boolean;
+    createdAt!: string;
+    updatedAt!: string;
+}
+
+export type ResponseArticle = ArticleResponseDto;
+
+export class ResponseGetArticles extends PaginatedResponseDto<ArticleResponseDto> {}
 
 export class RequestGetArticles {
     @IsOptional()
     @Type(() => Number)
     @IsInt()
     @Min(1)
-    page: number = 1;
+    page?: number = 1;
 
     @IsOptional()
     @Type(() => Number)
     @IsInt()
     @Min(1)
     @Max(100)
-    limit: number = 10;
+    limit?: number = 10;
 
     @IsOptional()
     @IsString()
     search?: string;
 
     @IsOptional()
-    @IsString()
+    @IsUUID()
     authorId?: string;
 
     @IsOptional()
@@ -110,17 +123,17 @@ export class RequestGetArticles {
     @Type(() => Number)
     @IsInt()
     @Min(0)
-    minLikes: number = 0;
+    minLikes?: number = 0;
 
     @IsOptional()
-    @IsString()
+    @IsDateString()
     createdAfter?: string;
 
     @IsOptional()
     @IsEnum(SortBy)
-    sortBy: SortBy = SortBy.CREATED_AT;
+    sortBy?: SortBy = SortBy.CREATED_AT;
 
     @IsOptional()
     @IsEnum(Order)
-    order: Order = Order.DESC;
+    order?: Order = Order.DESC;
 }

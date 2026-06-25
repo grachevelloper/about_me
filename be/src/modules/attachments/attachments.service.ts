@@ -3,8 +3,8 @@ import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
 
 import {S3StorageService} from "../../shared/storage/s3/s3.service";
+import {EntityAttachmentType} from "./attachments.dto";
 import {Attachment} from "./attachments.entity";
-import {EntityAttachmentType} from "./attachments.interface";
 
 @Injectable()
 export class AttachmentsService {

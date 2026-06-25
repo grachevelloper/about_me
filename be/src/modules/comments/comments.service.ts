@@ -4,7 +4,7 @@ import {Repository} from "typeorm";
 
 import {Order} from "../../types";
 import {UsersService} from "../users/users.service";
-import {CreateCommentDto, UpdateCommentDto} from "./comemnts.interface";
+import {CreateCommentDto, UpdateCommentDto} from "./comments.dto";
 import {Comment, EntityCommentType} from "./comments.entity";
 
 @Injectable()

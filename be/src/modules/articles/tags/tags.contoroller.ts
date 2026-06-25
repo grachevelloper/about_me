@@ -6,44 +6,42 @@ import {
     HttpCode,
     HttpStatus,
     Param,
+    ParseUUIDPipe,
     Patch,
     Post,
 } from "@nestjs/common";
-import {IsString} from "class-validator";
 
-import {Tag} from "./tags.entity";
+import {CreateTagDto, TagResponseDto} from "./tags.dto";
+import {TagsMapper} from "./tags.mapper";
 import {TagsService} from "./tags.service";
-
-export class CreateTagDto {
-    @IsString()
-    name: string;
-}
 
 @Controller("tags")
 export class TagsController {
     constructor(private readonly tagsService: TagsService) {}
 
     @Post()
-    async create(@Body() data: CreateTagDto): Promise<Tag> {
-        return await this.tagsService.create(data);
+    async create(@Body() data: CreateTagDto): Promise<TagResponseDto> {
+        return TagsMapper.toResponse(await this.tagsService.create(data));
     }
 
     @Get()
-    async findAll(): Promise<Tag[]> {
-        return await this.tagsService.findAll();
+    async findAll(): Promise<TagResponseDto[]> {
+        return (await this.tagsService.findAll()).map((tag) =>
+            TagsMapper.toResponse(tag),
+        );
     }
 
     @Patch(":id")
     async update(
-        @Param("id") id: string,
-        @Body() newName: string,
-    ): Promise<Tag> {
-        return await this.tagsService.update(id, newName);
+        @Param("id", ParseUUIDPipe) id: string,
+        @Body() data: CreateTagDto,
+    ): Promise<TagResponseDto> {
+        return TagsMapper.toResponse(await this.tagsService.update(id, data.name));
     }
 
     @Delete(":id")
     @HttpCode(HttpStatus.NO_CONTENT)
-    async remove(@Param("id") id: string): Promise<void> {
+    async remove(@Param("id", ParseUUIDPipe) id: string): Promise<void> {
         await this.tagsService.delete(id);
     }
 }

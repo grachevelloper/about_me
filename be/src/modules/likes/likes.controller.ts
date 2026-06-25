@@ -3,7 +3,7 @@ import {Body, Controller, UseGuards} from "@nestjs/common";
 import {CurrentUser} from "../../shared/decorators/current-user.decorator";
 import {AuthGuard} from "../../shared/guards/auth.guard";
 import {AuthenticatedUser} from "../../types";
-import {CreateLikeDto, DeleteLikeDto} from "./likes.interface";
+import {CreateLikeDto, DeleteLikeDto} from "./likes.dto";
 import {LikesService} from "./likes.service";
 
 @UseGuards(AuthGuard)

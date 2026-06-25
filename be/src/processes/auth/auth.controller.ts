@@ -14,7 +14,7 @@ import {JwtService} from "@nestjs/jwt";
 import {Request, Response} from "express";
 
 import {UserResponseDto} from "@/users/dto/user-response.dto";
-import {SigninUserDto, SignupUserDto} from "@/users/user.interface";
+import {SigninUserDto, SignupUserDto} from "@/users/user.dto";
 import {User} from "@/users/users.entity";
 import {UsersMapper} from "@/users/users.mapper";
 

@@ -15,7 +15,7 @@ import {CurrentUser} from "src/shared/decorators/current-user.decorator";
 import {AuthGuard} from "src/shared/guards/auth.guard";
 import {AuthenticatedUser} from "src/types";
 
-import {CreateTodoDto, UpdateTodoDto} from "./todo.interface";
+import {CreateTodoDto, UpdateTodoDto} from "./todo.dto";
 import {TodosService} from "./todos.service";
 
 @UseGuards(AuthGuard)

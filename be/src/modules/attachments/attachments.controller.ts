@@ -14,7 +14,7 @@ import {
 import {FileInterceptor} from "@nestjs/platform-express";
 
 import {AuthGuard} from "../../shared/guards/auth.guard";
-import {CreateAttachmentDto} from "./attachments.interface";
+import {CreateAttachmentDto} from "./attachments.dto";
 import {AttachmentsService} from "./attachments.service";
 
 @UseGuards(AuthGuard)

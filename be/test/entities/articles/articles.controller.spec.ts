@@ -1,0 +1,87 @@
+import {describe, expect, it, jest} from "@jest/globals";
+import {HttpStatus, ParseUUIDPipe} from "@nestjs/common";
+import {HTTP_CODE_METADATA, ROUTE_ARGS_METADATA} from "@nestjs/common/constants";
+import {ArticlesController} from "src/modules/articles/articles.controller";
+import {ArticlesService} from "src/modules/articles/articles.service";
+import {AuthenticatedUser, Role} from "src/types";
+
+describe("ArticlesController", () => {
+    const actor = {
+        id: "82c130b1-1c47-4a0c-8a1c-e79cc39282ad",
+        role: Role.USER,
+    } as AuthenticatedUser;
+
+    it("passes create body and actor to the service", async () => {
+        const service = {
+            create: jest.fn<ArticlesService["create"]>().mockResolvedValue(
+                {} as never,
+            ),
+        } as unknown as ArticlesService;
+        const controller = new ArticlesController(service);
+        const body = {title: "Article", content: "Content"};
+
+        await controller.create(actor, body);
+
+        expect(service.create).toHaveBeenCalledWith({actor, data: body});
+    });
+
+    it("passes update body and actor to the service", async () => {
+        const service = {
+            update: jest.fn<ArticlesService["update"]>().mockResolvedValue(
+                {} as never,
+            ),
+        } as unknown as ArticlesService;
+        const controller = new ArticlesController(service);
+        const body = {title: "Updated"};
+
+        await controller.update(
+            actor,
+            "82c130b1-1c47-4a0c-8a1c-e79cc39282ad",
+            body,
+        );
+
+        expect(service.update).toHaveBeenCalledWith({
+            actor,
+            id: "82c130b1-1c47-4a0c-8a1c-e79cc39282ad",
+            data: body,
+        });
+    });
+
+    it("passes publish actor to the service", async () => {
+        const service = {
+            publish: jest.fn<ArticlesService["publish"]>().mockResolvedValue(
+                {} as never,
+            ),
+        } as unknown as ArticlesService;
+        const controller = new ArticlesController(service);
+
+        await controller.publishArticle(
+            actor,
+            "82c130b1-1c47-4a0c-8a1c-e79cc39282ad",
+        );
+
+        expect(service.publish).toHaveBeenCalledWith({
+            actor,
+            id: "82c130b1-1c47-4a0c-8a1c-e79cc39282ad",
+        });
+    });
+
+    it("declares no-content status for deletion", () => {
+        expect(
+            Reflect.getMetadata(HTTP_CODE_METADATA, ArticlesController.prototype.delete),
+        ).toBe(HttpStatus.NO_CONTENT);
+    });
+
+    it("uses UUID parsing for article id route parameters", () => {
+        const routeArgs = Reflect.getMetadata(
+            ROUTE_ARGS_METADATA,
+            ArticlesController,
+            "update",
+        ) as Record<string, {pipes?: unknown[]}>;
+        const idParam = Object.values(routeArgs).find((metadata) =>
+            metadata.pipes?.some((pipe) => pipe === ParseUUIDPipe),
+        );
+
+        expect(idParam).toBeDefined();
+    });
+});

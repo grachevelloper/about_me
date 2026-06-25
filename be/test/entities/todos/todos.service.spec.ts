@@ -13,7 +13,7 @@ import {TodosService} from "src/modules/todos/todos.service";
 import {AuthenticatedUser, Role} from "src/types";
 import {DeleteResult, EntityManager, Repository} from "typeorm";
 
-import {CreateTodoDto, UpdateTodoDto} from "@/todos/todo.interface";
+import {CreateTodoDto, UpdateTodoDto} from "@/todos/todo.dto";
 import {TodoState} from "@/types/todo";
 
 describe("TodosService", () => {
