@@ -1,5 +1,7 @@
 import {
     ForbiddenException,
+    forwardRef,
+    Inject,
     Injectable,
     NotFoundException,
 } from "@nestjs/common";
@@ -11,11 +13,12 @@ import {Like} from "src/modules/likes/likes.entity";
 import {AuthenticatedUser, Role} from "src/types";
 import {In, Repository} from "typeorm";
 
+import {PaginatedResponseDto} from "@/shared/dto/paginated-response.dto";
 import {TodoState} from "@/types/todo";
 
 import {CommentsService} from "../comments/comments.service";
 import {CheckList} from "./checklists/checklists.entity";
-import {CreateTodoDto, UpdateTodoDto} from "./todo.dto";
+import {CreateTodoDto, QueryTodosDto, ResponseGetTodos, UpdateTodoDto} from "./todo.dto";
 import {Todo} from "./todos.entity";
 
 interface CreateTodoCommand {
@@ -49,6 +52,7 @@ export class TodosService {
     constructor(
         @InjectRepository(Todo)
         private todosRepository: Repository<Todo>,
+        @Inject(forwardRef(() => CommentsService))
         private commentsService: CommentsService,
         private attachmentsService: AttachmentsService,
     ) {}
@@ -138,9 +142,19 @@ export class TodosService {
         return todo;
     }
 
-    async findAll(authorId: string): Promise<Todo[]> {
-        const todos = await this.todosRepository.find({where: {authorId}});
-        return todos;
+    async findAll(
+        authorId: string,
+        query: QueryTodosDto = {},
+    ): Promise<ResponseGetTodos> {
+        const {page = 1, limit = 10} = query;
+        const [todos, total] = await this.todosRepository.findAndCount({
+            where: {authorId},
+            order: {createdAt: "DESC", id: "DESC"},
+            skip: (page - 1) * limit,
+            take: limit,
+        });
+
+        return new PaginatedResponseDto<Todo>(todos, page, limit, total);
     }
 
     async findActive(authorId: string): Promise<Todo[]> {
@@ -155,11 +169,12 @@ export class TodosService {
 
     async findTodoWithComments({todoId, actor}: FindTodoWithCommentsCommand) {
         const todo = await this.findOne({id: todoId, actor});
-        const comments = await this.commentsService.findByEntity(
-            "todo",
-            todoId,
-        );
-        return {...todo, comments};
+        const comments = await this.commentsService.findByEntity({
+            actor,
+            entityType: "todo",
+            entityId: todoId,
+        });
+        return {...todo, comments: comments.items};
     }
 
     private assertCanAccess(todo: Todo, actor: AuthenticatedUser): void {

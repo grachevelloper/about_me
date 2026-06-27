@@ -1,6 +1,18 @@
-import {IsEnum, IsNotEmpty, IsOptional, IsString} from "class-validator";
+import {Type} from "class-transformer";
+import {
+    IsEnum,
+    IsInt,
+    IsNotEmpty,
+    IsOptional,
+    IsString,
+    Max,
+    Min,
+} from "class-validator";
 
+import {PaginatedResponseDto} from "@/shared/dto/paginated-response.dto";
 import {TodoPriority, TodoState} from "@/types/todo";
+
+import {Todo} from "./todos.entity";
 
 export class CreateTodoDto {
     @IsString()
@@ -39,3 +51,20 @@ export class UpdateTodoDto {
     @IsEnum(TodoState)
     state?: TodoState;
 }
+
+export class QueryTodosDto {
+    @IsOptional()
+    @Type(() => Number)
+    @IsInt()
+    @Min(1)
+    page?: number = 1;
+
+    @IsOptional()
+    @Type(() => Number)
+    @IsInt()
+    @Min(1)
+    @Max(100)
+    limit?: number = 10;
+}
+
+export class ResponseGetTodos extends PaginatedResponseDto<Todo> {}

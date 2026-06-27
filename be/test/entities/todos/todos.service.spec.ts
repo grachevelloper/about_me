@@ -59,6 +59,7 @@ describe("TodosService", () => {
                         save: jest.fn(),
                         findOne: jest.fn(),
                         find: jest.fn(),
+                        findAndCount: jest.fn(),
                         delete: jest.fn(),
                         createQueryBuilder: jest.fn(),
                         manager: {
@@ -138,12 +139,25 @@ describe("TodosService", () => {
     describe("findAll", () => {
         it("should find todos by author", async () => {
             const todos = [mockTodo, {...mockTodo, id: "2"}];
-            repository.find.mockResolvedValue(todos);
+            repository.findAndCount.mockResolvedValue([todos, 2]);
 
-            await service.findAll("user-123");
+            const result = await service.findAll("user-123", {
+                page: 2,
+                limit: 1,
+            });
 
-            expect(repository.find).toHaveBeenCalledWith({
+            expect(repository.findAndCount).toHaveBeenCalledWith({
                 where: {authorId: "user-123"},
+                order: {createdAt: "DESC", id: "DESC"},
+                skip: 1,
+                take: 1,
+            });
+            expect(result).toEqual({
+                items: todos,
+                page: 2,
+                limit: 1,
+                total: 2,
+                hasNext: false,
             });
         });
     });
@@ -302,7 +316,13 @@ describe("TodosService", () => {
             const mockComments = [{id: "1", content: "Test comment"}];
 
             repository.findOne.mockResolvedValue(mockTodo);
-            commentsService.findByEntity.mockResolvedValue(mockComments as any);
+            commentsService.findByEntity.mockResolvedValue({
+                items: mockComments,
+                page: 1,
+                limit: 100,
+                total: 1,
+                hasNext: false,
+            } as any);
 
             const result = await service.findTodoWithComments({
                 todoId: "1",
@@ -310,10 +330,11 @@ describe("TodosService", () => {
             });
 
             expect(repository.findOne).toHaveBeenCalledWith({where: {id: "1"}});
-            expect(commentsService.findByEntity).toHaveBeenCalledWith(
-                "todo",
-                "1",
-            );
+            expect(commentsService.findByEntity).toHaveBeenCalledWith({
+                actor: owner,
+                entityType: "todo",
+                entityId: "1",
+            });
             expect(result).toEqual({...mockTodo, comments: mockComments});
         });
 

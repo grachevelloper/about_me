@@ -9,13 +9,14 @@ import {
     ParseUUIDPipe,
     Patch,
     Post,
+    Query,
     UseGuards,
 } from "@nestjs/common";
 import {CurrentUser} from "src/shared/decorators/current-user.decorator";
 import {AuthGuard} from "src/shared/guards/auth.guard";
 import {AuthenticatedUser} from "src/types";
 
-import {CreateTodoDto, UpdateTodoDto} from "./todo.dto";
+import {CreateTodoDto, QueryTodosDto, ResponseGetTodos, UpdateTodoDto} from "./todo.dto";
 import {TodosService} from "./todos.service";
 
 @UseGuards(AuthGuard)
@@ -35,8 +36,11 @@ export class TodosController {
     }
 
     @Get()
-    async findAll(@CurrentUser() user: AuthenticatedUser) {
-        return await this.todosService.findAll(user.id);
+    async findAll(
+        @CurrentUser() user: AuthenticatedUser,
+        @Query() query: QueryTodosDto,
+    ): Promise<ResponseGetTodos> {
+        return await this.todosService.findAll(user.id, query);
     }
 
     @Get(":id")

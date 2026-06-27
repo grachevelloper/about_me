@@ -3,9 +3,12 @@ import {
     Controller,
     Delete,
     FileTypeValidator,
+    HttpCode,
+    HttpStatus,
     MaxFileSizeValidator,
     Param,
     ParseFilePipe,
+    ParseUUIDPipe,
     Post,
     UploadedFile,
     UseGuards,
@@ -14,7 +17,7 @@ import {
 import {FileInterceptor} from "@nestjs/platform-express";
 
 import {AuthGuard} from "../../shared/guards/auth.guard";
-import {CreateAttachmentDto} from "./attachments.dto";
+import {AttachmentResponseDto, CreateAttachmentDto} from "./attachments.dto";
 import {AttachmentsService} from "./attachments.service";
 
 @UseGuards(AuthGuard)
@@ -37,7 +40,7 @@ export class AttachmentsController {
         )
         file: Express.Multer.File,
         @Param() createData: CreateAttachmentDto,
-    ) {
+    ): Promise<AttachmentResponseDto> {
         return this.attachmentsService.attachImage(
             file,
             createData.entityType,
@@ -45,9 +48,9 @@ export class AttachmentsController {
         );
     }
 
-    @Delete(":url")
-    @UseInterceptors(FileInterceptor("file"))
-    async delete(@Param() url: string) {
-        return this.attachmentsService.deleteAttachmentByUrl(url);
+    @Delete(":id")
+    @HttpCode(HttpStatus.NO_CONTENT)
+    async delete(@Param("id", ParseUUIDPipe) id: string): Promise<void> {
+        await this.attachmentsService.deleteAttachmentById(id);
     }
 }

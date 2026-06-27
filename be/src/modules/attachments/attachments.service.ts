@@ -1,10 +1,20 @@
-import {Injectable} from "@nestjs/common";
+import {Injectable, NotFoundException} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
 
 import {S3StorageService} from "../../shared/storage/s3/s3.service";
-import {EntityAttachmentType} from "./attachments.dto";
+import {AttachmentResponseDto, EntityAttachmentType} from "./attachments.dto";
 import {Attachment} from "./attachments.entity";
+
+function toAttachmentResponse(attachment: Attachment): AttachmentResponseDto {
+    return {
+        id: attachment.id,
+        url: attachment.url,
+        entityType: attachment.entityType,
+        entityId: attachment.entityId,
+        createdAt: attachment.createdAt,
+    };
+}
 
 @Injectable()
 export class AttachmentsService {
@@ -18,7 +28,7 @@ export class AttachmentsService {
         file: Express.Multer.File,
         entityType: EntityAttachmentType,
         entityId: string,
-    ) {
+    ): Promise<AttachmentResponseDto> {
         return this.attachmentsRepo.manager.transaction(
             async (transactionalEntityManager) => {
                 let s3Key: string | null = null;
@@ -37,7 +47,7 @@ export class AttachmentsService {
                     const savedAttachment =
                         await transactionalEntityManager.save(attachment);
 
-                    return savedAttachment;
+                    return toAttachmentResponse(savedAttachment);
                 } catch (error) {
                     if (s3Key) {
                         try {
@@ -103,7 +113,7 @@ export class AttachmentsService {
         const attachment = await this.attachmentsRepo.findOneBy({s3Key});
 
         if (!attachment) {
-            throw new Error("Attachment not found");
+            throw new NotFoundException("Attachment not found");
         }
 
         await this.s3Service.delete(s3Key);
@@ -112,11 +122,22 @@ export class AttachmentsService {
         return {deleted: s3Key};
     }
 
+    async deleteAttachmentById(id: string): Promise<void> {
+        const attachment = await this.attachmentsRepo.findOneBy({id});
+
+        if (!attachment) {
+            throw new NotFoundException("Attachment not found");
+        }
+
+        await this.s3Service.delete(attachment.s3Key);
+        await this.attachmentsRepo.delete({id});
+    }
+
     async deleteAttachmentByUrl(url: string) {
         const attachment = await this.attachmentsRepo.findOneBy({url});
 
         if (!attachment) {
-            throw new Error("Attachment not found");
+            throw new NotFoundException("Attachment not found");
         }
 
         await this.s3Service.delete(attachment.s3Key);

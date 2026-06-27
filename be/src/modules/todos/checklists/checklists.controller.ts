@@ -7,6 +7,7 @@ import {
     HttpStatus,
     Param,
     ParseIntPipe,
+    ParseUUIDPipe,
     Patch,
     Post,
 } from "@nestjs/common";
@@ -40,7 +41,7 @@ export class ChecklistController {
 
     @Post()
     createChecklist(
-        @Param("todoId") todoId: string,
+        @Param("todoId", ParseUUIDPipe) todoId: string,
         @CurrentUser() user: AuthenticatedUser,
     ) {
         return this.checklistService.create({
@@ -52,7 +53,7 @@ export class ChecklistController {
 
     @Get()
     getChecklist(
-        @Param("todoId") todoId: string,
+        @Param("todoId", ParseUUIDPipe) todoId: string,
         @CurrentUser() user: AuthenticatedUser,
     ) {
         return this.checklistService.getByTodoId({todoId, actor: user});
@@ -60,7 +61,7 @@ export class ChecklistController {
 
     @Post("items")
     addItem(
-        @Param("todoId") todoId: string,
+        @Param("todoId", ParseUUIDPipe) todoId: string,
         @Body() dto: AddItemDto,
         @CurrentUser() user: AuthenticatedUser,
     ) {
@@ -73,7 +74,7 @@ export class ChecklistController {
 
     @Patch("items/:index")
     updateItemText(
-        @Param("todoId") todoId: string,
+        @Param("todoId", ParseUUIDPipe) todoId: string,
         @Param("index", ParseIntPipe) index: number,
         @Body() dto: UpdateItemTextDto,
         @CurrentUser() user: AuthenticatedUser,
@@ -88,7 +89,7 @@ export class ChecklistController {
 
     @Patch("progress")
     updateProgress(
-        @Param("todoId") todoId: string,
+        @Param("todoId", ParseUUIDPipe) todoId: string,
         @Body() dto: UpdateProgressDto,
         @CurrentUser() user: AuthenticatedUser,
     ) {
@@ -101,7 +102,7 @@ export class ChecklistController {
 
     @Delete("items/:index")
     removeItem(
-        @Param("todoId") todoId: string,
+        @Param("todoId", ParseUUIDPipe) todoId: string,
         @Param("index", ParseIntPipe) index: number,
         @CurrentUser() user: AuthenticatedUser,
     ) {
@@ -115,7 +116,7 @@ export class ChecklistController {
     @Delete()
     @HttpCode(HttpStatus.NO_CONTENT)
     async deleteChecklist(
-        @Param("todoId") todoId: string,
+        @Param("todoId", ParseUUIDPipe) todoId: string,
         @CurrentUser() user: AuthenticatedUser,
     ) {
         await this.checklistService.deleteChecklist({todoId, actor: user});

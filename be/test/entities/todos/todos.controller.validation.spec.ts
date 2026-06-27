@@ -19,6 +19,7 @@ describe("TodosController validation", () => {
     } as AuthenticatedUser;
     const todosService = {
         create: jest.fn(),
+        findAll: jest.fn(),
         update: jest.fn(),
     };
 
@@ -90,5 +91,24 @@ describe("TodosController validation", () => {
             .expect(400);
 
         expect(todosService.update).not.toHaveBeenCalled();
+    });
+
+    it("transforms todo list pagination query", async () => {
+        todosService.findAll.mockResolvedValue({
+            items: [],
+            page: 2,
+            limit: 5,
+            total: 0,
+            hasNext: false,
+        } as never);
+
+        await request(app.getHttpServer())
+            .get("/api/todos?page=2&limit=5")
+            .expect(200);
+
+        expect(todosService.findAll).toHaveBeenCalledWith(actor.id, {
+            page: 2,
+            limit: 5,
+        });
     });
 });

@@ -42,6 +42,25 @@ describe("TodosController", () => {
         });
     });
 
+    it("passes pagination query and actor id to the service", async () => {
+        const service = {
+            findAll: jest.fn<TodosService["findAll"]>().mockResolvedValue({
+                items: [],
+                page: 1,
+                limit: 10,
+                total: 0,
+                hasNext: false,
+            }),
+        } as unknown as TodosService;
+        const controller = new TodosController(service);
+        const query = {page: 1, limit: 10};
+
+        await controller.findAll(actor, query);
+
+        expect(service.findAll).toHaveBeenCalledWith(actor.id, query);
+    });
+
+
     it("declares no-content status for deletion", () => {
         expect(
             Reflect.getMetadata(HTTP_CODE_METADATA, TodosController.prototype.delete),

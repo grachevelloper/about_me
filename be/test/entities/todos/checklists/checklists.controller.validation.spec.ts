@@ -13,9 +13,13 @@ describe("ChecklistController validation", () => {
 
     const checklistService = {
         addItem: jest.fn(),
+        create: jest.fn(),
+        deleteChecklist: jest.fn(),
+        getByTodoId: jest.fn(),
         updateProgress: jest.fn(),
         updateItemText: jest.fn(),
     };
+    const todoId = "82c130b1-1c47-4a0c-8a1c-e79cc39282ad";
     const actor = {
         id: "82c130b1-1c47-4a0c-8a1c-e79cc39282ad",
         role: Role.USER,
@@ -50,12 +54,12 @@ describe("ChecklistController validation", () => {
         checklistService.addItem.mockResolvedValue(undefined as never);
 
         await request(app.getHttpServer())
-            .post("/api/todos/todo-1/checklist/items")
+            .post(`/api/todos/${todoId}/checklist/items`)
             .send({text: "read"})
             .expect(201);
 
         expect(checklistService.addItem).toHaveBeenCalledWith({
-            todoId: "todo-1",
+            todoId,
             text: "read",
             actor,
         });
@@ -65,12 +69,12 @@ describe("ChecklistController validation", () => {
         checklistService.updateProgress.mockResolvedValue(undefined as never);
 
         await request(app.getHttpServer())
-            .patch("/api/todos/todo-1/checklist/progress")
+            .patch(`/api/todos/${todoId}/checklist/progress`)
             .send({delta: "1"})
             .expect(200);
 
         expect(checklistService.updateProgress).toHaveBeenCalledWith({
-            todoId: "todo-1",
+            todoId,
             delta: 1,
             actor,
         });
@@ -80,15 +84,24 @@ describe("ChecklistController validation", () => {
         checklistService.updateItemText.mockResolvedValue(undefined as never);
 
         await request(app.getHttpServer())
-            .patch("/api/todos/todo-1/checklist/items/2")
+            .patch(`/api/todos/${todoId}/checklist/items/2`)
             .send({text: "updated"})
             .expect(200);
 
         expect(checklistService.updateItemText).toHaveBeenCalledWith({
-            todoId: "todo-1",
+            todoId,
             itemIndex: 2,
             text: "updated",
             actor,
         });
+    });
+
+    it("rejects an invalid todo id before calling the checklist service", async () => {
+        await request(app.getHttpServer())
+            .post("/api/todos/not-a-uuid/checklist/items")
+            .send({text: "read"})
+            .expect(400);
+
+        expect(checklistService.addItem).not.toHaveBeenCalled();
     });
 });

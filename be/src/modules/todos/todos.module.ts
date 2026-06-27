@@ -1,4 +1,4 @@
-import {Module} from "@nestjs/common";
+import {forwardRef, Module} from "@nestjs/common";
 import {TypeOrmModule} from "@nestjs/typeorm";
 
 import {AttachmentModule} from "../attachments/attachments.module";
@@ -13,7 +13,7 @@ import {TodosService} from "./todos.service";
         TypeOrmModule.forFeature([Todo]),
         AttachmentModule,
         ChecklistsModule,
-        CommentsModule,
+        forwardRef(() => CommentsModule),
     ],
     controllers: [TodosController],
     providers: [TodosService],
