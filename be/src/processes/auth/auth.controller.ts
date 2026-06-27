@@ -7,15 +7,12 @@ import {
     Post,
     Req,
     Res,
-    UnauthorizedException,
     UseGuards,
 } from "@nestjs/common";
-import {JwtService} from "@nestjs/jwt";
 import {Request, Response} from "express";
 
 import {UserResponseDto} from "@/users/dto/user-response.dto";
 import {SigninUserDto, SignupUserDto} from "@/users/user.dto";
-import {User} from "@/users/users.entity";
 import {UsersMapper} from "@/users/users.mapper";
 
 import {Public} from "../../shared/decorators/auth.decorator";
@@ -24,16 +21,11 @@ import {AuthGuard} from "../../shared/guards/auth.guard";
 import {AuthenticatedUser} from "../../types";
 import {AuthService} from "./auth.service";
 import {ACCESS_TOKEN_TTL_IN_MS, REFRESH_TOKEN_TTL_IN_MS} from "./constants";
-import {RefreshTokensService} from "./refresh-token/refresh-token.service";
-import {clearTokenConfig, hashToken, tokenConfig} from "./utils";
+import {clearTokenConfig, tokenConfig} from "./utils";
 
 @Controller("auth")
 export class AuthController {
-    constructor(
-        private authService: AuthService,
-        private refreshTokensService: RefreshTokensService,
-        private jwtService: JwtService,
-    ) {}
+    constructor(private authService: AuthService) {}
 
     @Public()
     @HttpCode(HttpStatus.CREATED)
@@ -49,7 +41,7 @@ export class AuthController {
             signUpDto.password,
         );
 
-        await this.issueTokens(result, response);
+        await this.setTokenCookies(result, response);
         return UsersMapper.toResponse(result);
     }
 
@@ -65,7 +57,7 @@ export class AuthController {
             signInDto.password,
         );
 
-        await this.issueTokens(result, response);
+        await this.setTokenCookies(result, response);
         return UsersMapper.toResponse(result);
     }
 
@@ -76,40 +68,11 @@ export class AuthController {
         @Req() request: Request,
         @Res({passthrough: true}) response: Response,
     ) {
-        const refreshToken = request.cookies?.refreshToken;
-
-        if (!refreshToken) {
-            throw new UnauthorizedException("Refresh token not found");
-        }
-
-        const tokenHash = hashToken(refreshToken);
-        const tokenEntity =
-            await this.refreshTokensService.findByHash(tokenHash);
-
-        if (!tokenEntity) {
-            throw new UnauthorizedException("Invalid refresh token");
-        }
-
-        const user = await this.authService.isMe(tokenEntity.userId);
-
-        await this.refreshTokensService.revokeToken(user.id, refreshToken);
-
-        const [accessToken, newRefreshToken] = await Promise.all([
-            this.jwtService.signAsync({sub: user.id, role: user.role}),
-            this.refreshTokensService.createToken(user.id),
-        ]);
-
-        response.cookie(
-            "accessToken",
-            accessToken,
-            tokenConfig(ACCESS_TOKEN_TTL_IN_MS),
+        const result = await this.authService.refresh(
+            request.cookies?.refreshToken,
         );
 
-        response.cookie(
-            "refreshToken",
-            newRefreshToken,
-            tokenConfig(REFRESH_TOKEN_TTL_IN_MS),
-        );
+        this.setCookies(response, result.accessToken, result.refreshToken);
 
         return {message: "Tokens refreshed successfully"};
     }
@@ -121,10 +84,7 @@ export class AuthController {
         @CurrentUser() user: AuthenticatedUser,
         @Res({passthrough: true}) response: Response,
     ) {
-        const refreshToken = req.cookies?.refreshToken;
-        if (refreshToken) {
-            await this.refreshTokensService.revokeToken(user.id, refreshToken);
-        }
+        await this.authService.logout(user.id, req.cookies?.refreshToken);
 
         response.clearCookie("accessToken", clearTokenConfig());
         response.clearCookie("refreshToken", clearTokenConfig());
@@ -148,12 +108,21 @@ export class AuthController {
         return UsersMapper.toResponse(await this.authService.isMe(user.id));
     }
 
-    private async issueTokens(user: User, response: Response): Promise<void> {
-        const [accessToken, refreshToken] = await Promise.all([
-            this.jwtService.signAsync({sub: user.id, role: user.role}),
-            this.refreshTokensService.createToken(user.id),
-        ]);
+    private async setTokenCookies(
+        user: Parameters<AuthService["issueTokens"]>[0],
+        response: Response,
+    ): Promise<void> {
+        const {accessToken, refreshToken} =
+            await this.authService.issueTokens(user);
 
+        this.setCookies(response, accessToken, refreshToken);
+    }
+
+    private setCookies(
+        response: Response,
+        accessToken: string,
+        refreshToken: string,
+    ): void {
         response.cookie(
             "refreshToken",
             refreshToken,

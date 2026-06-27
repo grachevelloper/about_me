@@ -27,6 +27,41 @@ import {UsersService} from "./users.service";
 export class UsersController {
     constructor(private readonly usersService: UsersService) {}
 
+    @Get("me")
+    async getMe(
+        @CurrentUser() actor: AuthenticatedUser,
+    ): Promise<UserResponseDto> {
+        const user = await this.usersService.findForActor(actor.id, actor);
+        return UsersMapper.toResponse(user);
+    }
+
+    @Patch("me")
+    async updateMe(
+        @Body() updateUserDto: UpdateUserDto,
+        @CurrentUser() actor: AuthenticatedUser,
+    ): Promise<UserResponseDto> {
+        const user = await this.usersService.update(
+            actor.id,
+            updateUserDto,
+            actor,
+        );
+        return UsersMapper.toResponse(user);
+    }
+
+    @Patch("me/password")
+    @HttpCode(HttpStatus.NO_CONTENT)
+    async changeMyPassword(
+        @Body() changePasswordDto: ChangePasswordDto,
+        @CurrentUser() actor: AuthenticatedUser,
+    ): Promise<void> {
+        await this.usersService.changePassword(
+            actor.id,
+            changePasswordDto.currentPassword,
+            changePasswordDto.newPassword,
+            actor,
+        );
+    }
+
     @Get(":id")
     async findOne(
         @Param("id", ParseUUIDPipe) id: string,
@@ -55,7 +90,8 @@ export class UsersController {
     ): Promise<void> {
         await this.usersService.changePassword(
             id,
-            changePasswordDto.password,
+            changePasswordDto.currentPassword,
+            changePasswordDto.newPassword,
             actor,
         );
     }

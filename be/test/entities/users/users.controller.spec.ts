@@ -35,6 +35,35 @@ describe("UsersController", () => {
         expect(result).not.toHaveProperty("password");
     });
 
+    it("maps current-user profile reads through the service", async () => {
+        const service = {
+            findForActor: jest
+                .fn<UsersService["findForActor"]>()
+                .mockResolvedValue(user),
+        } as unknown as UsersService;
+        const controller = new UsersController(service);
+
+        const result = await controller.getMe(actor);
+
+        expect(service.findForActor).toHaveBeenCalledWith(actor.id, actor);
+        expect(result).not.toHaveProperty("password");
+    });
+
+    it("updates the current user's own profile", async () => {
+        const service = {
+            update: jest.fn<UsersService["update"]>().mockResolvedValue(user),
+        } as unknown as UsersService;
+        const controller = new UsersController(service);
+
+        await controller.updateMe({username: "updated-reader"}, actor);
+
+        expect(service.update).toHaveBeenCalledWith(
+            actor.id,
+            {username: "updated-reader"},
+            actor,
+        );
+    });
+
     it("passes only the password field and actor to the password operation", async () => {
         const service = {
             changePassword: jest
@@ -45,18 +74,52 @@ describe("UsersController", () => {
 
         await controller.changePassword(
             user.id,
-            {password: "StrongPassword123"},
+            {
+                currentPassword: "StrongPassword123",
+                newPassword: "NewStrongPassword123",
+            },
             actor,
         );
 
         expect(service.changePassword).toHaveBeenCalledWith(
             user.id,
             "StrongPassword123",
+            "NewStrongPassword123",
+            actor,
+        );
+    });
+
+    it("changes the current user's own password", async () => {
+        const service = {
+            changePassword: jest
+                .fn<UsersService["changePassword"]>()
+                .mockResolvedValue(),
+        } as unknown as UsersService;
+        const controller = new UsersController(service);
+
+        await controller.changeMyPassword(
+            {
+                currentPassword: "StrongPassword123",
+                newPassword: "NewStrongPassword123",
+            },
+            actor,
+        );
+
+        expect(service.changePassword).toHaveBeenCalledWith(
+            actor.id,
+            "StrongPassword123",
+            "NewStrongPassword123",
             actor,
         );
     });
 
     it("declares no-content status for password changes and deletion", () => {
+        expect(
+            Reflect.getMetadata(
+                HTTP_CODE_METADATA,
+                UsersController.prototype.changeMyPassword,
+            ),
+        ).toBe(HttpStatus.NO_CONTENT);
         expect(
             Reflect.getMetadata(
                 HTTP_CODE_METADATA,

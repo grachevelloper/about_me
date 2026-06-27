@@ -1,5 +1,7 @@
 import {afterAll, beforeAll, describe, expect, it} from "@jest/globals";
+import {JwtService} from "@nestjs/jwt";
 import bcrypt from "bcrypt";
+import {AttachmentsService} from "src/modules/attachments/attachments.service";
 import {User} from "src/modules/users/users.entity";
 import {UsersService} from "src/modules/users/users.service";
 import {AuthService} from "src/processes/auth/auth.service";
@@ -30,10 +32,17 @@ describe("Users and auth PostgreSQL integration", () => {
             namingStrategy: new SnakeNamingStrategy(),
         });
         await dataSource.initialize();
-        usersService = new UsersService(dataSource.getRepository(User));
-        authService = new AuthService(usersService);
+        usersService = new UsersService(
+            dataSource.getRepository(User),
+            {} as AttachmentsService,
+        );
         refreshTokensService = new RefreshTokensService(
             dataSource.getRepository(RefreshToken),
+        );
+        authService = new AuthService(
+            usersService,
+            refreshTokensService,
+            new JwtService({secret: "test-secret"}),
         );
     });
 

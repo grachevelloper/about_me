@@ -87,5 +87,14 @@ export class ChangePasswordDto {
     @IsString()
     @MinLength(8)
     @MaxLength(72)
-    password!: string;
+    currentPassword!: string;
+
+    @ApiProperty({example: "NewStrongPassword123!"})
+    @IsString()
+    @MinLength(8)
+    @MaxLength(72)
+    @Matches(/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])/, {
+        message: "Пароль должен содержать заглавные, строчные буквы и цифры",
+    })
+    newPassword!: string;
 }

@@ -1,12 +1,9 @@
 import {describe, expect, it, jest} from "@jest/globals";
-import {UnauthorizedException} from "@nestjs/common";
-import {JwtService} from "@nestjs/jwt";
 import {Request, Response} from "express";
 import {User} from "src/modules/users/users.entity";
 import {UsersMapper} from "src/modules/users/users.mapper";
 import {AuthController} from "src/processes/auth/auth.controller";
 import {AuthService} from "src/processes/auth/auth.service";
-import {RefreshTokensService} from "src/processes/auth/refresh-token/refresh-token.service";
 import {clearTokenConfig} from "src/processes/auth/utils";
 import {Role} from "src/types";
 
@@ -21,22 +18,18 @@ describe("AuthController", () => {
         updatedAt: "2026-01-02T00:00:00.000Z",
     });
 
-    it("returns a safe user and signs an access token with sub and role", async () => {
+    it("returns a safe user and delegates token issuance", async () => {
         const authService = {
             signIn: jest.fn<AuthService["signIn"]>().mockResolvedValue(user),
+            issueTokens: jest
+                .fn<AuthService["issueTokens"]>()
+                .mockResolvedValue({
+                    accessToken: "access-token",
+                    refreshToken: "refresh-token",
+                }),
         } as unknown as AuthService;
-        const refreshTokens = {
-            createToken: jest
-                .fn<RefreshTokensService["createToken"]>()
-                .mockResolvedValue("refresh-token"),
-        } as unknown as RefreshTokensService;
-        const jwt = {
-            signAsync: jest
-                .fn<JwtService["signAsync"]>()
-                .mockResolvedValue("access-token"),
-        } as unknown as JwtService;
         const response = {cookie: jest.fn()} as unknown as Response;
-        const controller = new AuthController(authService, refreshTokens, jwt);
+        const controller = new AuthController(authService);
 
         const result = await controller.signIn(
             {email: user.email, password: "StrongPassword123"},
@@ -45,102 +38,54 @@ describe("AuthController", () => {
 
         expect(result).toEqual(UsersMapper.toResponse(user));
         expect(result).not.toHaveProperty("password");
-        expect(jwt.signAsync).toHaveBeenCalledWith({
-            sub: user.id,
-            role: Role.USER,
-        });
-    });
-
-    it("rejects refresh without a cookie", async () => {
-        const controller = new AuthController(
-            {} as AuthService,
-            {} as RefreshTokensService,
-            {} as JwtService,
+        expect(authService.issueTokens).toHaveBeenCalledWith(user);
+        expect(response.cookie).toHaveBeenCalledWith(
+            "accessToken",
+            "access-token",
+            expect.objectContaining({httpOnly: true}),
         );
-
-        await expect(
-            controller.refresh(
-                {cookies: {}} as Request,
-                {} as Response,
-            ),
-        ).rejects.toEqual(
-            new UnauthorizedException("Refresh token not found"),
+        expect(response.cookie).toHaveBeenCalledWith(
+            "refreshToken",
+            "refresh-token",
+            expect.objectContaining({httpOnly: true}),
         );
     });
 
-    it("rejects a refresh token that is invalid, expired, or revoked", async () => {
-        const refreshTokens = {
-            findByHash: jest
-                .fn<RefreshTokensService["findByHash"]>()
-                .mockResolvedValue(null),
-        } as unknown as RefreshTokensService;
-        const controller = new AuthController(
-            {} as AuthService,
-            refreshTokens,
-            {} as JwtService,
-        );
-
-        await expect(
-            controller.refresh(
-                {cookies: {refreshToken: "unusable"}} as unknown as Request,
-                {} as Response,
-            ),
-        ).rejects.toEqual(new UnauthorizedException("Invalid refresh token"));
-    });
-
-    it("rotates a refresh token and keeps role in the access token", async () => {
+    it("delegates refresh rotation and writes replacement cookies", async () => {
         const authService = {
-            isMe: jest.fn<AuthService["isMe"]>().mockResolvedValue(user),
+            refresh: jest.fn<AuthService["refresh"]>().mockResolvedValue({
+                user,
+                accessToken: "new-access",
+                refreshToken: "new-refresh",
+            }),
         } as unknown as AuthService;
-        const refreshTokens = {
-            findByHash: jest
-                .fn<RefreshTokensService["findByHash"]>()
-                .mockResolvedValue(
-                    Object.assign(new (class {})(), {userId: user.id}) as never,
-                ),
-            revokeToken: jest
-                .fn<RefreshTokensService["revokeToken"]>()
-                .mockResolvedValue(),
-            createToken: jest
-                .fn<RefreshTokensService["createToken"]>()
-                .mockResolvedValue("new-refresh"),
-        } as unknown as RefreshTokensService;
-        const jwt = {
-            signAsync: jest
-                .fn<JwtService["signAsync"]>()
-                .mockResolvedValue("new-access"),
-        } as unknown as JwtService;
         const response = {cookie: jest.fn()} as unknown as Response;
-        const controller = new AuthController(authService, refreshTokens, jwt);
+        const controller = new AuthController(authService);
 
         await controller.refresh(
             {cookies: {refreshToken: "old-refresh"}} as unknown as Request,
             response,
         );
 
-        expect(refreshTokens.revokeToken).toHaveBeenCalledWith(
-            user.id,
-            "old-refresh",
+        expect(authService.refresh).toHaveBeenCalledWith("old-refresh");
+        expect(response.cookie).toHaveBeenCalledWith(
+            "accessToken",
+            "new-access",
+            expect.objectContaining({httpOnly: true}),
         );
-        expect(jwt.signAsync).toHaveBeenCalledWith({
-            sub: user.id,
-            role: Role.USER,
-        });
-        expect(refreshTokens.createToken).toHaveBeenCalledWith(user.id);
+        expect(response.cookie).toHaveBeenCalledWith(
+            "refreshToken",
+            "new-refresh",
+            expect.objectContaining({httpOnly: true}),
+        );
     });
 
     it("clears both authentication cookies on logout", async () => {
-        const refreshTokens = {
-            revokeToken: jest
-                .fn<RefreshTokensService["revokeToken"]>()
-                .mockResolvedValue(),
-        } as unknown as RefreshTokensService;
+        const authService = {
+            logout: jest.fn<AuthService["logout"]>().mockResolvedValue(),
+        } as unknown as AuthService;
         const response = {clearCookie: jest.fn()} as unknown as Response;
-        const controller = new AuthController(
-            {} as AuthService,
-            refreshTokens,
-            {} as JwtService,
-        );
+        const controller = new AuthController(authService);
 
         await controller.logout(
             {cookies: {refreshToken: "refresh-token"}} as unknown as Request,
@@ -148,7 +93,7 @@ describe("AuthController", () => {
             response,
         );
 
-        expect(refreshTokens.revokeToken).toHaveBeenCalledWith(
+        expect(authService.logout).toHaveBeenCalledWith(
             user.id,
             "refresh-token",
         );
