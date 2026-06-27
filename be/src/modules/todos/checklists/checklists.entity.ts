@@ -11,7 +11,10 @@ export class CheckList extends BaseEntity {
     @Column({default: 0})
     progress!: number;
 
+    @Column({name: "todo_id", type: "uuid", unique: true})
+    todoId!: string;
+
     @OneToOne(() => Todo, (todo) => todo.checklist, {onDelete: "CASCADE"})
-    @JoinColumn()
+    @JoinColumn({name: "todo_id"})
     todo!: Todo;
 }

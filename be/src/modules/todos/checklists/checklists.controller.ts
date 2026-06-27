@@ -26,6 +26,7 @@ class AddItemDto {
 
 class UpdateItemTextDto {
     @IsString()
+    @IsNotEmpty()
     text!: string;
 }
 

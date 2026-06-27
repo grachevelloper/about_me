@@ -1,16 +1,18 @@
-import {IsEnum, IsUUID} from "class-validator";
+import {IsEnum} from "class-validator";
 
 import {EntityLikeType} from "./likes.entity";
 
-export class CreateLikeDto {
-    @IsUUID()
-    authorId: string;
+export const LIKE_TARGET_TYPES: Record<EntityLikeType, EntityLikeType> = {
+    article: "article",
+    comment: "comment",
+    todo: "todo",
+};
 
-    @IsUUID()
-    entityId: string;
-
-    @IsEnum(["todo", "article", "comment"])
-    entityType: EntityLikeType;
+export class LikeTargetParamsDto {
+    @IsEnum(LIKE_TARGET_TYPES)
+    entityType!: EntityLikeType;
 }
 
-export class DeleteLikeDto extends CreateLikeDto {}
+export class CreateLikeDto extends LikeTargetParamsDto {}
+
+export class DeleteLikeDto extends LikeTargetParamsDto {}

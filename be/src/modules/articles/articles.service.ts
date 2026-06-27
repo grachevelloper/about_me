@@ -300,29 +300,6 @@ export class ArticlesService {
         );
     }
 
-    async incrementLikesCount(articleId: string): Promise<void> {
-        await this.articlesRepository
-            .createQueryBuilder()
-            .update(Article)
-            .set({
-                likesCount: () => "likesCount + 1",
-            })
-            .where("id = :articleId", {articleId})
-            .execute();
-    }
-
-    async decrementLikesCount(articleId: string): Promise<void> {
-        await this.articlesRepository
-            .createQueryBuilder()
-            .update(Article)
-            .set({
-                likesCount: () => "likesCount - 1",
-            })
-            .where("id = :articleId", {articleId})
-            .andWhere("likesCount > 0")
-            .execute();
-    }
-
     private async findOneForMutation(
         id: string,
         actor: AuthenticatedUser,

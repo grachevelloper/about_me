@@ -9,27 +9,27 @@ export type EntityCommentType = "todo" | "article";
 export class Comment extends BaseEntity {
     @ManyToOne(() => User)
     @JoinColumn()
-    author: User;
+    author!: User;
 
     @Column()
-    content: string;
+    content!: string;
 
     @Column({
         type: "enum",
         enumName: "entity_commented_type",
         enum: ["todo", "article"],
     })
-    entityType: EntityCommentType;
+    entityType!: EntityCommentType;
 
     @Column({type: "uuid"})
-    entityId: string;
+    entityId!: string;
 
     @Column({type: "uuid", nullable: true})
-    parentId: string | null;
+    parentId!: string | null;
 
     @Column({default: 0})
-    depth: number;
+    depth!: number;
 
     @Column({default: 0})
-    likesCount: number;
+    likesCount!: number;
 }

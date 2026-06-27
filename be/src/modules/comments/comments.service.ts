@@ -150,29 +150,6 @@ export class CommentsService {
         return new PaginatedResponseDto<Comment>(comments, page, limit, total);
     }
 
-    async incrementLikesCount(commentId: string): Promise<void> {
-        await this.commentRepository
-            .createQueryBuilder()
-            .update(Comment)
-            .set({
-                likesCount: () => "likesCount + 1",
-            })
-            .where("id = :commentId", {commentId})
-            .execute();
-    }
-
-    async decrementLikesCount(commentId: string): Promise<void> {
-        await this.commentRepository
-            .createQueryBuilder()
-            .update(Comment)
-            .set({
-                likesCount: () => "likesCount - 1",
-            })
-            .where("id = :commentId", {commentId})
-            .andWhere("likesCount > 0")
-            .execute();
-    }
-
     private async assertCanReadTarget(
         entityType: EntityCommentType,
         entityId: string,

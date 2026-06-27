@@ -87,7 +87,7 @@ export class ChecklistService {
     }: CreateChecklistCommand): Promise<CheckList> {
         await this.findTodoForActor({todoId, actor});
         const existingChecklist = await this.checklistRepo.findOne({
-            where: {todo: {id: todoId}},
+            where: {todoId},
         });
 
         if (existingChecklist) {
@@ -97,7 +97,7 @@ export class ChecklistService {
         const checklist = this.checklistRepo.create({
             text: initialText,
             progress: 0,
-            todo: {id: todoId},
+            todoId,
         });
 
         return await this.checklistRepo.save(checklist);
@@ -187,7 +187,7 @@ export class ChecklistService {
     }: FindChecklistCommand): Promise<CheckList | null> {
         await this.findTodoForActor({todoId, actor});
         return await this.checklistRepo.findOne({
-            where: {todo: {id: todoId}},
+            where: {todoId},
         });
     }
 

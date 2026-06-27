@@ -1,9 +1,20 @@
-import {Body, Controller, UseGuards} from "@nestjs/common";
+import {
+    Controller,
+    Delete,
+    HttpCode,
+    HttpStatus,
+    Param,
+    ParseEnumPipe,
+    ParseUUIDPipe,
+    Post,
+    UseGuards,
+} from "@nestjs/common";
 
 import {CurrentUser} from "../../shared/decorators/current-user.decorator";
 import {AuthGuard} from "../../shared/guards/auth.guard";
 import {AuthenticatedUser} from "../../types";
-import {CreateLikeDto, DeleteLikeDto} from "./likes.dto";
+import {LIKE_TARGET_TYPES} from "./likes.dto";
+import {EntityLikeType} from "./likes.entity";
 import {LikesService} from "./likes.service";
 
 @UseGuards(AuthGuard)
@@ -11,27 +22,24 @@ import {LikesService} from "./likes.service";
 export class LikesController {
     constructor(private readonly likesService: LikesService) {}
 
+    @Post(":entityType/:entityId")
     async create(
         @CurrentUser() user: AuthenticatedUser,
-        @Body() createLikeData: CreateLikeDto,
+        @Param("entityType", new ParseEnumPipe(LIKE_TARGET_TYPES))
+        entityType: EntityLikeType,
+        @Param("entityId", ParseUUIDPipe) entityId: string,
     ) {
-        const createLikeDataWithUserId: CreateLikeDto = {
-            ...createLikeData,
-            authorId: user.id,
-        };
-
-        return await this.likesService.create(createLikeDataWithUserId);
+        return await this.likesService.create({actor: user, entityType, entityId});
     }
 
+    @Delete(":entityType/:entityId")
+    @HttpCode(HttpStatus.NO_CONTENT)
     async delete(
         @CurrentUser() user: AuthenticatedUser,
-        @Body() deleteLikeData: DeleteLikeDto,
+        @Param("entityType", new ParseEnumPipe(LIKE_TARGET_TYPES))
+        entityType: EntityLikeType,
+        @Param("entityId", ParseUUIDPipe) entityId: string,
     ) {
-        const createLikeDataWithUserId: CreateLikeDto = {
-            ...deleteLikeData,
-            authorId: user.id,
-        };
-
-        return await this.likesService.delete(createLikeDataWithUserId);
+        await this.likesService.delete({actor: user, entityType, entityId});
     }
 }

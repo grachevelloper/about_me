@@ -26,6 +26,7 @@ describe("ChecklistService", () => {
         id: "checklist-123",
         text: ["first", "second"],
         progress: 1,
+        todoId: todo.id,
         todo,
     });
 
@@ -69,7 +70,7 @@ describe("ChecklistService", () => {
         expect(checklistRepository.create).toHaveBeenCalledWith({
             text: ["first"],
             progress: 0,
-            todo: {id: todo.id},
+            todoId: todo.id,
         });
     });
 
@@ -119,5 +120,71 @@ describe("ChecklistService", () => {
             }),
         ).rejects.toBeInstanceOf(NotFoundException);
         expect(checklistRepository.save).not.toHaveBeenCalled();
+    });
+
+    it("rejects negative item indexes without saving", async () => {
+        checklistRepository.findOne.mockResolvedValue(checklist);
+
+        await expect(
+            service.removeItem({
+                todoId: todo.id,
+                itemIndex: -1,
+                actor: owner,
+            }),
+        ).rejects.toBeInstanceOf(NotFoundException);
+        expect(checklistRepository.save).not.toHaveBeenCalled();
+    });
+
+    it("keeps progress within checklist item bounds", async () => {
+        checklistRepository.findOne.mockResolvedValue(
+            Object.assign(new CheckList(), {
+                ...checklist,
+                text: ["first", "second"],
+                progress: 1,
+            }),
+        );
+
+        const afterOverflow = await service.updateProgress({
+            todoId: todo.id,
+            delta: 5,
+            actor: owner,
+        });
+
+        expect(afterOverflow.progress).toBe(2);
+
+        checklistRepository.findOne.mockResolvedValue(
+            Object.assign(new CheckList(), {
+                ...checklist,
+                text: ["first", "second"],
+                progress: 1,
+            }),
+        );
+
+        const afterUnderflow = await service.updateProgress({
+            todoId: todo.id,
+            delta: -5,
+            actor: owner,
+        });
+
+        expect(afterUnderflow.progress).toBe(0);
+    });
+
+    it("keeps progress in range when removing completed items", async () => {
+        checklistRepository.findOne.mockResolvedValue(
+            Object.assign(new CheckList(), {
+                ...checklist,
+                text: ["first", "second"],
+                progress: 2,
+            }),
+        );
+
+        const result = await service.removeItem({
+            todoId: todo.id,
+            itemIndex: 1,
+            actor: owner,
+        });
+
+        expect(result.text).toEqual(["first"]);
+        expect(result.progress).toBe(1);
     });
 });

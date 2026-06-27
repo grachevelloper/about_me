@@ -96,6 +96,15 @@ describe("ChecklistController validation", () => {
         });
     });
 
+    it("rejects empty item text before calling the checklist service", async () => {
+        await request(app.getHttpServer())
+            .patch(`/api/todos/${todoId}/checklist/items/0`)
+            .send({text: ""})
+            .expect(400);
+
+        expect(checklistService.updateItemText).not.toHaveBeenCalled();
+    });
+
     it("rejects an invalid todo id before calling the checklist service", async () => {
         await request(app.getHttpServer())
             .post("/api/todos/not-a-uuid/checklist/items")

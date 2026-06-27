@@ -98,7 +98,7 @@ export class TodosService {
                 entityType: "todo",
                 entityId: id,
             });
-            await manager.delete(CheckList, {todo: {id}});
+            await manager.delete(CheckList, {todoId: id});
             await manager.delete(Todo, id);
         });
     }
@@ -108,29 +108,6 @@ export class TodosService {
 
         Object.assign(todo, data);
         return this.todosRepository.save(todo);
-    }
-
-    async incrementLikesCount(todoId: string): Promise<void> {
-        await this.todosRepository
-            .createQueryBuilder()
-            .update(Todo)
-            .set({
-                likesCount: () => "likesCount + 1",
-            })
-            .where("id = :todoId", {todoId})
-            .execute();
-    }
-
-    async decrementLikesCount(todoId: string): Promise<void> {
-        await this.todosRepository
-            .createQueryBuilder()
-            .update(Todo)
-            .set({
-                likesCount: () => "likesCount - 1",
-            })
-            .where("id = :todoId", {todoId})
-            .andWhere("likesCount > 0")
-            .execute();
     }
 
     async findOne({id, actor}: FindTodoCommand): Promise<Todo> {

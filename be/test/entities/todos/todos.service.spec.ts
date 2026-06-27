@@ -125,6 +125,22 @@ describe("TodosService", () => {
             expect(repository.findOne).toHaveBeenCalledWith({where: {id: "1"}});
         });
 
+        it("should allow an administrator to read another user's todo", async () => {
+            repository.findOne.mockResolvedValue(mockTodo);
+
+            await expect(
+                service.findOne({id: "1", actor: admin}),
+            ).resolves.toBe(mockTodo);
+        });
+
+        it("should forbid regular users from reading another user's todo", async () => {
+            repository.findOne.mockResolvedValue(mockTodo);
+
+            await expect(
+                service.findOne({id: "1", actor: stranger}),
+            ).rejects.toBeInstanceOf(ForbiddenException);
+        });
+
         it("should throw NotFoundException if todo not found", async () => {
             repository.findOne.mockResolvedValue(null);
 
@@ -275,7 +291,7 @@ describe("TodosService", () => {
                 entityId: "1",
             });
             expect(entityManager.delete).toHaveBeenNthCalledWith(5, CheckList, {
-                todo: {id: "1"},
+                todoId: "1",
             });
             expect(entityManager.delete).toHaveBeenNthCalledWith(6, Todo, "1");
         });
@@ -348,60 +364,4 @@ describe("TodosService", () => {
         });
     });
 
-    describe("incrementLikesCount", () => {
-        it("should increment likes count", async () => {
-            const mockQueryBuilder = {
-                update: jest.fn().mockReturnThis(),
-                set: jest.fn().mockReturnThis(),
-                where: jest.fn().mockReturnThis(),
-                execute: jest.fn().mockResolvedValue({} as never),
-            };
-
-            repository.createQueryBuilder.mockReturnValue(
-                mockQueryBuilder as any,
-            );
-
-            await service.incrementLikesCount("1");
-
-            expect(repository.createQueryBuilder).toHaveBeenCalled();
-            expect(mockQueryBuilder.update).toHaveBeenCalledWith(Todo);
-            expect(mockQueryBuilder.set).toHaveBeenCalledWith({
-                likesCount: expect.any(Function),
-            });
-            expect(mockQueryBuilder.where).toHaveBeenCalledWith(
-                "id = :todoId",
-                {todoId: "1"},
-            );
-            expect(mockQueryBuilder.execute).toHaveBeenCalled();
-        });
-    });
-
-    describe("decrementLikesCount", () => {
-        it("should decrement likes count", async () => {
-            const mockQueryBuilder = {
-                update: jest.fn().mockReturnThis(),
-                set: jest.fn().mockReturnThis(),
-                where: jest.fn().mockReturnThis(),
-                andWhere: jest.fn().mockReturnThis(),
-                execute: jest.fn().mockResolvedValue({} as never),
-            };
-
-            repository.createQueryBuilder.mockReturnValue(
-                mockQueryBuilder as any,
-            );
-
-            await service.decrementLikesCount("1");
-
-            expect(repository.createQueryBuilder).toHaveBeenCalled();
-            expect(mockQueryBuilder.update).toHaveBeenCalledWith(Todo);
-            expect(mockQueryBuilder.where).toHaveBeenCalledWith(
-                "id = :todoId",
-                {todoId: "1"},
-            );
-            expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith(
-                "likesCount > 0",
-            );
-            expect(mockQueryBuilder.execute).toHaveBeenCalled();
-        });
-    });
 });

@@ -1,20 +1,45 @@
 import {
     BadRequestException,
     ConflictException,
+    ForbiddenException,
     Injectable,
     NotFoundException,
 } from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
-import {EntityManager, Repository} from "typeorm";
+import {EntityManager, EntityTarget, Repository} from "typeorm";
 
-import {CreateLikeDto, DeleteLikeDto} from "./likes.dto";
+import {AuthenticatedUser, Role} from "../../types";
+import {Article} from "../articles/articles.entity";
+import {Comment} from "../comments/comments.entity";
+import {Todo} from "../todos/todos.entity";
 import {EntityLikeType, Like} from "./likes.entity";
+
+interface LikeTargetCommand {
+    actor: AuthenticatedUser;
+    entityId: string;
+    entityType: EntityLikeType;
+}
 
 type HasLikedProps = {
     entityId: string;
     entityType: EntityLikeType;
     userId: string;
 };
+
+interface TodoAccessData {
+    authorId: string;
+}
+
+interface ArticleAccessData {
+    authorId: string;
+    isDraft: boolean;
+}
+
+interface CommentTargetData {
+    entityId: string;
+    entityType: "todo" | "article";
+}
+
 @Injectable()
 export class LikesService {
     constructor(
@@ -38,164 +63,227 @@ export class LikesService {
         );
     }
 
-    async create(createLikeData: CreateLikeDto): Promise<Like> {
-        const {entityId, entityType, authorId} = createLikeData;
+    async create(command: LikeTargetCommand): Promise<Like> {
+        try {
+            return await this.likesRepository.manager.transaction(
+                async (manager) => {
+                    await this.assertCanAccessTarget(command, manager);
 
-        const existingLike = await this.likesRepository.findOne({
-            where: {entityId, entityType, authorId},
+                    const existingLike = await manager.findOne(Like, {
+                        where: {
+                            entityId: command.entityId,
+                            entityType: command.entityType,
+                            authorId: command.actor.id,
+                        },
+                    });
+
+                    if (existingLike) {
+                        throw new ConflictException("Already liked");
+                    }
+
+                    const like = manager.create(Like, {
+                        entityId: command.entityId,
+                        entityType: command.entityType,
+                        authorId: command.actor.id,
+                    });
+                    const savedLike = await manager.save(like);
+
+                    await this.updateLikesCount({
+                        manager,
+                        entityId: command.entityId,
+                        entityType: command.entityType,
+                        delta: 1,
+                    });
+
+                    return savedLike;
+                },
+            );
+        } catch (error) {
+            if (this.isUniqueViolation(error)) {
+                throw new ConflictException("Already liked");
+            }
+
+            throw error;
+        }
+    }
+
+    async delete(command: LikeTargetCommand): Promise<void> {
+        await this.likesRepository.manager.transaction(async (manager) => {
+            await this.assertCanAccessTarget(command, manager);
+
+            const result = await manager.delete(Like, {
+                entityId: command.entityId,
+                entityType: command.entityType,
+                authorId: command.actor.id,
+            });
+
+            if (result.affected === 0) {
+                throw new NotFoundException("Like not found");
+            }
+
+            await this.updateLikesCount({
+                manager,
+                entityId: command.entityId,
+                entityType: command.entityType,
+                delta: -1,
+            });
         });
-
-        if (existingLike) {
-            throw new ConflictException("Already liked");
-        }
-
-        return await this.likesRepository.manager.transaction(
-            async (transactionalEntityManager) => {
-                await this.checkEntityExistsInTransaction(
-                    entityId,
-                    entityType,
-                    transactionalEntityManager,
-                );
-
-                const duplicateInTx = await transactionalEntityManager.findOne(
-                    Like,
-                    {
-                        where: {entityId, entityType, authorId},
-                    },
-                );
-
-                if (duplicateInTx) {
-                    throw new ConflictException(
-                        "Already liked (concurrent request)",
-                    );
-                }
-
-                const like = transactionalEntityManager.create(
-                    Like,
-                    createLikeData,
-                );
-                const savedLike = await transactionalEntityManager.save(like);
-
-                await this.incrementLikesCountInTransaction(
-                    entityId,
-                    entityType,
-                    transactionalEntityManager,
-                );
-
-                return savedLike;
-            },
-        );
     }
 
-    async delete(deleteLikeData: DeleteLikeDto): Promise<void> {
-        await this.likesRepository.manager.transaction(
-            async (transactionalEntityManager) => {
-                // 1. Удаляем лайк
-                const result = await transactionalEntityManager.delete(
-                    Like,
-                    deleteLikeData,
-                );
-
-                if (result.affected === 0) {
-                    throw new NotFoundException("Like not found");
-                }
-
-                // 2. Декрементим счетчик В транзакции
-                await this.decrementLikesCountInTransaction(
-                    deleteLikeData.entityId,
-                    deleteLikeData.entityType,
-                    transactionalEntityManager,
-                );
-            },
-        );
-    }
-
-    private async incrementLikesCountInTransaction(
-        entityId: string,
-        entityType: string,
-        transactionalEntityManager: EntityManager,
-    ) {
+    private async assertCanAccessTarget(
+        {actor, entityId, entityType}: LikeTargetCommand,
+        manager: EntityManager,
+    ): Promise<void> {
         switch (entityType) {
             case "todo":
-                await transactionalEntityManager
-                    .createQueryBuilder()
-                    .update("todos")
-                    .set({likesCount: () => "likes_count + 1"})
-                    .where("id = :id", {id: entityId})
-                    .execute();
-                break;
+                await this.assertCanAccessTodo(entityId, actor, manager);
+                return;
+            case "article":
+                await this.assertCanAccessArticle(entityId, actor, manager);
+                return;
             case "comment":
-                await transactionalEntityManager
-                    .createQueryBuilder()
-                    .update("comments")
-                    .set({likesCount: () => "likes_count + 1"})
-                    .where("id = :id", {id: entityId})
-                    .execute();
-                break;
+                await this.assertCanAccessComment(entityId, actor, manager);
+                return;
             default:
                 throw new BadRequestException("Invalid entity type");
         }
     }
 
-    private async decrementLikesCountInTransaction(
-        entityId: string,
-        entityType: string,
-        transactionalEntityManager: EntityManager,
-    ) {
+    private async assertCanAccessTodo(
+        todoId: string,
+        actor: AuthenticatedUser,
+        manager: EntityManager,
+    ): Promise<void> {
+        const todo = await manager
+            .createQueryBuilder()
+            .select("todo.author_id", "authorId")
+            .from("todos", "todo")
+            .where("todo.id = :todoId", {todoId})
+            .getRawOne<TodoAccessData>();
+
+        if (!todo) {
+            throw new NotFoundException("Todo not found");
+        }
+
+        if (todo.authorId !== actor.id && actor.role !== Role.ADMIN) {
+            throw new ForbiddenException("You do not have access to this todo");
+        }
+    }
+
+    private async assertCanAccessArticle(
+        articleId: string,
+        actor: AuthenticatedUser,
+        manager: EntityManager,
+    ): Promise<void> {
+        const article = await manager
+            .createQueryBuilder()
+            .select('article."authorId"', "authorId")
+            .addSelect("article.is_draft", "isDraft")
+            .from("articles", "article")
+            .where("article.id = :articleId", {articleId})
+            .getRawOne<ArticleAccessData>();
+
+        if (!article) {
+            throw new NotFoundException("Article not found");
+        }
+
+        const canAccessDraft =
+            article.authorId === actor.id || actor.role === Role.ADMIN;
+        if (article.isDraft && !canAccessDraft) {
+            throw new ForbiddenException(
+                "You do not have access to this article",
+            );
+        }
+    }
+
+    private async assertCanAccessComment(
+        commentId: string,
+        actor: AuthenticatedUser,
+        manager: EntityManager,
+    ): Promise<void> {
+        const comment = await manager
+            .createQueryBuilder()
+            .select("comment.entity_type", "entityType")
+            .addSelect("comment.entity_id", "entityId")
+            .from("comments", "comment")
+            .where("comment.id = :commentId", {commentId})
+            .getRawOne<CommentTargetData>();
+
+        if (!comment) {
+            throw new NotFoundException("Comment not found");
+        }
+
+        await this.assertCanAccessTarget(
+            {
+                actor,
+                entityType: comment.entityType,
+                entityId: comment.entityId,
+            },
+            manager,
+        );
+    }
+
+    private async updateLikesCount({
+        manager,
+        entityId,
+        entityType,
+        delta,
+    }: {
+        delta: 1 | -1;
+        entityId: string;
+        entityType: EntityLikeType;
+        manager: EntityManager;
+    }): Promise<void> {
+        const target = this.getTargetEntity(entityType);
+        const likesCountExpression =
+            delta > 0 ? "likes_count + 1" : "GREATEST(likes_count - 1, 0)";
+
+        const result = await manager
+            .createQueryBuilder()
+            .update(target)
+            .set({likesCount: () => likesCountExpression})
+            .where("id = :entityId", {entityId})
+            .execute();
+
+        if (result.affected === 0) {
+            throw new NotFoundException(
+                `${this.getTargetLabel(entityType)} not found`,
+            );
+        }
+    }
+
+    private getTargetEntity(entityType: EntityLikeType): EntityTarget<{
+        likesCount: number;
+    }> {
         switch (entityType) {
             case "todo":
-                await transactionalEntityManager
-                    .createQueryBuilder()
-                    .update("todos")
-                    .set({likesCount: () => "GREATEST(likes_count - 1, 0)"})
-                    .where("id = :id", {id: entityId})
-                    .execute();
-                break;
+                return Todo;
+            case "article":
+                return Article;
             case "comment":
-                await transactionalEntityManager
-                    .createQueryBuilder()
-                    .update("comments")
-                    .set({likesCount: () => "GREATEST(likes_count - 1, 0)"})
-                    .where("id = :id", {id: entityId})
-                    .execute();
-                break;
+                return Comment;
             default:
                 throw new BadRequestException("Invalid entity type");
         }
     }
 
-    private async checkEntityExistsInTransaction(
-        entityId: string,
-        entityType: string,
-        transactionalEntityManager: EntityManager,
-    ) {
+    private isUniqueViolation(error: unknown): boolean {
+        return (
+            typeof error === "object" &&
+            error !== null &&
+            "code" in error &&
+            error.code === "23505"
+        );
+    }
+
+    private getTargetLabel(entityType: EntityLikeType): string {
         switch (entityType) {
-            case "todo": {
-                const todoExists = await transactionalEntityManager
-                    .createQueryBuilder()
-                    .select("1")
-                    .from("todos", "todo")
-                    .where("todo.id = :id", {id: entityId})
-                    .getRawOne();
-
-                if (!todoExists) {
-                    throw new NotFoundException("Todo not found");
-                }
-                break;
-            }
-            case "comment": {
-                const commentExists = await transactionalEntityManager
-                    .createQueryBuilder()
-                    .select("1")
-                    .from("comments", "comment")
-                    .where("comment.id = :id", {id: entityId})
-                    .getRawOne();
-
-                if (!commentExists) {
-                    throw new NotFoundException("Comment not found");
-                }
-                break;
-            }
+            case "todo":
+                return "Todo";
+            case "article":
+                return "Article";
+            case "comment":
+                return "Comment";
             default:
                 throw new BadRequestException("Invalid entity type");
         }
