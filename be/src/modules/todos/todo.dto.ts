@@ -12,8 +12,6 @@ import {
 import {PaginatedResponseDto} from "@/shared/dto/paginated-response.dto";
 import {TodoPriority, TodoState} from "@/types/todo";
 
-import {Todo} from "./todos.entity";
-
 export class CreateTodoDto {
     @IsString()
     @IsNotEmpty()
@@ -67,4 +65,16 @@ export class QueryTodosDto {
     limit?: number = 10;
 }
 
-export class ResponseGetTodos extends PaginatedResponseDto<Todo> {}
+export class TodoResponseDto {
+    id!: string;
+    title!: string;
+    content!: string;
+    authorId!: string;
+    priority!: TodoPriority | null;
+    state!: TodoState | null;
+    likesCount!: number;
+    createdAt!: string;
+    updatedAt!: string;
+}
+
+export class ResponseGetTodos extends PaginatedResponseDto<TodoResponseDto> {}

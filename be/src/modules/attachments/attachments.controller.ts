@@ -26,6 +26,8 @@ import {
 } from "./attachments.dto";
 import {AttachmentsService} from "./attachments.service";
 
+const MAX_SIZE = 10 * 1024 * 1024;
+
 @UseGuards(AuthGuard)
 @Controller("attachments")
 export class AttachmentsController {
@@ -37,7 +39,7 @@ export class AttachmentsController {
         @UploadedFile(
             new ParseFilePipe({
                 validators: [
-                    new MaxFileSizeValidator({maxSize: 10 * 1024 * 1024}),
+                    new MaxFileSizeValidator({maxSize: MAX_SIZE}),
                     new FileTypeValidator({
                         fileType: /^image\/(jpeg|png|webp)$/,
                     }),

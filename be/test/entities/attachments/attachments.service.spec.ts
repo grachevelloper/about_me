@@ -125,11 +125,11 @@ describe("AttachmentsService", () => {
             url: attachment.url,
             mimeType: "image/png",
             size: 1024,
-            entityType: "todo",
-            entityId: attachment.entityId,
             createdAt: attachment.createdAt,
         });
         expect(response).not.toHaveProperty("s3Key");
+        expect(response).not.toHaveProperty("entityType");
+        expect(response).not.toHaveProperty("entityId");
     });
 
     it("allows an administrator to upload for another user's article", async () => {

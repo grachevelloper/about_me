@@ -11,8 +11,7 @@
         "!src/migrations/**/*.ts"
     ],
     "ignoreDependencies": [
-        "@types/multer",
-        "source-map-support"
+        "@types/multer"
     ],
     "ignoreExportsUsedInFile": true
 }

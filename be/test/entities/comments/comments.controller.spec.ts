@@ -1,5 +1,5 @@
 import {describe, expect, it, jest} from "@jest/globals";
-import {HttpStatus, ParseUUIDPipe} from "@nestjs/common";
+import {HttpStatus, ParseEnumPipe, ParseUUIDPipe} from "@nestjs/common";
 import {
     HTTP_CODE_METADATA,
     ROUTE_ARGS_METADATA,
@@ -133,5 +133,18 @@ describe("CommentsController", () => {
         );
 
         expect(idParam).toBeDefined();
+    });
+
+    it("uses enum parsing for entity comment target types", () => {
+        const routeArgs = Reflect.getMetadata(
+            ROUTE_ARGS_METADATA,
+            CommentsController,
+            "getByEntityId",
+        ) as Record<string, {pipes?: unknown[]}>;
+        const entityTypeParam = Object.values(routeArgs).find((metadata) =>
+            metadata.pipes?.some((pipe) => pipe instanceof ParseEnumPipe),
+        );
+
+        expect(entityTypeParam).toBeDefined();
     });
 });

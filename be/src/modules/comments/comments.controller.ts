@@ -6,6 +6,7 @@ import {
     HttpCode,
     HttpStatus,
     Param,
+    ParseEnumPipe,
     ParseUUIDPipe,
     Patch,
     Post,
@@ -17,6 +18,7 @@ import {CurrentUser} from "../../shared/decorators/current-user.decorator";
 import {AuthGuard} from "../../shared/guards/auth.guard";
 import {AuthenticatedUser, Order} from "../../types";
 import {
+    COMMENT_TARGET_TYPES,
     CommentResponseDto,
     CreateCommentDto,
     QueryCommentsDto,
@@ -54,7 +56,8 @@ export class CommentsController {
     @HttpCode(HttpStatus.OK)
     @Get(":entityType/:entityId")
     async getByEntityId(
-        @Param("entityType") entityType: EntityCommentType,
+        @Param("entityType", new ParseEnumPipe(COMMENT_TARGET_TYPES))
+        entityType: EntityCommentType,
         @Param("entityId", ParseUUIDPipe) entityId: string,
         @CurrentUser() user: AuthenticatedUser,
         @Query() query: QueryCommentsDto,

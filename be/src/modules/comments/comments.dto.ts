@@ -15,6 +15,8 @@ import {PaginatedResponseDto} from "@/shared/dto/paginated-response.dto";
 import {UserResponseDto} from "../users/dto/user-response.dto";
 import {EntityCommentType} from "./comments.entity";
 
+export const COMMENT_TARGET_TYPES = ["todo", "article"] as const;
+
 export class CreateCommentDto {
     @IsString()
     @IsNotEmpty()
@@ -28,7 +30,7 @@ export class CreateCommentDto {
     @IsUUID()
     entityId!: string;
 
-    @IsEnum(["todo", "article"] as const)
+    @IsEnum(COMMENT_TARGET_TYPES)
     entityType!: EntityCommentType;
 }
 

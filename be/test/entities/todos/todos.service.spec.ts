@@ -93,22 +93,38 @@ describe("TodosService", () => {
     });
 
     describe("create", () => {
-        it("should create a todo", async () => {
+        it("should create a todo and return a mapped response", async () => {
             const createTodoData: CreateTodoDto = {
                 title: "New Todo",
                 content: "Description",
             };
+            const todoWithRelation = {
+                ...mockTodo,
+                checklist: {id: "checklist-1"},
+            } as Todo;
 
             repository.create.mockReturnValue(mockTodo);
-            repository.save.mockResolvedValue(mockTodo);
+            repository.save.mockResolvedValue(todoWithRelation);
 
-            await service.create({data: createTodoData, actor: owner});
+            const result = await service.create({data: createTodoData, actor: owner});
 
             expect(repository.create).toHaveBeenCalledWith({
                 ...createTodoData,
                 authorId: owner.id,
             });
             expect(repository.save).toHaveBeenCalledWith(mockTodo);
+            expect(result).toEqual({
+                id: mockTodo.id,
+                title: mockTodo.title,
+                content: mockTodo.content,
+                authorId: mockTodo.authorId,
+                priority: null,
+                state: null,
+                likesCount: 0,
+                createdAt: mockTodo.createdAt,
+                updatedAt: mockTodo.updatedAt,
+            });
+            expect(result).not.toHaveProperty("checklist");
         });
     });
 
@@ -124,9 +140,17 @@ describe("TodosService", () => {
         it("should allow an administrator to read another user's todo", async () => {
             repository.findOne.mockResolvedValue(mockTodo);
 
-            await expect(
-                service.findOne({id: "1", actor: admin}),
-            ).resolves.toBe(mockTodo);
+            await expect(service.findOne({id: "1", actor: admin})).resolves.toEqual({
+                id: mockTodo.id,
+                title: mockTodo.title,
+                content: mockTodo.content,
+                authorId: mockTodo.authorId,
+                priority: null,
+                state: null,
+                likesCount: 0,
+                createdAt: mockTodo.createdAt,
+                updatedAt: mockTodo.updatedAt,
+            });
         });
 
         it("should forbid regular users from reading another user's todo", async () => {
@@ -165,7 +189,17 @@ describe("TodosService", () => {
                 take: 1,
             });
             expect(result).toEqual({
-                items: todos,
+                items: todos.map((todo) => ({
+                    id: todo.id,
+                    title: todo.title,
+                    content: todo.content,
+                    authorId: todo.authorId,
+                    priority: null,
+                    state: null,
+                    likesCount: 0,
+                    createdAt: todo.createdAt,
+                    updatedAt: todo.updatedAt,
+                })),
                 page: 2,
                 limit: 1,
                 total: 2,
@@ -198,12 +232,24 @@ describe("TodosService", () => {
             repository.findOne.mockResolvedValue(mockTodo);
             repository.save.mockResolvedValue(updatedTodo);
 
-            await service.update({id: "1", data: updateData, actor: owner});
+            const result = await service.update({id: "1", data: updateData, actor: owner});
 
             expect(repository.findOne).toHaveBeenCalledWith({where: {id: "1"}});
             expect(repository.save).toHaveBeenCalledWith({
                 ...mockTodo,
                 ...updateData,
+            });
+            expect(mockTodo.title).toBe("Test Todo");
+            expect(result).toEqual({
+                id: mockTodo.id,
+                title: "Updated Todo",
+                content: mockTodo.content,
+                authorId: mockTodo.authorId,
+                priority: null,
+                state: null,
+                likesCount: 0,
+                createdAt: mockTodo.createdAt,
+                updatedAt: mockTodo.updatedAt,
             });
         });
 
@@ -310,7 +356,18 @@ describe("TodosService", () => {
                 entityType: "todo",
                 entityId: "1",
             });
-            expect(result).toEqual({...mockTodo, comments: mockComments});
+            expect(result).toEqual({
+                id: mockTodo.id,
+                title: mockTodo.title,
+                content: mockTodo.content,
+                authorId: mockTodo.authorId,
+                priority: null,
+                state: null,
+                likesCount: 0,
+                createdAt: mockTodo.createdAt,
+                updatedAt: mockTodo.updatedAt,
+                comments: mockComments,
+            });
         });
 
         it("should throw NotFoundException if todo not found", async () => {

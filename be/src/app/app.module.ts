@@ -14,7 +14,6 @@ import {AuthModule} from "@/auth/auth.module";
 import {CommentsModule} from "@/comments/comments.module";
 import s3Config from "@/config/s3";
 import {LikesModule} from "@/likes/likes.module";
-import {S3Module} from "@/shared/storage/s3/s3.module";
 import {TodosModule} from "@/todos/todos.module";
 import {UsersModule} from "@/users/users.module";
 
@@ -47,7 +46,6 @@ dotenv.config();
         ArticlesModule,
         TagsModule,
         AttachmentModule,
-        S3Module,
     ],
     providers: [
         {

@@ -21,8 +21,6 @@ function toAttachmentResponse(attachment: Attachment): AttachmentResponseDto {
         url: attachment.url,
         mimeType: attachment.mimeType,
         size: attachment.size,
-        entityType: attachment.entityType,
-        entityId: attachment.entityId,
         createdAt: attachment.createdAt,
     };
 }

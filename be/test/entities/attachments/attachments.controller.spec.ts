@@ -52,10 +52,9 @@ describe("AttachmentsController", () => {
             url: "https://cdn.example/image.png",
             mimeType: "image/png",
             size: 1024,
-            entityType: "todo" as const,
-            entityId: "a2b479e6-3cf8-464c-91ea-e2cf07bfe35f",
             createdAt: "2026-01-01T00:00:00.000Z",
         };
+        const entityId = "a2b479e6-3cf8-464c-91ea-e2cf07bfe35f";
         const service = {
             attachImage: jest
                 .fn<AttachmentsService["attachImage"]>()
@@ -65,13 +64,13 @@ describe("AttachmentsController", () => {
         const file = {mimetype: "image/png", size: 1024} as Express.Multer.File;
 
         await expect(
-            controller.upload(file, "todo", response.entityId, actor),
+            controller.upload(file, "todo", entityId, actor),
         ).resolves.toBe(response);
 
         expect(service.attachImage).toHaveBeenCalledWith(
             file,
             "todo",
-            response.entityId,
+            entityId,
             actor,
         );
     });
