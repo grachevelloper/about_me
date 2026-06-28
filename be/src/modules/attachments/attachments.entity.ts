@@ -7,18 +7,24 @@ import {EntityAttachmentType} from "./attachments.dto";
 @Index("IDX_attachments_entity", ["entityType", "entityId"])
 export class Attachment extends UnUpdatableBaseEntity {
     @Column()
-    url: string;
+    url!: string;
 
     @Column()
-    s3Key: string;
+    s3Key!: string;
+
+    @Column()
+    mimeType!: string;
+
+    @Column("integer")
+    size!: number;
 
     @Column({
         type: "enum",
         enum: ["user", "article", "todo"],
         enumName: "entity_image_type",
     })
-    entityType: EntityAttachmentType;
+    entityType!: EntityAttachmentType;
 
     @Column("uuid")
-    entityId: string;
+    entityId!: string;
 }

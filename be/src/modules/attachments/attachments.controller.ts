@@ -1,5 +1,4 @@
 import {
-    Body,
     Controller,
     Delete,
     FileTypeValidator,
@@ -7,6 +6,7 @@ import {
     HttpStatus,
     MaxFileSizeValidator,
     Param,
+    ParseEnumPipe,
     ParseFilePipe,
     ParseUUIDPipe,
     Post,
@@ -16,8 +16,14 @@ import {
 } from "@nestjs/common";
 import {FileInterceptor} from "@nestjs/platform-express";
 
+import {CurrentUser} from "../../shared/decorators/current-user.decorator";
 import {AuthGuard} from "../../shared/guards/auth.guard";
-import {AttachmentResponseDto, CreateAttachmentDto} from "./attachments.dto";
+import {AuthenticatedUser} from "../../types";
+import {
+    ATTACHMENT_TARGET_TYPES,
+    AttachmentResponseDto,
+    EntityAttachmentType,
+} from "./attachments.dto";
 import {AttachmentsService} from "./attachments.service";
 
 @UseGuards(AuthGuard)
@@ -33,24 +39,31 @@ export class AttachmentsController {
                 validators: [
                     new MaxFileSizeValidator({maxSize: 10 * 1024 * 1024}),
                     new FileTypeValidator({
-                        fileType: /(jpg|jpeg|png|webp)$/,
+                        fileType: /^image\/(jpeg|png|webp)$/,
                     }),
                 ],
             }),
         )
         file: Express.Multer.File,
-        @Param() createData: CreateAttachmentDto,
+        @Param("entityType", new ParseEnumPipe(ATTACHMENT_TARGET_TYPES))
+        entityType: EntityAttachmentType,
+        @Param("entityId", ParseUUIDPipe) entityId: string,
+        @CurrentUser() actor: AuthenticatedUser,
     ): Promise<AttachmentResponseDto> {
         return this.attachmentsService.attachImage(
             file,
-            createData.entityType,
-            createData.entityId,
+            entityType,
+            entityId,
+            actor,
         );
     }
 
     @Delete(":id")
     @HttpCode(HttpStatus.NO_CONTENT)
-    async delete(@Param("id", ParseUUIDPipe) id: string): Promise<void> {
-        await this.attachmentsService.deleteAttachmentById(id);
+    async delete(
+        @Param("id", ParseUUIDPipe) id: string,
+        @CurrentUser() actor: AuthenticatedUser,
+    ): Promise<void> {
+        await this.attachmentsService.deleteAttachmentById(id, actor);
     }
 }

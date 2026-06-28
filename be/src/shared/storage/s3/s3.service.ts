@@ -8,10 +8,11 @@ import {Injectable, Logger, NotFoundException} from "@nestjs/common";
 import {ConfigService} from "@nestjs/config";
 
 import {generateKey} from "../../utils/generate";
+import {StoragePort} from "../storage.port";
 import {FileUpload, S3Config, UploadResult} from "./s3.interface";
 
 @Injectable()
-export class S3StorageService {
+export class S3StorageService implements StoragePort {
     private readonly logger = new Logger(S3StorageService.name);
     private s3Client: S3Client;
     private bucket: string;
@@ -52,6 +53,7 @@ export class S3StorageService {
         return {
             url: `${this.publicDomain}/${key}`,
             key,
+            mimeType: file.mimetype,
             size: file.size,
         };
     }

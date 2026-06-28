@@ -1,8 +1,17 @@
-import {Injectable, NotFoundException} from "@nestjs/common";
+import {
+    ForbiddenException,
+    Inject,
+    Injectable,
+    NotFoundException,
+} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
 
-import {S3StorageService} from "../../shared/storage/s3/s3.service";
+import {STORAGE_PORT, StoragePort} from "../../shared/storage/storage.port";
+import {AuthenticatedUser, Role} from "../../types";
+import {Article} from "../articles/articles.entity";
+import {Todo} from "../todos/todos.entity";
+import {User} from "../users/users.entity";
 import {AttachmentResponseDto, EntityAttachmentType} from "./attachments.dto";
 import {Attachment} from "./attachments.entity";
 
@@ -10,6 +19,8 @@ function toAttachmentResponse(attachment: Attachment): AttachmentResponseDto {
     return {
         id: attachment.id,
         url: attachment.url,
+        mimeType: attachment.mimeType,
+        size: attachment.size,
         entityType: attachment.entityType,
         entityId: attachment.entityId,
         createdAt: attachment.createdAt,
@@ -21,25 +32,37 @@ export class AttachmentsService {
     constructor(
         @InjectRepository(Attachment)
         private attachmentsRepo: Repository<Attachment>,
-        private s3Service: S3StorageService,
+        @InjectRepository(Todo)
+        private todosRepo: Repository<Todo>,
+        @InjectRepository(Article)
+        private articlesRepo: Repository<Article>,
+        @InjectRepository(User)
+        private usersRepo: Repository<User>,
+        @Inject(STORAGE_PORT)
+        private storage: StoragePort,
     ) {}
 
     async attachImage(
         file: Express.Multer.File,
         entityType: EntityAttachmentType,
         entityId: string,
+        actor: AuthenticatedUser,
     ): Promise<AttachmentResponseDto> {
+        await this.assertCanAccessTarget(entityType, entityId, actor);
+
         return this.attachmentsRepo.manager.transaction(
             async (transactionalEntityManager) => {
                 let s3Key: string | null = null;
 
                 try {
-                    const uploadResult = await this.s3Service.upload(file);
+                    const uploadResult = await this.storage.upload(file);
                     s3Key = uploadResult.key;
 
                     const attachment = this.attachmentsRepo.create({
                         url: uploadResult.url,
                         s3Key: uploadResult.key,
+                        mimeType: uploadResult.mimeType,
+                        size: uploadResult.size,
                         entityType,
                         entityId,
                     });
@@ -51,10 +74,10 @@ export class AttachmentsService {
                 } catch (error) {
                     if (s3Key) {
                         try {
-                            await this.s3Service.delete(s3Key);
+                            await this.storage.delete(s3Key);
                         } catch (deleteError) {
                             console.error(
-                                "Failed to delete from S3:",
+                                "Failed to delete uploaded attachment during compensation",
                                 deleteError,
                             );
                         }
@@ -72,19 +95,6 @@ export class AttachmentsService {
         });
     }
 
-    async deleteEntityImages(
-        entityType: EntityAttachmentType,
-        entityId: string,
-    ) {
-        const result = await this.deleteEntityFiles(entityType, entityId);
-        await this.attachmentsRepo.delete({
-            entityType,
-            entityId,
-        });
-
-        return result;
-    }
-
     async deleteEntityFiles(
         entityType: EntityAttachmentType,
         entityId: string,
@@ -93,7 +103,7 @@ export class AttachmentsService {
 
         try {
             await Promise.all(
-                attachments.map((att) => this.s3Service.delete(att.s3Key)),
+                attachments.map((att) => this.storage.delete(att.s3Key)),
             );
 
             return {deleted: attachments.length};
@@ -109,40 +119,73 @@ export class AttachmentsService {
         }
     }
 
-    async deleteAttachmentByS3Key(s3Key: string) {
-        const attachment = await this.attachmentsRepo.findOneBy({s3Key});
-
-        if (!attachment) {
-            throw new NotFoundException("Attachment not found");
-        }
-
-        await this.s3Service.delete(s3Key);
-        await this.attachmentsRepo.delete({s3Key});
-
-        return {deleted: s3Key};
-    }
-
-    async deleteAttachmentById(id: string): Promise<void> {
+    async deleteAttachmentById(
+        id: string,
+        actor: AuthenticatedUser,
+    ): Promise<void> {
         const attachment = await this.attachmentsRepo.findOneBy({id});
 
         if (!attachment) {
             throw new NotFoundException("Attachment not found");
         }
 
-        await this.s3Service.delete(attachment.s3Key);
+        await this.assertCanAccessTarget(
+            attachment.entityType,
+            attachment.entityId,
+            actor,
+        );
+
+        await this.storage.delete(attachment.s3Key);
         await this.attachmentsRepo.delete({id});
     }
 
-    async deleteAttachmentByUrl(url: string) {
-        const attachment = await this.attachmentsRepo.findOneBy({url});
+    private async assertCanAccessTarget(
+        entityType: EntityAttachmentType,
+        entityId: string,
+        actor: AuthenticatedUser,
+    ): Promise<void> {
+        const ownerId = await this.getTargetOwnerId(entityType, entityId);
 
-        if (!attachment) {
-            throw new NotFoundException("Attachment not found");
+        if (ownerId === actor.id || actor.role === Role.ADMIN) {
+            return;
         }
 
-        await this.s3Service.delete(attachment.s3Key);
-        await this.attachmentsRepo.delete({url});
+        throw new ForbiddenException("You do not have access to this target");
+    }
 
-        return {deleted: attachment.s3Key};
+    private async getTargetOwnerId(
+        entityType: EntityAttachmentType,
+        entityId: string,
+    ): Promise<string> {
+        switch (entityType) {
+            case "todo": {
+                const todo = await this.todosRepo.findOne({
+                    where: {id: entityId},
+                });
+                if (!todo) {
+                    throw new NotFoundException("Todo not found");
+                }
+                return todo.authorId;
+            }
+            case "article": {
+                const article = await this.articlesRepo.findOne({
+                    where: {id: entityId},
+                    relations: ["author"],
+                });
+                if (!article) {
+                    throw new NotFoundException("Article not found");
+                }
+                return article.author.id;
+            }
+            case "user": {
+                const user = await this.usersRepo.findOne({
+                    where: {id: entityId},
+                });
+                if (!user) {
+                    throw new NotFoundException("User not found");
+                }
+                return user.id;
+            }
+        }
     }
 }

@@ -1,9 +1,11 @@
 import {IsEnum, IsUUID} from "class-validator";
 
-export type EntityAttachmentType = "user" | "article" | "todo";
+export const ATTACHMENT_TARGET_TYPES = ["user", "article", "todo"] as const;
+
+export type EntityAttachmentType = (typeof ATTACHMENT_TARGET_TYPES)[number];
 
 export class CreateAttachmentDto {
-    @IsEnum(["user", "article", "todo"])
+    @IsEnum(ATTACHMENT_TARGET_TYPES)
     entityType!: EntityAttachmentType;
 
     @IsUUID()
@@ -13,6 +15,8 @@ export class CreateAttachmentDto {
 export class AttachmentResponseDto {
     id!: string;
     url!: string;
+    mimeType!: string;
+    size!: number;
     entityType!: EntityAttachmentType;
     entityId!: string;
     createdAt!: string;

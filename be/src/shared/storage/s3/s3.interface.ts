@@ -9,15 +9,4 @@ export interface S3Config {
     };
 }
 
-export interface FileUpload {
-    buffer: Buffer;
-    originalname: string;
-    mimetype: string;
-    size: number;
-}
-
-export interface UploadResult {
-    url: string;
-    key: string;
-    size: number;
-}
+export type {StorageUploadFile as FileUpload, StorageUploadResult as UploadResult} from "../storage.port";
