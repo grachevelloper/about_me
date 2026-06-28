@@ -1,9 +1,9 @@
 import {afterAll, beforeAll, describe, expect, it} from "@jest/globals";
 import {JwtService} from "@nestjs/jwt";
 import bcrypt from "bcrypt";
-import {AttachmentsService} from "src/modules/attachments/attachments.service";
 import {User} from "src/modules/users/users.entity";
 import {UsersService} from "src/modules/users/users.service";
+import {AggregateDeletionService} from "src/processes/aggregate-deletion/aggregate-deletion.service";
 import {AuthService} from "src/processes/auth/auth.service";
 import {RefreshToken} from "src/processes/auth/refresh-token/refresh-token.entity";
 import {RefreshTokensService} from "src/processes/auth/refresh-token/refresh-token.service";
@@ -34,7 +34,7 @@ describe("Users and auth PostgreSQL integration", () => {
         await dataSource.initialize();
         usersService = new UsersService(
             dataSource.getRepository(User),
-            {} as AttachmentsService,
+            {} as AggregateDeletionService,
         );
         refreshTokensService = new RefreshTokensService(
             dataSource.getRepository(RefreshToken),

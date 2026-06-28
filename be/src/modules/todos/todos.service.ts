@@ -6,18 +6,14 @@ import {
     NotFoundException,
 } from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
-import {Attachment} from "src/modules/attachments/attachments.entity";
-import {AttachmentsService} from "src/modules/attachments/attachments.service";
-import {Comment} from "src/modules/comments/comments.entity";
-import {Like} from "src/modules/likes/likes.entity";
 import {AuthenticatedUser, Role} from "src/types";
-import {In, Repository} from "typeorm";
+import {Repository} from "typeorm";
 
 import {PaginatedResponseDto} from "@/shared/dto/paginated-response.dto";
 import {TodoState} from "@/types/todo";
 
+import {AggregateDeletionService} from "../../processes/aggregate-deletion/aggregate-deletion.service";
 import {CommentsService} from "../comments/comments.service";
-import {CheckList} from "./checklists/checklists.entity";
 import {CreateTodoDto, QueryTodosDto, ResponseGetTodos, UpdateTodoDto} from "./todo.dto";
 import {Todo} from "./todos.entity";
 
@@ -54,7 +50,7 @@ export class TodosService {
         private todosRepository: Repository<Todo>,
         @Inject(forwardRef(() => CommentsService))
         private commentsService: CommentsService,
-        private attachmentsService: AttachmentsService,
+        private aggregateDeletionService: AggregateDeletionService,
     ) {}
 
     async create({data, actor}: CreateTodoCommand): Promise<Todo> {
@@ -70,37 +66,7 @@ export class TodosService {
 
     async delete({id, actor}: DeleteTodoCommand): Promise<void> {
         await this.findOne({id, actor});
-        await this.attachmentsService.deleteEntityFiles("todo", id);
-
-        await this.todosRepository.manager.transaction(async (manager) => {
-            const comments = await manager.find(Comment, {
-                select: {id: true},
-                where: {entityType: "todo", entityId: id},
-            });
-            const commentIds = comments.map((comment) => comment.id);
-
-            if (commentIds.length > 0) {
-                await manager.delete(Like, {
-                    entityType: "comment",
-                    entityId: In(commentIds),
-                });
-            }
-
-            await manager.delete(Comment, {
-                entityType: "todo",
-                entityId: id,
-            });
-            await manager.delete(Like, {
-                entityType: "todo",
-                entityId: id,
-            });
-            await manager.delete(Attachment, {
-                entityType: "todo",
-                entityId: id,
-            });
-            await manager.delete(CheckList, {todoId: id});
-            await manager.delete(Todo, id);
-        });
+        await this.aggregateDeletionService.deleteTodoAggregate(id);
     }
 
     async update({id, data, actor}: UpdateTodoCommand): Promise<Todo> {

@@ -1,7 +1,7 @@
 import {Module} from "@nestjs/common";
 import {TypeOrmModule} from "@nestjs/typeorm";
 
-import {AttachmentModule} from "../attachments/attachments.module";
+import {AggregateDeletionModule} from "../../processes/aggregate-deletion/aggregate-deletion.module";
 import {LikesModule} from "../likes/likes.module";
 import {UsersModule} from "../users/users.module";
 import {ArticlesController} from "./articles.controller";
@@ -15,7 +15,7 @@ import {TagsModule} from "./tags/tags.module";
         UsersModule,
         LikesModule,
         TagsModule,
-        AttachmentModule,
+        AggregateDeletionModule,
     ],
     controllers: [ArticlesController],
     providers: [ArticlesService],

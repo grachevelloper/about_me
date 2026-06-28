@@ -7,9 +7,9 @@ import {
 import {Test} from "@nestjs/testing";
 import {getRepositoryToken} from "@nestjs/typeorm";
 import bcrypt from "bcrypt";
-import {AttachmentsService} from "src/modules/attachments/attachments.service";
 import {User} from "src/modules/users/users.entity";
 import {UsersService} from "src/modules/users/users.service";
+import {AggregateDeletionService} from "src/processes/aggregate-deletion/aggregate-deletion.service";
 import {AuthenticatedUser, Role} from "src/types";
 import {Repository} from "typeorm";
 
@@ -60,20 +60,23 @@ describe("UsersService authorization", () => {
                 ),
             },
         };
-        const attachmentsService = {
-            deleteEntityFiles: jest
-                .fn<AttachmentsService["deleteEntityFiles"]>()
-                .mockResolvedValue({deleted: 0}),
-        } as jest.Mocked<Pick<AttachmentsService, "deleteEntityFiles">>;
+        const aggregateDeletionService = {
+            deleteUserAggregate: jest
+                .fn<AggregateDeletionService["deleteUserAggregate"]>()
+                .mockResolvedValue(),
+        } as jest.Mocked<Pick<AggregateDeletionService, "deleteUserAggregate">>;
         const moduleRef = await Test.createTestingModule({
             providers: [
                 UsersService,
                 {provide: getRepositoryToken(User), useValue: repository},
-                {provide: AttachmentsService, useValue: attachmentsService},
+                {
+                    provide: AggregateDeletionService,
+                    useValue: aggregateDeletionService,
+                },
             ],
         }).compile();
         return {
-            attachmentsService,
+            aggregateDeletionService,
             repository,
             service: moduleRef.get(UsersService),
             user,
@@ -156,7 +159,7 @@ describe("UsersService authorization", () => {
     });
 
     it("allows only administrators to physically delete a user", async () => {
-        const {attachmentsService, service, repository} = await setup();
+        const {aggregateDeletionService, service} = await setup();
 
         await expect(service.delete(owner.id, owner)).rejects.toBeInstanceOf(
             ForbiddenException,
@@ -164,23 +167,20 @@ describe("UsersService authorization", () => {
 
         await service.delete(owner.id, admin);
 
-        expect(attachmentsService.deleteEntityFiles).toHaveBeenCalledWith(
-            "user",
+        expect(aggregateDeletionService.deleteUserAggregate).toHaveBeenCalledWith(
             owner.id,
         );
-        expect(repository.manager.transaction).toHaveBeenCalled();
     });
 
-    it("does not change the database if user attachment deletion fails", async () => {
-        const {attachmentsService, service, repository} = await setup();
-        attachmentsService.deleteEntityFiles.mockRejectedValue(
+    it("propagates aggregate deletion errors", async () => {
+        const {aggregateDeletionService, service} = await setup();
+        aggregateDeletionService.deleteUserAggregate.mockRejectedValue(
             new Error("storage failed"),
         );
 
         await expect(service.delete(owner.id, admin)).rejects.toThrow(
             "storage failed",
         );
-        expect(repository.manager.transaction).not.toHaveBeenCalled();
     });
 });
 
@@ -195,7 +195,7 @@ describe("UsersService creation", () => {
             providers: [
                 UsersService,
                 {provide: getRepositoryToken(User), useValue: repository},
-                {provide: AttachmentsService, useValue: {}},
+                {provide: AggregateDeletionService, useValue: {}},
             ],
         }).compile();
         const service = moduleRef.get(UsersService);
@@ -222,7 +222,7 @@ describe("UsersService creation", () => {
             providers: [
                 UsersService,
                 {provide: getRepositoryToken(User), useValue: repository},
-                {provide: AttachmentsService, useValue: {}},
+                {provide: AggregateDeletionService, useValue: {}},
             ],
         }).compile();
         const service = moduleRef.get(UsersService);

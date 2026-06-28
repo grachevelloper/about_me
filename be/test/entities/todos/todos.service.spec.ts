@@ -2,16 +2,12 @@ import {beforeEach, describe, expect, it, jest} from "@jest/globals";
 import {ForbiddenException, NotFoundException} from "@nestjs/common";
 import {Test, TestingModule} from "@nestjs/testing";
 import {getRepositoryToken} from "@nestjs/typeorm";
-import {Attachment} from "src/modules/attachments/attachments.entity";
-import {AttachmentsService} from "src/modules/attachments/attachments.service";
-import {Comment} from "src/modules/comments/comments.entity";
 import {CommentsService} from "src/modules/comments/comments.service";
-import {Like} from "src/modules/likes/likes.entity";
-import {CheckList} from "src/modules/todos/checklists/checklists.entity";
 import {Todo} from "src/modules/todos/todos.entity";
 import {TodosService} from "src/modules/todos/todos.service";
+import {AggregateDeletionService} from "src/processes/aggregate-deletion/aggregate-deletion.service";
 import {AuthenticatedUser, Role} from "src/types";
-import {DeleteResult, EntityManager, Repository} from "typeorm";
+import {EntityManager, Repository} from "typeorm";
 
 import {CreateTodoDto, UpdateTodoDto} from "@/todos/todo.dto";
 import {TodoState} from "@/types/todo";
@@ -20,7 +16,7 @@ describe("TodosService", () => {
     let service: TodosService;
     let repository: jest.Mocked<Repository<Todo>>;
     let commentsService: jest.Mocked<CommentsService>;
-    let attachmentsService: jest.Mocked<AttachmentsService>;
+    let aggregateDeletionService: jest.Mocked<AggregateDeletionService>;
     const entityManager = {
         delete: jest.fn<EntityManager["delete"]>(),
         find: jest.fn<EntityManager["find"]>(),
@@ -80,9 +76,9 @@ describe("TodosService", () => {
                     },
                 },
                 {
-                    provide: AttachmentsService,
+                    provide: AggregateDeletionService,
                     useValue: {
-                        deleteEntityFiles: jest.fn(),
+                        deleteTodoAggregate: jest.fn(),
                     },
                 },
             ],
@@ -91,7 +87,7 @@ describe("TodosService", () => {
         service = module.get<TodosService>(TodosService);
         repository = module.get(getRepositoryToken(Todo));
         commentsService = module.get(CommentsService);
-        attachmentsService = module.get(AttachmentsService);
+        aggregateDeletionService = module.get(AggregateDeletionService);
         entityManager.delete.mockReset();
         entityManager.find.mockReset();
     });
@@ -253,47 +249,12 @@ describe("TodosService", () => {
     describe("delete", () => {
         it("should delete todo", async () => {
             repository.findOne.mockResolvedValue(mockTodo);
-            attachmentsService.deleteEntityFiles.mockResolvedValue({
-                deleted: 0,
-            });
-            entityManager.find.mockResolvedValue([{id: "comment-1"} as Comment]);
-            entityManager.delete.mockResolvedValue({
-                raw: [],
-                affected: 1,
-            } as DeleteResult);
+            aggregateDeletionService.deleteTodoAggregate.mockResolvedValue();
 
             await service.delete({id: "1", actor: owner});
 
             expect(repository.findOne).toHaveBeenCalledWith({where: {id: "1"}});
-            expect(attachmentsService.deleteEntityFiles).toHaveBeenCalledWith(
-                "todo",
-                "1",
-            );
-            expect(repository.manager.transaction).toHaveBeenCalled();
-            expect(entityManager.find).toHaveBeenCalledWith(Comment, {
-                select: {id: true},
-                where: {entityType: "todo", entityId: "1"},
-            });
-            expect(entityManager.delete).toHaveBeenNthCalledWith(1, Like, {
-                entityType: "comment",
-                entityId: expect.any(Object),
-            });
-            expect(entityManager.delete).toHaveBeenNthCalledWith(2, Comment, {
-                entityType: "todo",
-                entityId: "1",
-            });
-            expect(entityManager.delete).toHaveBeenNthCalledWith(3, Like, {
-                entityType: "todo",
-                entityId: "1",
-            });
-            expect(entityManager.delete).toHaveBeenNthCalledWith(4, Attachment, {
-                entityType: "todo",
-                entityId: "1",
-            });
-            expect(entityManager.delete).toHaveBeenNthCalledWith(5, CheckList, {
-                todoId: "1",
-            });
-            expect(entityManager.delete).toHaveBeenNthCalledWith(6, Todo, "1");
+            expect(aggregateDeletionService.deleteTodoAggregate).toHaveBeenCalledWith("1");
         });
 
         it("should throw NotFoundException if todo not found", async () => {
@@ -310,20 +271,18 @@ describe("TodosService", () => {
             await expect(
                 service.delete({id: "1", actor: stranger}),
             ).rejects.toBeInstanceOf(ForbiddenException);
-            expect(attachmentsService.deleteEntityFiles).not.toHaveBeenCalled();
-            expect(repository.manager.transaction).not.toHaveBeenCalled();
+            expect(aggregateDeletionService.deleteTodoAggregate).not.toHaveBeenCalled();
         });
 
-        it("should not change database if storage deletion fails", async () => {
+        it("should propagate aggregate deletion errors", async () => {
             repository.findOne.mockResolvedValue(mockTodo);
-            attachmentsService.deleteEntityFiles.mockRejectedValue(
+            aggregateDeletionService.deleteTodoAggregate.mockRejectedValue(
                 new Error("storage failed"),
             );
 
             await expect(
                 service.delete({id: "1", actor: owner}),
             ).rejects.toThrow("storage failed");
-            expect(repository.manager.transaction).not.toHaveBeenCalled();
         });
     });
 

@@ -5,14 +5,11 @@ import {
     NotFoundException,
 } from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
-import {In, Repository} from "typeorm";
+import {Repository} from "typeorm";
 
+import {AggregateDeletionService} from "../../processes/aggregate-deletion/aggregate-deletion.service";
 import {PaginatedResponseDto} from "../../shared/dto/paginated-response.dto";
 import {AuthenticatedUser, Order, Role, SortBy} from "../../types";
-import {Attachment} from "../attachments/attachments.entity";
-import {AttachmentsService} from "../attachments/attachments.service";
-import {Comment} from "../comments/comments.entity";
-import {Like} from "../likes/likes.entity";
 import {LikesService} from "../likes/likes.service";
 import {UsersService} from "../users/users.service";
 import {
@@ -81,7 +78,7 @@ export class ArticlesService {
         private likesService: LikesService,
         private usersService: UsersService,
         private tagsService: TagsService,
-        private attachmentsService: AttachmentsService,
+        private aggregateDeletionService: AggregateDeletionService,
     ) {}
 
     async create({
@@ -266,38 +263,7 @@ export class ArticlesService {
 
     async delete({id, actor}: DeleteArticleCommand): Promise<void> {
         const article = await this.findOneForMutation(id, actor);
-        await this.attachmentsService.deleteEntityFiles("article", article.id);
-
-        await this.articlesRepository.manager.transaction(
-            async (transactionalEntityManager) => {
-                const comments = await transactionalEntityManager.find(Comment, {
-                    select: ["id"],
-                    where: {entityType: "article", entityId: article.id},
-                });
-                const commentIds = comments.map((comment) => comment.id);
-
-                if (commentIds.length > 0) {
-                    await transactionalEntityManager.delete(Like, {
-                        entityType: "comment",
-                        entityId: In(commentIds),
-                    });
-                }
-
-                await transactionalEntityManager.delete(Comment, {
-                    entityType: "article",
-                    entityId: article.id,
-                });
-                await transactionalEntityManager.delete(Like, {
-                    entityType: "article",
-                    entityId: article.id,
-                });
-                await transactionalEntityManager.delete(Attachment, {
-                    entityType: "article",
-                    entityId: article.id,
-                });
-                await transactionalEntityManager.delete(Article, article.id);
-            },
-        );
+        await this.aggregateDeletionService.deleteArticleAggregate(article.id);
     }
 
     private async findOneForMutation(

@@ -10,12 +10,9 @@ import {Article} from "src/modules/articles/articles.entity";
 import {ArticlesService} from "src/modules/articles/articles.service";
 import {Tag} from "src/modules/articles/tags/tags.entity";
 import {TagsService} from "src/modules/articles/tags/tags.service";
-import {Attachment} from "src/modules/attachments/attachments.entity";
-import {AttachmentsService} from "src/modules/attachments/attachments.service";
-import {Comment} from "src/modules/comments/comments.entity";
-import {Like} from "src/modules/likes/likes.entity";
 import {LikesService} from "src/modules/likes/likes.service";
 import {UsersService} from "src/modules/users/users.service";
+import {AggregateDeletionService} from "src/processes/aggregate-deletion/aggregate-deletion.service";
 import {AuthenticatedUser, Order, Role, SortBy} from "src/types";
 import {Repository} from "typeorm";
 
@@ -24,7 +21,7 @@ describe("ArticlesService", () => {
     let repository: jest.Mocked<Repository<Article>>;
     let tagsService: jest.Mocked<TagsService>;
     let usersService: jest.Mocked<UsersService>;
-    let attachmentsService: jest.Mocked<AttachmentsService>;
+    let aggregateDeletionService: jest.Mocked<AggregateDeletionService>;
     let queryBuilder: ReturnType<typeof createArticleQueryBuilderMock>;
 
     const owner = {
@@ -98,9 +95,9 @@ describe("ArticlesService", () => {
                     },
                 },
                 {
-                    provide: AttachmentsService,
+                    provide: AggregateDeletionService,
                     useValue: {
-                        deleteEntityFiles: jest.fn(),
+                        deleteArticleAggregate: jest.fn(),
                     },
                 },
             ],
@@ -110,7 +107,7 @@ describe("ArticlesService", () => {
         repository = module.get(getRepositoryToken(Article));
         tagsService = module.get(TagsService);
         usersService = module.get(UsersService);
-        attachmentsService = module.get(AttachmentsService);
+        aggregateDeletionService = module.get(AggregateDeletionService);
         queryBuilder = createArticleQueryBuilderMock();
         queryBuilder.getManyAndCount.mockResolvedValue([[article], 1] as never);
         repository.createQueryBuilder.mockReturnValue(queryBuilder as never);
@@ -247,67 +244,13 @@ describe("ArticlesService", () => {
         expect(repository.delete).not.toHaveBeenCalled();
     });
 
-    it("deletes article files before transactional aggregate metadata", async () => {
-        const comment = Object.assign(new Comment(), {
-            id: "8d560b63-b068-4e63-a5a8-4b4a66585b4e",
-        });
-        const transactionalEntityManager = {
-            delete: jest
-                .fn<(...args: unknown[]) => Promise<{affected: number}>>()
-                .mockResolvedValue({affected: 1}),
-            find: jest
-                .fn<(...args: unknown[]) => Promise<Comment[]>>()
-                .mockResolvedValue([comment]),
-        };
-        const manager = repository.manager as unknown as {
-            transaction: jest.MockedFunction<
-                (
-                    callback: (
-                        manager: typeof transactionalEntityManager,
-                    ) => Promise<void>,
-                ) => Promise<void>
-            >;
-        };
+    it("delegates physical article aggregate deletion after mutation access check", async () => {
         repository.findOne.mockResolvedValue(article);
-        manager.transaction.mockImplementation(async (callback) =>
-            callback(transactionalEntityManager),
-        );
-        attachmentsService.deleteEntityFiles.mockResolvedValue({deleted: 2});
+        aggregateDeletionService.deleteArticleAggregate.mockResolvedValue();
 
         await service.delete({id: article.id, actor: owner});
 
-        expect(attachmentsService.deleteEntityFiles).toHaveBeenCalledWith(
-            "article",
-            article.id,
-        );
-        expect(manager.transaction).toHaveBeenCalled();
-        expect(transactionalEntityManager.find).toHaveBeenCalledWith(Comment, {
-            select: ["id"],
-            where: {entityType: "article", entityId: article.id},
-        });
-        expect(transactionalEntityManager.delete).toHaveBeenNthCalledWith(1, Like, {
-            entityType: "comment",
-            entityId: expect.anything(),
-        });
-        expect(transactionalEntityManager.delete).toHaveBeenNthCalledWith(2, Comment, {
-            entityType: "article",
-            entityId: article.id,
-        });
-        expect(transactionalEntityManager.delete).toHaveBeenNthCalledWith(3, Like, {
-            entityType: "article",
-            entityId: article.id,
-        });
-        expect(transactionalEntityManager.delete).toHaveBeenNthCalledWith(
-            4,
-            Attachment,
-            {
-                entityType: "article",
-                entityId: article.id,
-            },
-        );
-        expect(transactionalEntityManager.delete).toHaveBeenNthCalledWith(
-            5,
-            Article,
+        expect(aggregateDeletionService.deleteArticleAggregate).toHaveBeenCalledWith(
             article.id,
         );
     });
