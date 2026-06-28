@@ -1,7 +1,7 @@
 import {QueryErrorResetBoundary} from '@tanstack/react-query';
 import {Layout as AntLayout, Button, Flex, theme} from 'antd';
 import block from 'bem-cn-lite';
-import {useEffect} from 'react';
+import {lazy, Suspense, useEffect} from 'react';
 import {ErrorBoundary} from 'react-error-boundary';
 import {useTranslation} from 'react-i18next';
 import {MdOutlineMenuOpen} from 'react-icons/md';
@@ -11,13 +11,9 @@ import {useAuth} from '../../context';
 import {useSidebar} from '../../context/Sidebar';
 import {useCookie} from '../../hooks/useCookie';
 import {useLayout} from '../../hooks/useLayout';
-import {NewTodoForm} from '../NewTodoForm';
 
 import {isMe} from './api';
 import {Animation} from './components/Animation';
-import {CookieMessage} from './components/CookieMessage';
-import {Footer} from './components/Footer';
-import {OfflineOverlay} from './components/OfflineOverlay';
 import {Sider} from './components/Sider';
 
 import './Layout.scss';
@@ -25,6 +21,26 @@ import './Layout.scss';
 const b = block('layout');
 
 const {Content} = AntLayout;
+
+const NewTodoForm = lazy(() =>
+    import('../NewTodoForm').then(({NewTodoForm}) => ({default: NewTodoForm}))
+);
+
+const CookieMessage = lazy(() =>
+    import('./components/CookieMessage').then(({CookieMessage}) => ({
+        default: CookieMessage,
+    }))
+);
+
+const OfflineOverlay = lazy(() =>
+    import('./components/OfflineOverlay').then(({OfflineOverlay}) => ({
+        default: OfflineOverlay,
+    }))
+);
+
+const Footer = lazy(() =>
+    import('./components/Footer').then(({Footer}) => ({default: Footer}))
+);
 
 export const Layout = () => {
     const {t} = useTranslation('common');
@@ -72,7 +88,11 @@ export const Layout = () => {
                         </Flex>
                     )}
                 >
-                    {isOffline && <OfflineOverlay />}
+                    {isOffline && (
+                        <Suspense fallback={null}>
+                            <OfflineOverlay />
+                        </Suspense>
+                    )}
                     <Animation />
                     <AntLayout className={b()} hasSider>
                         {!isCollapsed && !isDesktop && (
@@ -95,13 +115,21 @@ export const Layout = () => {
                             />
                         )}
 
-                        <NewTodoForm />
-                        {!value && <CookieMessage />}
+                        <Suspense fallback={null}>
+                            <NewTodoForm />
+                        </Suspense>
+                        {!value && (
+                            <Suspense fallback={null}>
+                                <CookieMessage />
+                            </Suspense>
+                        )}
 
                         <Sider />
                         <Content className={b('content')}>
                             <Outlet />
-                            <Footer />
+                            <Suspense fallback={null}>
+                                <Footer />
+                            </Suspense>
                         </Content>
                     </AntLayout>
                 </ErrorBoundary>

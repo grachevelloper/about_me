@@ -9,6 +9,7 @@ import {AuthLayout} from '../components/AuthLayout';
 import {Layout} from '../components/Layout';
 import {sharedPagesRoutes} from '../pages';
 import {MainPage} from '../pages/MainPage';
+import {ResumePage} from '../pages/ResumePage';
 
 const routes: RouteProps[] = [
     ...todosRoutes,
@@ -24,6 +25,7 @@ export const Router = () => {
             <Routes>
                 <Route element={<Layout />} path='/'>
                     <Route index element={<MainPage />} />
+                    <Route path='resume' element={<ResumePage />} />
                     {routes.map((route: RouteProps) => (
                         <Route
                             key={route.path}

@@ -1,16 +1,30 @@
-import {Tokens} from '@/typings/common';
-
 import {User} from '../types';
 
-export type SignResponse = Tokens & User;
+export type SignResponse = User;
 
-export type DtoSignUpUser = Pick<User, 'email' | 'password' | 'username'>;
+export interface DtoSignUpUser {
+    email: string;
+    password: string;
+    username: string;
+}
 
-export type DtoSignInUser = Pick<User, 'email' | 'password'>;
+export interface DtoSignInUser {
+    email: string;
+    password: string;
+}
 
 export interface DtoUpdateUser extends Pick<User, 'id'> {
     username?: string;
-    password?: string;
+    avatar?: string;
+    nowBeingIn?: string;
+    nowListening?: string;
+    nowReading?: string;
+    nowWatch?: string;
+}
+
+export interface DtoChangePassword {
+    currentPassword: string;
+    newPassword: string;
 }
 
 export interface ResponseYandex0Auth {
@@ -27,5 +41,14 @@ export interface UserApi {
     signUp: (signUpData: DtoSignUpUser) => Promise<User>;
     logout: () => Promise<void>;
     yandexSignIn: () => Promise<ResponseYandex0Auth>;
+    getMe: () => Promise<User>;
+    updateMe: (updateData: Omit<DtoUpdateUser, 'id'>) => Promise<User>;
+    changeMyPassword: (data: DtoChangePassword) => Promise<void>;
+    getUserById: (id: string) => Promise<User>;
     updateUserById: (updateData: DtoUpdateUser) => Promise<User>;
+    changeUserPassword: (
+        id: string,
+        data: DtoChangePassword
+    ) => Promise<void>;
+    deleteUserById: (id: string) => Promise<void>;
 }

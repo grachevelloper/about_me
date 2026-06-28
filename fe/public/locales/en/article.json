@@ -1,6 +1,12 @@
 {
+    "articles.page.title": "Articles",
+    "articles.page.eyebrow": "Knowledge base",
     "page.title": "article",
     "articles.page.subtitle": "Tips, guides and news from the world of development",
+    "articles.search.title": "Find a material",
+    "articles.search.description": "Search by title, topic, or keyword.",
+    "articles.create": "Write article",
+    "articles.recent": "Recent articles",
 
     "actions.filters": "Filters",
     "actions.readMore": "Read more",

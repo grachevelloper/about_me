@@ -18,7 +18,7 @@ export const useTodosQuery = () => {
         queryFn: api.listTodos,
     });
 
-    return {data};
+    return {data: data.items};
 };
 
 export const useTodoQuery = (todoId: string) => {

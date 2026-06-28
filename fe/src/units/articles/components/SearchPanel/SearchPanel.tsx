@@ -14,7 +14,6 @@ export const SearchPanel = () => {
                 placeholder={t('article.articles.search.placeholder')}
                 size='large'
             />
-            <Flex justify='start' align='center' gap={2}></Flex>
         </Flex>
     );
 };

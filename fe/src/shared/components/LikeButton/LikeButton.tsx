@@ -7,22 +7,29 @@ import './LikeButton.scss';
 const b = block('like-button');
 
 interface LikeButtonProps {
+    disabled?: boolean;
     isLiked: boolean;
     onClick: () => void;
     likesCount?: number;
 }
 
-export const LikeButton = ({isLiked, onClick, likesCount}: LikeButtonProps) => {
+export const LikeButton = ({
+    disabled = false,
+    isLiked,
+    onClick,
+    likesCount,
+}: LikeButtonProps) => {
     const {
-        token: {colorPrimary, fontSize},
+        token: {colorPrimary},
     } = theme.useToken();
     return (
         <Statistic
             prefix={
                 <IoIosHeart
-                    onClick={onClick}
+                    onClick={disabled ? undefined : onClick}
                     size={18}
                     color={isLiked ? colorPrimary : undefined}
+                    style={{cursor: disabled ? 'not-allowed' : 'pointer'}}
                 />
             }
             value={likesCount}

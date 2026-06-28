@@ -1,4 +1,3 @@
-import {type CommentType} from '@/shared/entities/Comment';
 import {LikedEntity} from '@/typings/common';
 
 import {User} from '../../users/types';
@@ -8,7 +7,6 @@ export interface Article extends LikedEntity {
     image: string;
     content: string;
     tags?: Tag[];
-    comments: CommentType[];
     likesCount: number;
     readTime?: number;
     author: User;
@@ -16,7 +14,7 @@ export interface Article extends LikedEntity {
 }
 export type UpdatableArticle = Omit<
     Article,
-    'comments' | 'likesCount' | 'author' | 'hasLiked' | 'createdAt'
+    'likesCount' | 'author' | 'hasLiked' | 'createdAt'
 >;
 
 export interface Tag {

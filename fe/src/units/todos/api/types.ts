@@ -1,3 +1,5 @@
+import {PaginatedResponse} from '@/typings/common';
+
 import type {Todo} from '../types';
 
 export type DtoUpdateTodo = {
@@ -9,8 +11,9 @@ export type DtoCreateTodo = PartialFields<
     'state' | 'priority'
 >;
 export interface TodoApi {
-    listTodos: () => Promise<Todo[]>;
+    listTodos: () => Promise<PaginatedResponse<Todo>>;
     getTodoById: (todoId: string) => Promise<Nullable<Todo>>;
     createTodo: (CreateTodoDto: DtoCreateTodo) => Promise<Todo>;
     updateTodoById: (updateData: DtoUpdateTodo) => Promise<Todo>;
+    deleteTodoById: (todoId: string) => Promise<void>;
 }

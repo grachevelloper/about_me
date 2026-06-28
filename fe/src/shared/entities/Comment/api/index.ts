@@ -27,7 +27,7 @@ const actions: CommentsApi = {
 
     updateComment: async (updateCommentData: UpdateCommentDto) => {
         const {content, id} = updateCommentData;
-        return await query.patch(`comments/${id}`, content);
+        return await query.patch(`comments/${id}`, {content});
     },
 };
 export default actions;

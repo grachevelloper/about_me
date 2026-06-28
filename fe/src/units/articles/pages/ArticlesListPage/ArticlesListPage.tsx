@@ -1,4 +1,4 @@
-import {Col, Flex, Input, Row, theme, Typography} from 'antd';
+import {Card, Col, Flex, Row, theme, Typography} from 'antd';
 import block from 'bem-cn-lite';
 import {useTranslation} from 'react-i18next';
 
@@ -14,53 +14,94 @@ import './ArticlesListPage.scss';
 
 const b = block('aritcles-list-page');
 
-const {Title, Text, Paragraph} = Typography;
-const {Search} = Input;
+const {Title, Text} = Typography;
 
 export const ArticlesListPage = () => {
     const {t} = useTranslation('article');
     const {
-        token: {colorPrimary},
+        token: {colorBgContainer, colorBorderSecondary, colorPrimaryBg},
     } = theme.useToken();
     const {user} = useAuth();
     const role = user?.role || Role.USER;
-    const {data: articles, isPending, error} = useGetAllArticles();
+    const {data: articlesPage, isPending, error} = useGetAllArticles();
 
     const canWriteArticle = role === Role.WRITER || role === Role.ADMIN;
-
-    const handleSearch = (value: string) => {
-        console.log('Search:', value);
-    };
-
-    const handleCategorySelect = (category: string) => {
-        console.log('Selected category:', category);
-    };
 
     const renderNewArticleButton = () => {
         return canWriteArticle && <CreateNewArticleButton />;
     };
 
     return (
-        <Flex vertical gap='large' className={b()}>
-            <Row>
-                <Col xs={24} md={16}>
-                    <Title level={1} style={{marginBottom: '8px'}}>
-                        {t('articles.page.title')}
-                    </Title>
-                    <Text type='secondary'>{t('articles.page.subtitle')}</Text>
-                </Col>
-                <Col xs={16} sm={8} className={b('create-article-button-row')}>
-                    {renderNewArticleButton()}
-                </Col>
-            </Row>
+        <main className={b()}>
+            <Card
+                className={b('hero')}
+                style={{
+                    backgroundColor: colorBgContainer,
+                    borderColor: colorBorderSecondary,
+                }}
+            >
+                <Row gutter={[24, 24]} align='middle'>
+                    <Col xs={24} lg={16}>
+                        <Text className={b('eyebrow')}>
+                            {t('articles.page.eyebrow')}
+                        </Text>
+                        <Title level={1} className={b('title')}>
+                            {t('articles.page.title')}
+                        </Title>
+                        <Text type='secondary' className={b('subtitle')}>
+                            {t('articles.page.subtitle')}
+                        </Text>
+                    </Col>
+                    <Col xs={24} lg={8} className={b('actions')}>
+                        {renderNewArticleButton()}
+                    </Col>
+                </Row>
+                <div
+                    className={b('hero-accent')}
+                    style={{backgroundColor: colorPrimaryBg}}
+                />
+            </Card>
 
-            <Row gutter={[16, 16]} align='middle'>
-                <Col xs={24} md={24}>
+            <Card
+                className={b('search-card')}
+                style={{
+                    backgroundColor: colorBgContainer,
+                    borderColor: colorBorderSecondary,
+                }}
+            >
+                <Flex
+                    className={b('search-layout')}
+                    align='center'
+                    justify='space-between'
+                    gap={16}
+                    wrap='wrap'
+                >
+                    <Flex vertical gap={2} className={b('search-copy')}>
+                        <Text strong>{t('articles.search.title')}</Text>
+                        <Text type='secondary'>
+                            {t('articles.search.description')}
+                        </Text>
+                    </Flex>
                     <SearchPanel />
-                </Col>
-            </Row>
+                </Flex>
+            </Card>
 
-            <ArticlesList isPending={isPending} data={articles} error={error} />
-        </Flex>
+            <section className={b('content')}>
+                <Flex
+                    className={b('content-heading')}
+                    align='center'
+                    justify='space-between'
+                    gap={16}
+                    wrap='wrap'
+                >
+                    <Title level={2}>{t('articles.recent')}</Title>
+                </Flex>
+                <ArticlesList
+                    isPending={isPending}
+                    data={articlesPage?.items}
+                    error={error}
+                />
+            </section>
+        </main>
     );
 };

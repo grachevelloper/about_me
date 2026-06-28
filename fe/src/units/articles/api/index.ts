@@ -7,7 +7,6 @@ import {
     DtoCreateArticle,
     DtoUpdateArticle,
     DtoUpdateArticleContent,
-    DtoUpdateArticleDraftStatus,
     DtoUpdateArticleImage,
     DtoUpdateArticleReadTime,
     DtoUpdateArticleTags,
@@ -28,7 +27,7 @@ const api: ArticleApi = {
 
     updateTitle: async (data: DtoUpdateArticleTitle): Promise<Article> => {
         const {id, title} = data;
-        const response = await query.patch<Article>(`articles/${id}/title`, {
+        const response = await query.patch<Article>(`articles/${id}`, {
             title,
         });
         return response;
@@ -36,7 +35,7 @@ const api: ArticleApi = {
 
     updateContent: async (data: DtoUpdateArticleContent): Promise<Article> => {
         const {id, content} = data;
-        const response = await query.patch<Article>(`articles/${id}/content`, {
+        const response = await query.patch<Article>(`articles/${id}`, {
             content,
         });
         return response;
@@ -44,7 +43,7 @@ const api: ArticleApi = {
 
     updateImage: async (data: DtoUpdateArticleImage): Promise<Article> => {
         const {id, image} = data;
-        const response = await query.patch<Article>(`articles/${id}/image`, {
+        const response = await query.patch<Article>(`articles/${id}`, {
             image,
         });
         return response;
@@ -54,29 +53,17 @@ const api: ArticleApi = {
         data: DtoUpdateArticleReadTime
     ): Promise<Article> => {
         const {id, readTime} = data;
-        const response = await query.patch<Article>(
-            `articles/${id}/read-time`,
-            {readTime}
-        );
+        const response = await query.patch<Article>(`articles/${id}`, {
+            readTime,
+        });
         return response;
     },
 
     updateTags: async (data: DtoUpdateArticleTags): Promise<Article> => {
         const {id, tags} = data;
-        const response = await query.patch<Article>(`articles/${id}/tags`, {
+        const response = await query.patch<Article>(`articles/${id}`, {
             tags,
         });
-        return response;
-    },
-
-    updateDraftStatus: async (
-        data: DtoUpdateArticleDraftStatus
-    ): Promise<Article> => {
-        const {id, isDraft} = data;
-        const response = await query.patch<Article>(
-            `articles/${id}/draft-status`,
-            {isDraft}
-        );
         return response;
     },
 
@@ -101,14 +88,13 @@ const api: ArticleApi = {
         return response;
     },
 
-    getAll: async (): Promise<Article[]> => {
-        const response = await query.get<Article[]>('articles');
+    getAll: async () => {
+        const response = await query.get('articles');
         return response;
     },
 
-    publish: async (id: string): Promise<boolean> => {
-        const response = await query.post(`articles/${id}/publish`);
-        return response.status === 200;
+    publish: async (id: string): Promise<Article> => {
+        return await query.post<Article>(`articles/${id}/publish`);
     },
 };
 

@@ -1,4 +1,4 @@
-import {HomeOutlined} from '@ant-design/icons';
+import {HomeOutlined, UserOutlined} from '@ant-design/icons';
 import {MenuItemType} from 'antd/es/menu/interface';
 import {useCallback} from 'react';
 import {useTranslation} from 'react-i18next';
@@ -18,13 +18,19 @@ export const useNavigation = (userRole?: Role) => {
                 icon: <HomeOutlined />,
                 label: t('layout.top.main'),
                 key: 'nav-0',
-                onClick: () => navigate('/'),
+                onClick: () => void navigate('/'),
+            },
+            {
+                icon: <UserOutlined />,
+                label: t('layout.top.resume'),
+                key: 'nav-1',
+                onClick: () => void navigate('/resume'),
             },
             {
                 icon: <RiDraftLine />,
                 label: t('layout.top.articles'),
-                key: 'nav-1',
-                onClick: () => navigate('/articles'),
+                key: 'nav-2',
+                onClick: () => void navigate('/articles'),
             },
         ];
 
@@ -32,8 +38,8 @@ export const useNavigation = (userRole?: Role) => {
             {
                 icon: <RiArticleLine />,
                 label: t('layout.top.drafts'),
-                key: 'nav-3',
-                onClick: () => navigate('/articles/drafts'),
+                key: 'nav-4',
+                onClick: () => void navigate('/articles/drafts'),
             },
         ];
 
@@ -49,14 +55,17 @@ export const useNavigation = (userRole?: Role) => {
     const getDefaultSelectedKey = useCallback((): string[] => {
         const path = location.pathname.split('/').at(-1);
         switch (path) {
+            case '':
             case 'todos':
                 return ['nav-0'];
-            case 'articles':
+            case 'resume':
                 return ['nav-1'];
-            case 'user':
+            case 'articles':
                 return ['nav-2'];
-            case 'drafts':
+            case 'user':
                 return ['nav-3'];
+            case 'drafts':
+                return ['nav-4'];
             default:
                 return [''];
         }

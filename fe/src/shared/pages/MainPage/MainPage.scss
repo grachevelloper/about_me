@@ -4,7 +4,51 @@
     margin: 0 auto;
     padding: 0 clamp(24px, 4vw, 64px) 64px;
 
+    &__hero {
+        position: relative;
+        overflow: hidden;
+        border-radius: 8px;
+    }
+
+    &__hero-inner {
+        position: relative;
+        z-index: 1;
+    }
+
+    &__hero-copy {
+        min-width: min(100%, 360px);
+        max-width: 760px;
+    }
+
+    &__lead {
+        max-width: 680px;
+        margin: 14px 0 0 !important;
+        font-size: 16px;
+    }
+
+    &__actions {
+        flex-shrink: 0;
+    }
+
+    &__hero-accent {
+        position: absolute;
+        inset: auto -12% -48% auto;
+        width: min(42vw, 420px);
+        aspect-ratio: 1 / 1;
+        border-radius: 50%;
+        opacity: 0.72;
+        pointer-events: none;
+    }
+
     @media (max-width: 575px) {
         padding: 0 16px 40px;
+
+        &__actions {
+            width: 100%;
+
+            .ant-btn {
+                flex: 1 1 100%;
+            }
+        }
     }
 }

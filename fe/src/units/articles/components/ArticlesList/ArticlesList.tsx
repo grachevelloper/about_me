@@ -1,5 +1,5 @@
 import {UseQueryResult} from '@tanstack/react-query';
-import {Col, Flex, Row, theme, Typography} from 'antd';
+import {Col, Flex, Row, Typography} from 'antd';
 import block from 'bem-cn-lite';
 import {useTranslation} from 'react-i18next';
 import {useNavigate} from 'react-router-dom';
@@ -22,9 +22,6 @@ export const ArticlesList = ({
     isPending,
     error,
 }: ArticleListProps) => {
-    const {
-        token: {paddingLG, padding},
-    } = theme.useToken();
     const {t} = useTranslation('article');
     const navigate = useNavigate();
     const handleArticleClick = (id: string, isDraft: boolean) => {
@@ -44,8 +41,7 @@ export const ArticlesList = ({
         return (
             <Row
                 className={b()}
-                gutter={[paddingLG, padding]}
-                justify='space-around'
+                gutter={[20, 20]}
             >
                 {skeletons.map((_: Article, index: number) => (
                     <Col
@@ -64,8 +60,7 @@ export const ArticlesList = ({
     return articles?.length ? (
         <Row
             className={b()}
-            gutter={[paddingLG, padding]}
-            justify='space-around'
+            gutter={[20, 20]}
         >
             {articles.map((article: Article) => (
                 <Col

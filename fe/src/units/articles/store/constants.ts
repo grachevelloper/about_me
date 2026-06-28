@@ -29,7 +29,7 @@ export const fieldUpdateConfig: Record<
     image: (data) => api.updateImage(data),
     readTime: (data) => api.updateReadTime(data),
     tags: (data) => api.updateTags(data),
-    isDraft: (data) => api.updateDraftStatus(data),
+    isDraft: (data) => api.publish(data.id),
     id: (data) => api.update(data),
     updatedAt: (data) => api.update(data),
 };

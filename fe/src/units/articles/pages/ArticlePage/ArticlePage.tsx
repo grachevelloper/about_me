@@ -5,6 +5,7 @@ import {useParams} from 'react-router-dom';
 
 import {CommentsWrapper} from '@/shared/components/CommentsWrapper';
 import {LikeButton} from '@/shared/components/LikeButton';
+import {useToggleLikeMutation} from '@/shared/entities/Like';
 import {useLayout} from '@/shared/hooks';
 import {formatDate} from '@/shared/utils';
 
@@ -34,6 +35,20 @@ export const ArticlePage = () => {
         },
     } = theme.useToken();
     const {data, error, isPending} = useGetArticleById(id);
+    const {mutate: toggleLike, isPending: isLikePending} =
+        useToggleLikeMutation();
+
+    const handleLikeClick = () => {
+        if (!data) {
+            return;
+        }
+
+        toggleLike({
+            entityId: data.id,
+            entityType: 'article',
+            hasLiked: data.hasLiked,
+        });
+    };
 
     const renderTitle = () => {
         return (
@@ -145,13 +160,18 @@ export const ArticlePage = () => {
 
             <Row justify='end'>
                 <Col span='24'>
-                    <LikeButton isLiked={!!data?.hasLiked} onClick={() => {}} />
+                    <LikeButton
+                        isLiked={!!data?.hasLiked}
+                        likesCount={data?.likesCount}
+                        onClick={handleLikeClick}
+                        disabled={!data || isLikePending}
+                    />
                 </Col>
             </Row>
 
             <Divider titlePlacement='start' orientationMargin={0}>
                 <Title level={3} style={{marginBottom: 0}}>
-                    {tCommon('comments')} ({data?.comments.length})
+                    {tCommon('comments')}
                 </Title>
             </Divider>
 

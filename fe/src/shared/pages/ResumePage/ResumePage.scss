@@ -1,0 +1,196 @@
+.resume-page {
+    width: min(100%, 1120px);
+    margin: 0 auto;
+    padding: 0 clamp(24px, 4vw, 64px) 72px;
+
+    &__hero {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr);
+        gap: clamp(24px, 4vw, 40px);
+        align-items: center;
+        padding: clamp(24px, 5vw, 48px);
+        border: 1px solid;
+        border-radius: 8px;
+    }
+
+    &__avatar-wrap {
+        width: clamp(128px, 18vw, 188px);
+        aspect-ratio: 1 / 1;
+        overflow: hidden;
+        border-radius: 8px;
+    }
+
+    &__avatar {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover;
+    }
+
+    &__hero-content {
+        min-width: 0;
+    }
+
+    &__title {
+        margin: 0 !important;
+        font-size: clamp(38px, 6vw, 72px) !important;
+        line-height: 0.95 !important;
+    }
+
+    &__role {
+        display: block;
+        margin-top: 10px;
+        font-size: clamp(18px, 2.2vw, 26px);
+        font-weight: 700;
+    }
+
+    &__summary {
+        max-width: 760px;
+        margin: 18px 0 0 !important;
+        font-size: 16px;
+    }
+
+    &__section {
+        margin-top: clamp(40px, 7vw, 72px);
+    }
+
+    &__section-heading {
+        margin-bottom: 24px;
+
+        h2 {
+            margin: 0 !important;
+            font-size: clamp(22px, 3vw, 30px) !important;
+        }
+    }
+
+    &__timeline {
+        display: grid;
+        gap: 28px;
+    }
+
+    &__timeline-item {
+        position: relative;
+        display: grid;
+        grid-template-columns: 16px minmax(0, 1fr);
+        gap: 22px;
+
+        &::before {
+            content: '';
+            position: absolute;
+            top: 18px;
+            bottom: -30px;
+            left: 7px;
+            width: 2px;
+            background: currentColor;
+            opacity: 0.14;
+        }
+
+        &:last-child::before {
+            display: none;
+        }
+    }
+
+    &__dot {
+        position: relative;
+        z-index: 1;
+        width: 14px;
+        height: 14px;
+        margin-top: 7px;
+        border-radius: 50%;
+    }
+
+    &__timeline-content {
+        min-width: 0;
+    }
+
+    &__item-head {
+        margin-bottom: 8px;
+
+        h3 {
+            margin: 0 !important;
+            font-size: clamp(18px, 2.4vw, 24px) !important;
+        }
+    }
+
+    &__period {
+        display: inline-flex;
+        gap: 6px;
+        align-items: center;
+        font-size: 13px;
+    }
+
+    &__description {
+        margin: 0 !important;
+        font-size: 16px;
+    }
+
+    &__education-card,
+    &__skill-card {
+        border-radius: 8px;
+    }
+
+    &__education-card {
+        h3 {
+            margin: 0 0 8px !important;
+            font-size: clamp(18px, 2.4vw, 24px) !important;
+        }
+    }
+
+    &__education-company {
+        display: block;
+        margin-bottom: 8px;
+    }
+
+    &__skills-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 20px;
+    }
+
+    &__skill-card-title {
+        margin-bottom: 16px;
+    }
+
+    &__skill-title {
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+    }
+
+    &__skill-tag {
+        margin: 0;
+        white-space: normal;
+    }
+
+    @media (max-width: 991px) {
+        &__skills-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @media (max-width: 575px) {
+        padding: 0 16px 48px;
+
+        &__hero {
+            grid-template-columns: 1fr;
+            padding: 20px;
+        }
+
+        &__avatar-wrap {
+            width: min(48vw, 164px);
+        }
+
+        &__summary,
+        &__description {
+            font-size: 15px;
+        }
+
+        &__timeline-item {
+            gap: 16px;
+        }
+
+        &__skills-grid {
+            grid-template-columns: 1fr;
+            gap: 14px;
+        }
+    }
+}

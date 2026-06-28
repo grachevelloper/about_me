@@ -12,6 +12,7 @@ import {
 import {JSX} from 'react';
 
 import {query} from '../../configs/api';
+import {AttachmentResponse} from '../../entities/Attachment';
 
 import {EntityAttachmentType} from './MdEditor';
 
@@ -54,7 +55,7 @@ const imageUploadHandler = (
     return async (file: File) => {
         const formData = new FormData();
         formData.append('file', file);
-        const response = await query.post<string>(
+        const response = await query.post<AttachmentResponse>(
             `/attachments/${entityType}/${entityId}`,
             formData,
             {
@@ -63,6 +64,6 @@ const imageUploadHandler = (
                 },
             }
         );
-        return response;
+        return response.url;
     };
 };

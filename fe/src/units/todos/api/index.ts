@@ -6,7 +6,7 @@ import {DtoCreateTodo, type DtoUpdateTodo, type TodoApi} from './types';
 
 const Api: TodoApi = {
     listTodos: async () => {
-        const listTodos = await query.get<Todo[]>(`/todos`);
+        const listTodos = await query.get(`/todos`);
 
         return listTodos;
     },
@@ -23,6 +23,9 @@ const Api: TodoApi = {
     updateTodoById: async ({id, ...data}: DtoUpdateTodo) => {
         const response = await query.patch<Todo>(`/todos/${id}`, data);
         return response;
+    },
+    deleteTodoById: async (id: string) => {
+        await query.delete(`/todos/${id}`);
     },
 };
 

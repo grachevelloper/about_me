@@ -5,6 +5,7 @@ import {query} from '@/shared/configs/api';
 import {User} from '../types';
 
 import {
+    DtoChangePassword,
     DtoSignInUser,
     DtoSignUpUser,
     DtoUpdateUser,
@@ -44,9 +45,33 @@ const Api: UserApi = {
         return response.data;
     },
 
+    getMe: async () => {
+        return await query.get<User>('/users/me');
+    },
+
+    updateMe: async (data: Omit<DtoUpdateUser, 'id'>) => {
+        return await query.patch<User>('/users/me', data);
+    },
+
+    changeMyPassword: async (data: DtoChangePassword) => {
+        await query.patch('/users/me/password', data);
+    },
+
+    getUserById: async (id: string) => {
+        return await query.get<User>(`/users/${id}`);
+    },
+
     updateUserById: async ({id, ...data}: DtoUpdateUser) => {
-        const response = await query.patch<User>(`/user/${id}`, data);
+        const response = await query.patch<User>(`/users/${id}`, data);
         return response;
+    },
+
+    changeUserPassword: async (id: string, data: DtoChangePassword) => {
+        await query.patch(`/users/${id}/password`, data);
+    },
+
+    deleteUserById: async (id: string) => {
+        await query.delete(`/users/${id}`);
     },
 };
 

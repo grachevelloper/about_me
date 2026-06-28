@@ -69,7 +69,6 @@
         "i18next-resources-for-ts": "^1.9.0",
         "jiti": "^2.6.1",
         "mini-css-extract-plugin": "^2.9.4",
-        "msw": "2.11.6",
         "react-email": "5.0.5",
         "react-icons": "^5.5.0",
         "sass": "^1.93.3",
@@ -81,10 +80,5 @@
         "webpack": "^5.102.0",
         "webpack-cli": "^6.0.1",
         "webpack-dev-server": "^5.2.2"
-    },
-    "msw": {
-        "workerDirectory": [
-            "public"
-        ]
     }
 }

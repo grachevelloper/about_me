@@ -1,10 +1,42 @@
 .footer {
-    margin-top: 30px;
-    height: 180px;
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    width: 100%;
+    width: min(100% - 48px, 1120px);
+    margin: auto auto 24px;
+    padding: 20px 24px;
+    border: 1px solid;
+    border-radius: 8px;
 
-    border-top: 3px solid var(--ant-color-primary);
+    &__inner {
+        width: 100%;
+    }
+
+    &__title {
+        margin: 0 !important;
+        font-size: 18px !important;
+    }
+
+    &__subtitle {
+        display: block;
+        margin-top: 4px;
+    }
+
+    &__contacts {
+        min-width: 0;
+    }
+
+    @media (max-width: 575px) {
+        width: calc(100% - 32px);
+        padding: 16px;
+
+        &__copy,
+        &__contacts {
+            width: 100%;
+        }
+
+        &__contacts {
+            .ant-btn {
+                width: 100%;
+                justify-content: flex-start;
+            }
+        }
+    }
 }

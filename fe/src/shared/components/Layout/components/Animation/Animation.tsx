@@ -1,12 +1,11 @@
 import {Flex, Statistic, StatisticProps} from 'antd';
-import {valueType} from 'antd/es/statistic/utils';
 import block from 'bem-cn-lite';
-import {useRef, useState} from 'react';
+import {type CSSProperties, useEffect, useMemo, useState} from 'react';
 import CountUp from 'react-countup';
 
 import {CURRENT_TIME, formatTime} from '@/shared/utils';
 
-import {getRandomArbitrary, START_OF_DAY, TOTAL_DAY_DURATION} from './utils';
+import {START_OF_DAY, TOTAL_DAY_DURATION} from './utils';
 
 import './Animation.scss';
 
@@ -17,8 +16,9 @@ const millisecondsSinceStartOfDay = CURRENT_TIME - START_OF_DAY;
 const minutesSinceStartOfDay = millisecondsSinceStartOfDay / (1000 * 60) - 1;
 
 const progress = (millisecondsSinceStartOfDay / TOTAL_DAY_DURATION) * 100;
+const STAR_COUNT = 72;
 
-const formatter: StatisticProps['formatter'] = (_value: valueType) => (
+const formatter: StatisticProps['formatter'] = () => (
     <CountUp
         className={b('time')}
         start={0}
@@ -33,60 +33,37 @@ const formatter: StatisticProps['formatter'] = (_value: valueType) => (
 
 export const Animation = () => {
     const [isStopped, setStopped] = useState<boolean>(false);
-    const animateFillRef = useRef<HTMLDivElement>(null);
+
     const pathLength = 400;
     let strokeDashoffset = pathLength - ((pathLength * progress) / 100) * 0.65;
     if (strokeDashoffset < 170) strokeDashoffset += 15;
 
-    const qtdeEstrelas = 250;
-    let estrela = '';
-    const widthWindow = window.innerWidth;
-    const heightWindow = window.innerHeight;
-
     const hours = new Date().getHours();
-
     const isDay = hours > 5 && hours < 18 ? true : false;
 
-    const styleMods = ['style1', 'style2', 'style3', 'style4'];
-    const sizeMods = ['size1', 'size1', 'size1', 'size2', 'size3'];
-    const opacityMods = [
-        'opacity1',
-        'opacity1',
-        'opacity1',
-        'opacity2',
-        'opacity2',
-        'opacity3',
-    ];
-
-    for (let i = 0; i < qtdeEstrelas; i++) {
-        if (isDay) break;
-
-        const styleClass = b('star', {
-            style: styleMods[getRandomArbitrary(0, 4)],
-        });
-        const sizeClass = b('star', {size: sizeMods[getRandomArbitrary(0, 5)]});
-        const opacityClass = b('star', {
-            opacity: opacityMods[getRandomArbitrary(0, 6)],
-        });
-
-        estrela +=
-            `<span class="${b(
-                'star'
-            )} ${styleClass} ${sizeClass} ${opacityClass}" ` +
-            `style="animation-delay: .${getRandomArbitrary(0, 9)}s; ` +
-            `left: ${getRandomArbitrary(0, widthWindow)}px; ` +
-            `top: ${getRandomArbitrary(0, heightWindow)}px;"></span>`;
-    }
-
-    if (animateFillRef.current && !isDay) {
-        animateFillRef.current.innerHTML = `<div class="${b(
-            'stars'
-        )}">${estrela}</div>`;
-    }
+    const stars = useMemo(
+        () =>
+            Array.from({length: STAR_COUNT}, (_, index) => ({
+                id: index,
+                left: `${(index * 37) % 100}%`,
+                top: `${(index * 61) % 72}%`,
+                delay: `${(index % 9) * 0.18}s`,
+                scale: 0.7 + (index % 4) * 0.35,
+                opacity: 0.24 + (index % 5) * 0.12,
+            })),
+        []
+    );
 
     const handleClick = () => {
         setStopped(true);
     };
+
+    useEffect(() => {
+        if (window.location.pathname !== '/') {
+            setStopped(true);
+            return;
+        }
+    }, []);
 
     return (
         !isStopped && (
@@ -98,14 +75,32 @@ export const Animation = () => {
                 gap={16}
                 onClick={handleClick}
             >
-                <div
-                    ref={animateFillRef}
-                    className={b('animated-object', {
-                        stars: !isDay,
-                        sun: isDay,
-                    })}
-                >
-                    <div className={b('light')} />
+                <div className={b('sky', {night: !isDay, day: isDay})}>
+                    {!isDay && (
+                        <div className={b('stars')} aria-hidden='true'>
+                            {stars.map((star) => (
+                                <span
+                                    key={star.id}
+                                    className={b('star')}
+                                    style={
+                                        {
+                                            '--star-left': star.left,
+                                            '--star-top': star.top,
+                                            '--star-delay': star.delay,
+                                            '--star-scale': star.scale,
+                                            '--star-opacity': star.opacity,
+                                        } as CSSProperties
+                                    }
+                                />
+                            ))}
+                        </div>
+                    )}
+                    {isDay && (
+                        <>
+                            <div className={b('sun')} />
+                            <div className={b('light')} />
+                        </>
+                    )}
                 </div>
                 <Statistic
                     formatter={formatter}
@@ -142,7 +137,7 @@ export const Animation = () => {
                             {
                                 '--path-length': pathLength,
                                 '--stroke-dashoffset': strokeDashoffset,
-                            } as React.CSSProperties
+                            } as CSSProperties
                         }
                     />
                 </svg>

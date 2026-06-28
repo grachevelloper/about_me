@@ -2,6 +2,7 @@ import {useMutation, useQuery} from '@tanstack/react-query';
 import {useTranslation} from 'react-i18next';
 
 import {queryClient} from '@/shared/configs/api';
+import {PaginatedResponse} from '@/typings/common';
 
 import api from '../api';
 import {Article, UpdatableArticle} from '../types';
@@ -10,7 +11,7 @@ import {EMPTY_ARTICLE_BASE} from '../utils/constants';
 import {articleKeys, fieldUpdateConfig} from './constants';
 
 export const useGetAllArticles = () => {
-    return useQuery<Article[], Error>({
+    return useQuery<PaginatedResponse<Article>, Error>({
         queryKey: articleKeys.lists(),
         queryFn: () => api.getAll(),
     });
@@ -149,7 +150,7 @@ const useDeleteArticle = () => {
 };
 
 const usePublishArticle = () => {
-    return useMutation<boolean, Error, string>({
+    return useMutation<Article, Error, string>({
         mutationFn: (id) => api.publish(id),
         onSuccess: (_, id) => {
             queryClient.invalidateQueries({queryKey: articleKeys.detail(id)});

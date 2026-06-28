@@ -3,7 +3,7 @@ import {useMutation} from '@tanstack/react-query';
 import {queryClient} from '@/shared/configs/api';
 
 import api from '../api';
-import {DtoSignInUser, DtoSignUpUser} from '../api/types';
+import {DtoChangePassword, DtoSignInUser, DtoSignUpUser, DtoUpdateUser} from '../api/types';
 
 export const useSignupMutation = () => {
     return useMutation({
@@ -29,6 +29,23 @@ export const useSigninMutatuon = () => {
     );
 
     return {isPending, error, mutateAsync};
+};
+
+export const useUpdateMeMutation = () => {
+    return useMutation({
+        mutationKey: ['users', 'me', 'update'],
+        mutationFn: (data: Omit<DtoUpdateUser, 'id'>) => api.updateMe(data),
+        onSuccess: (user) => {
+            queryClient.setQueryData(['users', 'me'], user);
+        },
+    });
+};
+
+export const useChangeMyPasswordMutation = () => {
+    return useMutation({
+        mutationKey: ['users', 'me', 'password'],
+        mutationFn: (data: DtoChangePassword) => api.changeMyPassword(data),
+    });
 };
 
 // export const useUserMutation = () => {

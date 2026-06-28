@@ -2,14 +2,13 @@
 
 .animation {
     position: fixed;
-    height: 100vh;
-    width: 100%;
+    height: 100dvh;
+    width: 100dvw;
     z-index: 100000;
-    background: transparent;
-    overflow: hidden;
+    overflow: auto;
 
     &_night {
-        animation: dark-in-out 6s ease-in-out forwards; // ANIMATION__DURATION_IN_MS
+        animation: dark-in-out 60s ease-in-out forwards; // ANIMATION__DURATION_IN_MS
     }
 
     &_day {
@@ -17,19 +16,43 @@
     }
 
     @media (max-width: 767px) {
-        padding-bottom: 30%;
+        justify-content: center;
+        gap: 10px;
+        padding: 0 0 8vh;
     }
 
     &__time {
-        font-size: 86px;
+        font-size: clamp(56px, 8vw, 86px);
         color: #ffffff;
         animation: dark-in-out-color 5s ease-in-out backwards;
+        text-shadow: 0 8px 32px rgba(12, 20, 48, 0.24);
+
+        @media (max-width: 767px) {
+            font-size: clamp(54px, 17vw, 76px);
+            line-height: 1;
+            margin-bottom: 4px;
+        }
     }
 
     &__animated-arc {
         overflow: visible;
-        width: 80%;
-        height: 60%;
+        width: min(78vw, 900px);
+        height: min(34vh, 360px);
+
+        @media (max-width: 767px) {
+            width: 116vw;
+            min-width: 380px;
+            height: 34vh;
+            min-height: 210px;
+            max-height: 300px;
+            margin-top: -18px;
+        }
+
+        @media (max-width: 420px) {
+            min-width: 340px;
+            width: 122vw;
+            margin-top: -12px;
+        }
     }
 
     &__arc-path {
@@ -40,6 +63,32 @@
         animation: finish 4.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
         filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.3));
         stroke-linecap: round;
+
+        @media (max-width: 767px) {
+            stroke-width: 9;
+        }
+    }
+
+    &__sky {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+        pointer-events: none;
+
+        &_night {
+            background:
+                radial-gradient(
+                    ellipse at 50% 95%,
+                    rgba(54, 42, 96, 0.38) 0%,
+                    transparent 48%
+                ),
+                linear-gradient(
+                    180deg,
+                    rgba(5, 10, 31, 0.72) 0%,
+                    rgba(11, 14, 39, 0.72) 58%,
+                    rgba(27, 22, 51, 0.62) 100%
+                );
+        }
     }
 
     &__stars {
@@ -52,79 +101,23 @@
     }
 
     &__star {
+        left: var(--star-left);
+        top: var(--star-top);
+        width: 2px;
+        height: 2px;
+        opacity: var(--star-opacity);
         background-color: white;
         border-radius: 50%;
         position: absolute;
-        animation-timing-function: linear;
-        animation-iteration-count: infinite;
-
-        &_size_style_style1 {
-            animation-duration: 0.5s;
-            animation-name: star-twinkle;
-        }
-
-        &_style_style2 {
-            animation-duration: 1s;
-            animation-name: star-twinkle;
-        }
-
-        &_style_style3 {
-            animation-duration: 1.5s;
-            animation-name: star-twinkle;
-        }
-
-        &_style_style4 {
-            animation-duration: 2s;
-            animation-name: star-highlight;
-        }
-
-        &_size_size1 {
-            width: 1px;
-            height: 1px;
-        }
-
-        &_size_size2 {
-            width: 2px;
-            height: 2px;
-        }
-
-        &_size_size3 {
-            width: 3px;
-            height: 3px;
-        }
-
-        &_opacity_opacity1 {
-            opacity: 1;
-        }
-
-        &_opacity_opacity2 {
-            opacity: 0.5;
-        }
-
-        &_opacity_opacity3 {
-            opacity: 0.1;
-        }
+        transform: scale(var(--star-scale));
+        animation: star-twinkle 2.6s ease-in-out var(--star-delay) infinite;
+        box-shadow: 0 0 8px rgba(255, 255, 255, 0.42);
     }
 
-    &__animated-object_stars {
-        background: -webkit-linear-gradient(
-            top,
-            rgb(0, 0, 0, 0.5) 50%,
-            rgb(25, 19, 39, 0.5) 80%,
-            rgb(43, 32, 72, 0.5)
-        );
-        width: 100%;
-        height: 100%;
+    &__sun {
         position: absolute;
-        left: 0;
-        top: 0;
-        animation: rotate 600s infinite linear;
-    }
-
-    &__animated-object_sun {
-        position: absolute;
-        width: 140px;
-        height: 140px;
+        width: min(140px, 22vw);
+        height: min(140px, 22vw);
         border-radius: 50%;
         left: 80%;
         top: 10%;
@@ -149,21 +142,21 @@
         box-shadow:
             inset 0 0 40px rgba(255, 255, 180, 0.9),
             0 0 60px 15px rgba(255, 255, 100, 0.8),
-            0 0 100px 30px rgba(255, 200, 0, 0.6),
-            0 0 160px 50px rgba(255, 100, 0, 0.4);
+            0 0 100px 30px rgba(255, 200, 0, 0.34);
 
         animation:
-            fadeInUp 6s ease backwards,
-            sunPulse 4s ease-in-out infinite alternate;
-
-        filter: drop-shadow(0 0 5px rgba(255, 255, 100, 0.5));
+            fadeInUp 5.4s ease backwards,
+            sunPulse 4.8s ease-in-out infinite alternate;
 
         transform: translateZ(0);
-        will-change: transform, box-shadow, opacity;
+        will-change: transform, opacity;
 
         @media (max-width: 768px) {
-            width: 100px;
-            height: 100px;
+            width: 118px;
+            height: 118px;
+            left: auto;
+            right: 8%;
+            top: 12%;
             box-shadow:
                 inset 0 0 20px rgba(255, 255, 180, 0.8),
                 0 0 40px 10px rgba(255, 255, 100, 0.7),
@@ -179,7 +172,6 @@
         width: 100vw;
         height: 100vh;
 
-        // УПРОЩЕННЫЙ ГРАДИЕНТ
         background: radial-gradient(
             circle at 80% 20%,
             rgba(255, 255, 200, 0.6) 0%,
@@ -189,14 +181,11 @@
 
         z-index: 60;
         opacity: 0;
-        animation:
-            over 6s ease forwards,
-            lightPulse 4s ease-in-out infinite alternate;
+        animation: over 5.6s ease forwards;
 
-        filter: blur(20px);
-
-        will-change: opacity, filter;
+        will-change: opacity;
     }
+
     @keyframes finish {
         0% {
             stroke-dasharray: 60 340;
@@ -213,26 +202,10 @@
 
     @keyframes sunPulse {
         0% {
-            filter: brightness(1.1) drop-shadow(0 0 8px rgba(255, 200, 0, 0.6))
-                drop-shadow(0 0 16px rgba(255, 150, 0, 0.4));
             transform: scale(1);
         }
         100% {
-            filter: brightness(1.3)
-                drop-shadow(0 0 12px rgba(255, 255, 100, 0.7))
-                drop-shadow(0 0 24px rgba(255, 200, 0, 0.5));
-            transform: scale(1.05);
-        }
-    }
-
-    @keyframes lightPulse {
-        0% {
-            opacity: 0.25;
-            filter: blur(40px);
-        }
-        100% {
-            opacity: 0.35;
-            filter: blur(30px);
+            transform: scale(1.035);
         }
     }
 
@@ -242,19 +215,7 @@
             opacity: 0.1;
         }
         50% {
-            opacity: 1;
-        }
-    }
-
-    @keyframes star-highlight {
-        0%,
-        100% {
-            opacity: 0.3;
-            transform: scale(1);
-        }
-        50% {
-            opacity: 1;
-            transform: scale(1.2);
+            opacity: 0.86;
         }
     }
 

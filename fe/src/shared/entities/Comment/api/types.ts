@@ -1,3 +1,5 @@
+import {PaginatedResponse} from '@/typings/common';
+
 import {CommentType} from '../types';
 
 type EntityCommentType = 'todo' | 'article';
@@ -34,7 +36,9 @@ export interface CommentsApi {
         updateCommentData: UpdateCommentDto
     ) => Promise<CommentType>;
 
-    listComments: (ListCommentsData: ListComments) => Promise<CommentType[]>;
+    listComments: (
+        ListCommentsData: ListComments
+    ) => Promise<PaginatedResponse<CommentType>>;
 
     getComment: (commentId: string) => Promise<CommentType>;
 }

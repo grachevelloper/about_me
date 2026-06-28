@@ -4,12 +4,11 @@ export interface User extends BaseEntity {
     email: string;
     avatar?: string;
     username?: string;
-    password: string;
     role?: Role;
 
     nowWatch?: string;
     nowReading?: string;
-    newListening?: string;
+    nowListening?: string;
     nowBeingIn?: string;
 }
 

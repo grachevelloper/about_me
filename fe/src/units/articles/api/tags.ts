@@ -15,9 +15,13 @@ const tagsApi: TagsApi = {
         return response;
     },
 
-    deleteTag: async (id: string): Promise<boolean> => {
-        const response = await query.delete(`tags/${id}`);
+    updateTag: async (id: string, data: DtoCreateTag): Promise<Tag> => {
+        const response = await query.patch<Tag>(`tags/${id}`, data);
         return response;
+    },
+
+    deleteTag: async (id: string): Promise<void> => {
+        await query.delete(`tags/${id}`);
     },
 };
 export default tagsApi;

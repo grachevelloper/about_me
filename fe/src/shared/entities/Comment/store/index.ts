@@ -16,7 +16,7 @@ export const useCommentsQuery = (listCommentsData: ListComments) => {
         queryFn: () => api.listComments(listCommentsData),
     });
 
-    return {comments: data, isPending, isError};
+    return {comments: data?.items, isPending, isError};
 };
 
 const useCommentQuery = (commentId: string) => {

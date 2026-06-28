@@ -1,9 +1,12 @@
 {
     "articles.page.title": "Статьи",
+    "articles.page.eyebrow": "База знаний",
     "articles.page.subtitle": "Советы, руководства и новости из мира разработки",
     "articles.drafts.page.title": "Мои черновики",
 
     "articles.search.placeholder": "Поиск статей...",
+    "articles.search.title": "Найти материал",
+    "articles.search.description": "Ищи по названию, теме или ключевому слову.",
     "articles.search.button": "Найти",
 
     "aritcle.void_container.description": "Здесь пока ничего нет",

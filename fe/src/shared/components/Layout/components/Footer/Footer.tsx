@@ -1,4 +1,4 @@
-import {Flex, Layout, theme, Typography} from 'antd';
+import {Button, Flex, Layout, theme, Typography} from 'antd';
 import block from 'bem-cn-lite';
 import {useTranslation} from 'react-i18next';
 import {FaTelegramPlane} from 'react-icons/fa';
@@ -14,21 +14,50 @@ const {Footer: AntFooter} = Layout;
 export const Footer = () => {
     const {t} = useTranslation('common');
     const {
-        token: {},
+        token: {colorBgContainer, colorBorderSecondary, colorTextSecondary},
     } = theme.useToken();
+
     return (
-        <AntFooter className={b()}>
-            <Flex vertical gap={8}>
-                <Typography.Title level={5}>
-                    {t('footer.contacts')}
-                </Typography.Title>
-                <Flex gap={4} align='center'>
-                    <FaTelegramPlane size={18} />
-                    <Typography.Link>{TELEGRAMM}</Typography.Link>
-                </Flex>
-                <Flex gap={4} align='center'>
-                    <LuMail size={18} />
-                    <Typography.Link>{EMAIL}</Typography.Link>
+        <AntFooter
+            className={b()}
+            style={{
+                backgroundColor: colorBgContainer,
+                borderColor: colorBorderSecondary,
+            }}
+        >
+            <Flex
+                className={b('inner')}
+                justify='space-between'
+                align='center'
+                gap={16}
+                wrap='wrap'
+            >
+                <div className={b('copy')}>
+                    <Typography.Title level={5} className={b('title')}>
+                        @gracheveloper
+                    </Typography.Title>
+                    <Typography.Text
+                        className={b('subtitle')}
+                        style={{color: colorTextSecondary}}
+                    >
+                        {t('footer.contacts')}
+                    </Typography.Text>
+                </div>
+                <Flex className={b('contacts')} gap={10} wrap='wrap'>
+                    <Button
+                        href='https://t.me/gracheveloper'
+                        target='_blank'
+                        rel='noreferrer'
+                        icon={<FaTelegramPlane size={16} />}
+                    >
+                        {TELEGRAMM}
+                    </Button>
+                    <Button
+                        href={`mailto:${EMAIL}`}
+                        icon={<LuMail size={16} />}
+                    >
+                        {EMAIL}
+                    </Button>
                 </Flex>
             </Flex>
         </AntFooter>

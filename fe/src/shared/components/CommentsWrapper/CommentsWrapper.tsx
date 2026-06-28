@@ -20,7 +20,7 @@ interface CommentsContainer {
 
 export const CommentsWrapper = ({entityId, entityType}: CommentsContainer) => {
     const {user} = useAuth();
-    const {comments, isPending, isError} = useCommentsQuery({
+    const {comments} = useCommentsQuery({
         entityId,
         entityType,
     });
