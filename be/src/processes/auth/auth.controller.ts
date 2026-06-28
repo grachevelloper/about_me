@@ -7,28 +7,25 @@ import {
     Post,
     Req,
     Res,
-    UnauthorizedException,
     UseGuards,
 } from "@nestjs/common";
-import {JwtService} from "@nestjs/jwt";
 import {Request, Response} from "express";
 
-import {SigninUserDto, SignupUserDto} from "@/users/user.interface";
+import {UserResponseDto} from "@/users/dto/user-response.dto";
+import {SigninUserDto, SignupUserDto} from "@/users/user.dto";
+import {UsersMapper} from "@/users/users.mapper";
 
 import {Public} from "../../shared/decorators/auth.decorator";
+import {CurrentUser} from "../../shared/decorators/current-user.decorator";
 import {AuthGuard} from "../../shared/guards/auth.guard";
+import {AuthenticatedUser} from "../../types";
 import {AuthService} from "./auth.service";
 import {ACCESS_TOKEN_TTL_IN_MS, REFRESH_TOKEN_TTL_IN_MS} from "./constants";
-import {RefreshTokensService} from "./refresh-token/refresh-token.service";
-import {hashToken, tokenConfig} from "./utils";
+import {clearTokenConfig, tokenConfig} from "./utils";
 
 @Controller("auth")
 export class AuthController {
-    constructor(
-        private authService: AuthService,
-        private refreshTokensService: RefreshTokensService,
-        private jwtService: JwtService,
-    ) {}
+    constructor(private authService: AuthService) {}
 
     @Public()
     @HttpCode(HttpStatus.CREATED)
@@ -36,7 +33,7 @@ export class AuthController {
     async signUp(
         @Body() signUpDto: SignupUserDto,
         @Res({passthrough: true}) response: Response,
-    ) {
+    ): Promise<UserResponseDto> {
         const result = await this.authService.signUp(
             signUpDto.username,
 
@@ -44,25 +41,8 @@ export class AuthController {
             signUpDto.password,
         );
 
-        const payload = {sub: result.id, email: result.email};
-        const refreshToken = await this.refreshTokensService.createToken(
-            result.id,
-        );
-        const accessToken = await this.jwtService.signAsync(payload);
-
-        response.cookie(
-            "refreshToken",
-            refreshToken,
-            tokenConfig(REFRESH_TOKEN_TTL_IN_MS),
-        );
-
-        response.cookie(
-            "accessToken",
-            accessToken,
-            tokenConfig(ACCESS_TOKEN_TTL_IN_MS),
-        );
-
-        return result;
+        await this.setTokenCookies(result, response);
+        return UsersMapper.toResponse(result);
     }
 
     @Public()
@@ -71,31 +51,14 @@ export class AuthController {
     async signIn(
         @Body() signInDto: SigninUserDto,
         @Res({passthrough: true}) response: Response,
-    ) {
+    ): Promise<UserResponseDto> {
         const result = await this.authService.signIn(
             signInDto.email,
             signInDto.password,
         );
 
-        const payload = {sub: result.id, email: result.email};
-        const refreshToken = await this.refreshTokensService.createToken(
-            result.id,
-        );
-        const accessToken = await this.jwtService.signAsync(payload);
-
-        response.cookie(
-            "refreshToken",
-            refreshToken,
-            tokenConfig(REFRESH_TOKEN_TTL_IN_MS),
-        );
-
-        response.cookie(
-            "accessToken",
-            accessToken,
-            tokenConfig(ACCESS_TOKEN_TTL_IN_MS),
-        );
-
-        return result;
+        await this.setTokenCookies(result, response);
+        return UsersMapper.toResponse(result);
     }
 
     @Public()
@@ -105,40 +68,11 @@ export class AuthController {
         @Req() request: Request,
         @Res({passthrough: true}) response: Response,
     ) {
-        const refreshToken = request.cookies?.refreshToken;
-
-        if (!refreshToken) {
-            throw new UnauthorizedException("Refresh token not found");
-        }
-
-        const tokenHash = hashToken(refreshToken);
-        const tokenEntity =
-            await this.refreshTokensService.findByHash(tokenHash);
-
-        if (!tokenEntity) {
-            throw new UnauthorizedException("Invalid refresh token");
-        }
-
-        const userId = tokenEntity.userId;
-
-        await this.refreshTokensService.revokeToken(userId, refreshToken);
-
-        const [accessToken, newRefreshToken] = await Promise.all([
-            this.jwtService.signAsync({sub: userId}),
-            this.refreshTokensService.createToken(userId),
-        ]);
-
-        response.cookie(
-            "accessToken",
-            accessToken,
-            tokenConfig(ACCESS_TOKEN_TTL_IN_MS),
+        const result = await this.authService.refresh(
+            request.cookies?.refreshToken,
         );
 
-        response.cookie(
-            "refreshToken",
-            newRefreshToken,
-            tokenConfig(REFRESH_TOKEN_TTL_IN_MS),
-        );
+        this.setCookies(response, result.accessToken, result.refreshToken);
 
         return {message: "Tokens refreshed successfully"};
     }
@@ -147,22 +81,13 @@ export class AuthController {
     @Post("/logout")
     async logout(
         @Req() req: Request,
+        @CurrentUser() user: AuthenticatedUser,
         @Res({passthrough: true}) response: Response,
     ) {
-        const refreshToken = req.cookies?.refreshToken;
-        if (refreshToken) {
-            await this.refreshTokensService.revokeToken(
-                req.user.id,
-                refreshToken,
-            );
-        }
+        await this.authService.logout(user.id, req.cookies?.refreshToken);
 
-        response.clearCookie("accessToken", {
-            path: "/",
-        });
-        response.clearCookie("refreshToken", {
-            path: "/",
-        });
+        response.clearCookie("accessToken", clearTokenConfig());
+        response.clearCookie("refreshToken", clearTokenConfig());
 
         return {message: "Logged out successfully"};
     }
@@ -170,14 +95,43 @@ export class AuthController {
     @HttpCode(HttpStatus.OK)
     @Get("check")
     @UseGuards(AuthGuard)
-    check(@Req() req: Request) {
-        return !!req.user;
+    check(@CurrentUser() user: AuthenticatedUser) {
+        return !!user;
     }
 
     @HttpCode(HttpStatus.OK)
     @Get("me")
     @UseGuards(AuthGuard)
-    getMe(@Req() req: Request) {
-        return this.authService.isMe(req.user.id);
+    async getMe(
+        @CurrentUser() user: AuthenticatedUser,
+    ): Promise<UserResponseDto> {
+        return UsersMapper.toResponse(await this.authService.isMe(user.id));
+    }
+
+    private async setTokenCookies(
+        user: Parameters<AuthService["issueTokens"]>[0],
+        response: Response,
+    ): Promise<void> {
+        const {accessToken, refreshToken} =
+            await this.authService.issueTokens(user);
+
+        this.setCookies(response, accessToken, refreshToken);
+    }
+
+    private setCookies(
+        response: Response,
+        accessToken: string,
+        refreshToken: string,
+    ): void {
+        response.cookie(
+            "refreshToken",
+            refreshToken,
+            tokenConfig(REFRESH_TOKEN_TTL_IN_MS),
+        );
+        response.cookie(
+            "accessToken",
+            accessToken,
+            tokenConfig(ACCESS_TOKEN_TTL_IN_MS),
+        );
     }
 }

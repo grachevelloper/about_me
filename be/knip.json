@@ -1,0 +1,17 @@
+{
+    "$schema": "https://unpkg.com/knip/schema.json",
+    "entry": [
+        "src/main.ts",
+        "src/data-source-cli.ts",
+        "test/**/*.spec.ts"
+    ],
+    "project": [
+        "src/**/*.ts",
+        "test/**/*.ts",
+        "!src/migrations/**/*.ts"
+    ],
+    "ignoreDependencies": [
+        "@types/multer"
+    ],
+    "ignoreExportsUsedInFile": true
+}

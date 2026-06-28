@@ -103,10 +103,6 @@ export const useTodoMutations = () => {
         return baseMutation.mutate({id, state});
     };
 
-    const updateChecklist = (id: string, checklist: string[]) => {
-        return baseMutation.mutate({id, checklist});
-    };
-
     const updateContent = (id: string, content: string) => {
         return baseMutation.mutate({id, content});
     };
@@ -117,7 +113,6 @@ export const useTodoMutations = () => {
         updateTitle,
         updatePriority,
         updateState,
-        updateChecklist,
         updateContent,
 
         isPending: baseMutation.isPending,

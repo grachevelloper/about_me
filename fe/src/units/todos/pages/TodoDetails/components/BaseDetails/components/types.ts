@@ -9,5 +9,5 @@ export interface BaseDetail<T> {
 
 export type UpdateField = keyof Pick<
     Todo,
-    'checklist' | 'content' | 'state' | 'priority' | 'title'
+    'content' | 'state' | 'priority' | 'title'
 >;

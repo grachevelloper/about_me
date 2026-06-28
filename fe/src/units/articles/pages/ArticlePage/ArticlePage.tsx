@@ -53,7 +53,7 @@ export const ArticlePage = () => {
             {!isDesktop ? (
                 renderTitle()
             ) : (
-                <Divider orientation='left' orientationMargin={0}>
+                <Divider titlePlacement='start' orientationMargin={0}>
                     {renderTitle()}
                 </Divider>
             )}
@@ -124,7 +124,7 @@ export const ArticlePage = () => {
                 <Row gutter={8} style={{marginBottom: 32}}>
                     {data?.tags?.map((tag: Tag) => (
                         <Col key={tag.id}>
-                            <ArticleTag name={tag.name} />
+                            <ArticleTag tag={tag} />
                         </Col>
                     ))}
                 </Row>
@@ -149,7 +149,7 @@ export const ArticlePage = () => {
                 </Col>
             </Row>
 
-            <Divider orientation='left' orientationMargin={0}>
+            <Divider titlePlacement='start' orientationMargin={0}>
                 <Title level={3} style={{marginBottom: 0}}>
                     {tCommon('comments')} ({data?.comments.length})
                 </Title>

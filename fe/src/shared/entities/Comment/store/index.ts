@@ -19,7 +19,7 @@ export const useCommentsQuery = (listCommentsData: ListComments) => {
     return {comments: data, isPending, isError};
 };
 
-export const useCommentQuery = (commentId: string) => {
+const useCommentQuery = (commentId: string) => {
     const {data, isPending, isError} = useQuery(
         {
             queryKey: ['comment', commentId],

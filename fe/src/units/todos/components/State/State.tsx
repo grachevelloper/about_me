@@ -54,7 +54,7 @@ export const State = forwardRef<HTMLButtonElement, StateProps>(
                     className={b({
                         'is-edited': isEdited,
                     })}
-                    onClick={onUpdate}
+                    onClick={() => onUpdate?.(state)}
                     type='primary'
                     color={getColor(state)}
                     variant='solid'

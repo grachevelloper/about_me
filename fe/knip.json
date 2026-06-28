@@ -1,0 +1,15 @@
+{
+    "$schema": "https://unpkg.com/knip/schema.json",
+    "entry": [
+        "src/__test__/mocks/handlers/**/*.ts",
+        "src/typings/**/*.d.ts"
+    ],
+    "project": [
+        "src/**/*.{ts,tsx,js,jsx}"
+    ],
+    "ignoreDependencies": [
+        "animate.css",
+        "style-loader"
+    ],
+    "ignoreExportsUsedInFile": true
+}

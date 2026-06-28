@@ -1,177 +1,83 @@
-import {beforeEach, describe, expect, it, jest} from "@jest/globals";
-import {NotFoundException} from "@nestjs/common";
-import {Test, TestingModule} from "@nestjs/testing";
-import {Request} from "express";
-
+import {describe, expect, it, jest} from "@jest/globals";
+import {HttpStatus, ParseUUIDPipe} from "@nestjs/common";
+import {HTTP_CODE_METADATA, ROUTE_ARGS_METADATA} from "@nestjs/common/constants";
 import {TodosController} from "src/modules/todos/todos.controller";
-import {Todo} from "src/modules/todos/todos.entity";
 import {TodosService} from "src/modules/todos/todos.service";
-import {AuthGuard} from "src/shared/guards/auth.guard";
-import {Role} from "../../../src/types";
-
-const mockTodo: Todo = {
-    id: "1",
-    title: "Test Todo",
-    content: "Test Description",
-    likesCount: 0,
-    authorId: "user-123",
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-};
-
-const mockUser = {
-    id: "user-123",
-    role: Role.USER,
-};
-
-const mockRequest = {
-    user: mockUser,
-} as Request;
+import {AuthenticatedUser, Role} from "src/types";
 
 describe("TodosController", () => {
-    let controller: TodosController;
+    const actor = {
+        id: "82c130b1-1c47-4a0c-8a1c-e79cc39282ad",
+        role: Role.USER,
+    } as AuthenticatedUser;
 
-    const mockTodosService = {
-        create: jest.fn(),
-        findAll: jest.fn(),
-        findTodoWithComments: jest.fn(),
-        update: jest.fn(),
-        delete: jest.fn(),
-        incrementLikesCount: jest.fn(),
-        decrementLikesCount: jest.fn(),
-        findOne: jest.fn(),
-        findActive: jest.fn(),
-    };
+    it("passes create body and actor to the service without trusting author fields", async () => {
+        const service = {
+            create: jest.fn<TodosService["create"]>().mockResolvedValue({} as never),
+        } as unknown as TodosService;
+        const controller = new TodosController(service);
+        const body = {
+            title: "Read",
+            content: "Read docs",
+        };
 
-    beforeEach(async () => {
-        const module: TestingModule = await Test.createTestingModule({
-            controllers: [TodosController],
-            providers: [
-                {
-                    provide: TodosService,
-                    useValue: mockTodosService,
-                },
-            ],
-        })
-            .overrideGuard(AuthGuard)
-            .useValue({canActivate: () => true})
-            .compile();
+        await controller.create(body, actor);
 
-        controller = module.get<TodosController>(TodosController);
-        jest.clearAllMocks();
+        expect(service.create).toHaveBeenCalledWith({data: body, actor});
     });
 
-    it("should be defined", () => {
-        expect(controller).toBeDefined();
-    });
+    it("passes update body and actor to the service", async () => {
+        const service = {
+            update: jest.fn<TodosService["update"]>().mockResolvedValue({} as never),
+        } as unknown as TodosService;
+        const controller = new TodosController(service);
+        const body = {title: "Updated"};
 
-    describe("create", () => {
-        it("should create a new todo with user id from request", async () => {
-            const createTodoData = {
-                authorId: "user-123",
-                title: "New Todo",
-                content: "Description",
-            };
+        await controller.update("82c130b1-1c47-4a0c-8a1c-e79cc39282ad", body, actor);
 
-            mockTodosService.create.mockResolvedValue(mockTodo as never);
-
-            const result = await controller.create(createTodoData, mockRequest);
-
-            expect(mockTodosService.create).toHaveBeenCalledWith({
-                ...createTodoData,
-                authorId: mockUser.id,
-            });
-            expect(result).toEqual(mockTodo);
-        });
-
-        it("should throw error if service throws", async () => {
-            const createTodoData = {
-                title: "New Todo",
-                content: "Description",
-            };
-
-            const error = new Error("Database error");
-            mockTodosService.create.mockRejectedValue(error as never);
-
-            await expect(
-                controller.create(createTodoData as never, mockRequest),
-            ).rejects.toThrow("Database error");
+        expect(service.update).toHaveBeenCalledWith({
+            id: "82c130b1-1c47-4a0c-8a1c-e79cc39282ad",
+            data: body,
+            actor,
         });
     });
 
-    describe("findAll", () => {
-        it("should return all todos for user", async () => {
-            const todos = [mockTodo, {...mockTodo, id: "2"}];
-            mockTodosService.findAll.mockResolvedValue(todos as never);
+    it("passes pagination query and actor id to the service", async () => {
+        const service = {
+            findAll: jest.fn<TodosService["findAll"]>().mockResolvedValue({
+                items: [],
+                page: 1,
+                limit: 10,
+                total: 0,
+                hasNext: false,
+            }),
+        } as unknown as TodosService;
+        const controller = new TodosController(service);
+        const query = {page: 1, limit: 10};
 
-            const result = await controller.findAll(mockRequest);
+        await controller.findAll(actor, query);
 
-            expect(mockTodosService.findAll).toHaveBeenCalledWith(mockUser.id);
-            expect(result).toEqual(todos);
-            expect(result).toHaveLength(2);
-        });
-
-        it("should return empty array if no todos", async () => {
-            mockTodosService.findAll.mockResolvedValue([] as never);
-
-            const result = await controller.findAll(mockRequest);
-
-            expect(mockTodosService.findAll).toHaveBeenCalledWith(mockUser.id);
-            expect(result).toEqual([]);
-            expect(result).toHaveLength(0);
-        });
+        expect(service.findAll).toHaveBeenCalledWith(actor.id, query);
     });
 
-    describe("findOne", () => {
-        it("should return todo with comments by id", async () => {
-            const todoWithComments = {...mockTodo, comments: []};
-            mockTodosService.findTodoWithComments.mockResolvedValue(
-                todoWithComments as never,
-            );
 
-            const result = await controller.findOne("1");
-
-            expect(mockTodosService.findTodoWithComments).toHaveBeenCalledWith(
-                "1",
-            );
-            expect(result).toEqual(todoWithComments);
-        });
-
-        it("should throw error if service throws", async () => {
-            const error = new Error("Todo not found");
-            mockTodosService.findTodoWithComments.mockRejectedValue(
-                error as never,
-            );
-
-            await expect(controller.findOne("999")).rejects.toThrow(
-                "Todo not found",
-            );
-        });
+    it("declares no-content status for deletion", () => {
+        expect(
+            Reflect.getMetadata(HTTP_CODE_METADATA, TodosController.prototype.delete),
+        ).toBe(HttpStatus.NO_CONTENT);
     });
 
-    describe("update", () => {
-        it("should update todo", async () => {
-            const updateData = {title: "Updated Todo"};
-            const updatedTodo = {...mockTodo, ...updateData};
-            mockTodosService.update.mockResolvedValue(updatedTodo as never);
+    it("uses UUID parsing for todo id route parameters", () => {
+        const routeArgs = Reflect.getMetadata(
+            ROUTE_ARGS_METADATA,
+            TodosController,
+            "update",
+        ) as Record<string, {pipes?: unknown[]}>;
+        const idParam = Object.values(routeArgs).find(
+            (metadata) =>
+                metadata.pipes?.some((pipe) => pipe === ParseUUIDPipe),
+        );
 
-            const result = await controller.update("1", updateData);
-
-            expect(mockTodosService.update).toHaveBeenCalledWith(
-                "1",
-                updateData,
-            );
-            expect(result).toEqual(updatedTodo);
-        });
-
-        it("should throw NotFoundException if todo not found", async () => {
-            mockTodosService.update.mockRejectedValue(
-                new NotFoundException("Todo not found") as never,
-            );
-
-            await expect(
-                controller.update("999", {title: "Updated"}),
-            ).rejects.toThrow(NotFoundException);
-        });
+        expect(idParam).toBeDefined();
     });
 });

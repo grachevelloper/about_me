@@ -1,5 +1,5 @@
 import {DoubleLeftOutlined} from '@ant-design/icons';
-import {Button} from 'antd';
+import {Button, type ButtonProps} from 'antd';
 import block from 'bem-cn-lite';
 import {useTranslation} from 'react-i18next';
 
@@ -16,7 +16,10 @@ interface PriorityProps {
     isLoading?: boolean;
 }
 
-const getCustomize = (priority: TodoPriority) => {
+const getCustomize = (priority: TodoPriority): Pick<
+    ButtonProps,
+    'variant' | 'color' | 'icon'
+> => {
     switch (priority) {
         case TodoPriority.LOW:
             return {
@@ -55,7 +58,7 @@ export const Priority = ({
     return (
         <Button
             className={b({'is-edited': isEdited})}
-            onClick={onUpdate}
+            onClick={() => onUpdate?.(priority)}
             loading={isLoading}
             size='middle'
             {...customize}

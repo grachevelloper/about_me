@@ -6,24 +6,22 @@ import {
     HttpCode,
     HttpStatus,
     Param,
+    ParseUUIDPipe,
     Patch,
     Post,
     Query,
-    Req,
-    ValidationPipe,
 } from "@nestjs/common";
-import {Request} from "express";
 
+import {CurrentUser} from "../../shared/decorators/current-user.decorator";
+import {AuthenticatedUser} from "../../types";
 import {
     CreateArticleDto,
     RequestGetArticles,
     ResponseArticle,
     ResponseGetArticles,
     UpdateArticleDto,
-} from "./article.interface";
-import {Article} from "./articles.entity";
+} from "./article.dto";
 import {ArticlesService} from "./articles.service";
-import {Tag} from "./tags/tags.entity";
 
 @Controller("articles")
 export class ArticlesController {
@@ -31,133 +29,79 @@ export class ArticlesController {
 
     @Post()
     async create(
-        @Req() req: Request,
+        @CurrentUser() user: AuthenticatedUser,
         @Body() createArticleData: CreateArticleDto,
     ): Promise<ResponseArticle> {
-        const authorId = req.user.id;
-        return await this.articlesService.create(authorId, createArticleData);
+        return await this.articlesService.create({
+            actor: user,
+            data: createArticleData,
+        });
     }
 
     @Get("drafts")
-    async findAllDrafts(@Req() req: Request): Promise<Article[]> {
-        const authorId = req.user.id;
-        return await this.articlesService.findAllByAuthorId(authorId, true);
-    }
-
-    @Get(":id")
-    async findOne(
-        @Req() req: Request,
-        @Param("id") id: string,
-    ): Promise<ResponseArticle> {
-        const authorId = req.user.id;
-        return await this.articlesService.findOne(id, authorId);
-    }
-
-    @Patch(":id")
-    async update(
-        @Param("id") id: string,
-        @Body() data: UpdateArticleDto,
-    ): Promise<Article> {
-        return await this.articlesService.update(id, data);
-    }
-
-    @Patch(":id/title")
-    async updateTitle(
-        @Param("id") id: string,
-        @Body("title") title: string,
-    ): Promise<Article> {
-        return await this.articlesService.updateTitle(id, title);
-    }
-
-    @Patch(":id/content")
-    async updateContent(
-        @Param("id") id: string,
-        @Body("content") content: string,
-    ): Promise<Article> {
-        return await this.articlesService.updateContent(id, content);
-    }
-
-    @Patch(":id/image")
-    async updateImage(
-        @Param("id") id: string,
-        @Body("image") image: string,
-    ): Promise<Article> {
-        return await this.articlesService.updateImage(id, image);
-    }
-
-    @Patch(":id/read-time")
-    async updateReadTime(
-        @Param("id") id: string,
-        @Body("readTime") readTime: number,
-    ): Promise<Article> {
-        return await this.articlesService.updateReadTime(id, readTime);
-    }
-
-    @Patch(":id/tags")
-    async updateTags(
-        @Param("id") id: string,
-        @Body("tags") tags: Tag[],
-    ): Promise<Article> {
-        return await this.articlesService.updateTags(id, tags);
-    }
-
-    @Patch(":id/draft-status")
-    async updateDraftStatus(
-        @Param("id") id: string,
-        @Body("isDraft") isDraft: boolean,
-    ): Promise<Article> {
-        return await this.articlesService.updateDraftStatus(id, isDraft);
-    }
-
-    @Delete(":id")
-    @HttpCode(HttpStatus.NO_CONTENT)
-    async delete(@Param("id") id: string): Promise<void> {
-        return await this.articlesService.delete(id);
-    }
-
-    @Post(":id/publish")
-    async publichArticle(
-        @Req() req: Request,
-        @Param("id") id: string,
-    ): Promise<boolean> {
-        const authorId = req.user.id;
-        return await this.articlesService.publish(id, authorId);
-    }
-
-    @Post(":id/like")
-    @HttpCode(HttpStatus.NO_CONTENT)
-    async incrementLikes(@Param("id") id: string): Promise<void> {
-        await this.articlesService.incrementLikesCount(id);
-    }
-
-    @Post(":id/unlike")
-    @HttpCode(HttpStatus.NO_CONTENT)
-    async decrementLikes(@Param("id") id: string): Promise<void> {
-        await this.articlesService.decrementLikesCount(id);
+    async findAllDrafts(
+        @CurrentUser() user: AuthenticatedUser,
+    ): Promise<ResponseArticle[]> {
+        return await this.articlesService.findAllByAuthorId({
+            authorId: user.id,
+            actor: user,
+            drafts: true,
+        });
     }
 
     @Get("author/:authorId")
     async findAllByAuthorId(
-        @Param("authorId") authorId: string,
-    ): Promise<Article[]> {
-        return await this.articlesService.findAllByAuthorId(authorId);
+        @Param("authorId", ParseUUIDPipe) authorId: string,
+    ): Promise<ResponseArticle[]> {
+        return await this.articlesService.findAllByAuthorId({authorId});
+    }
+
+    @Get(":id")
+    async findOne(
+        @CurrentUser() user: AuthenticatedUser,
+        @Param("id", ParseUUIDPipe) id: string,
+    ): Promise<ResponseArticle> {
+        return await this.articlesService.findOne({id, actor: user});
+    }
+
+    @Patch(":id")
+    async update(
+        @CurrentUser() user: AuthenticatedUser,
+        @Param("id", ParseUUIDPipe) id: string,
+        @Body() data: UpdateArticleDto,
+    ): Promise<ResponseArticle> {
+        return await this.articlesService.update({id, actor: user, data});
+    }
+
+    @Delete(":id")
+    @HttpCode(HttpStatus.NO_CONTENT)
+    async delete(
+        @CurrentUser() user: AuthenticatedUser,
+        @Param("id", ParseUUIDPipe) id: string,
+    ): Promise<void> {
+        await this.articlesService.delete({id, actor: user});
+    }
+
+    @Post(":id/publish")
+    async publishArticle(
+        @CurrentUser() user: AuthenticatedUser,
+        @Param("id", ParseUUIDPipe) id: string,
+    ): Promise<ResponseArticle> {
+        return await this.articlesService.publish({id, actor: user});
     }
 
     @Get()
     async findAll(
-        @Query(
-            new ValidationPipe({
-                transform: true,
-                transformOptions: {enableImplicitConversion: true},
-                forbidNonWhitelisted: true,
-            }),
-        )
-        query: RequestGetArticles,
+        @Query() query: RequestGetArticles,
     ): Promise<ResponseGetArticles> {
-        const filters = {
+        return await this.articlesService.findAll({
             ...query,
-            tags: query.tags ? query.tags.split(",") : undefined,
-        };
-        return await this.articlesService.findAll(filters);
+            tags: query.tags
+                ? query.tags
+                      .split(",")
+                      .map((tag) => tag.trim().toLowerCase())
+                      .filter((tag) => tag.length > 0)
+                : undefined,
+        });
     }
 }

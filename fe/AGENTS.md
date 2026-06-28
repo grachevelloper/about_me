@@ -348,5 +348,4 @@ Do not copy these into new work:
 - Routes, API contracts, authentication, translations, accessibility, themes, and responsive states are updated where affected.
 - Applicable type-check, lint, and build commands pass, or exact pre-existing blockers are reported.
 - The final diff contains no secret, debug output, generated junk, blanket suppression, or accidental formatting churn.
-- Backend and MSW contracts are synchronized when the API changes.
 - Nothing is staged or committed unless the user explicitly requested it.

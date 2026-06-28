@@ -11,7 +11,7 @@ import {TodoListTable} from './components/TodoListTable';
 import './MainPage.scss';
 
 const AboutMe = lazy(() =>
-    import('./components/AboutMe/index.js').then(({AboutMe}) => ({
+    import('./components/AboutMe').then(({AboutMe}) => ({
         default: AboutMe,
     }))
 );

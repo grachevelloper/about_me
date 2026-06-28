@@ -1,11 +1,14 @@
 import {
-    Body,
     Controller,
     Delete,
     FileTypeValidator,
+    HttpCode,
+    HttpStatus,
     MaxFileSizeValidator,
     Param,
+    ParseEnumPipe,
     ParseFilePipe,
+    ParseUUIDPipe,
     Post,
     UploadedFile,
     UseGuards,
@@ -13,9 +16,17 @@ import {
 } from "@nestjs/common";
 import {FileInterceptor} from "@nestjs/platform-express";
 
+import {CurrentUser} from "../../shared/decorators/current-user.decorator";
 import {AuthGuard} from "../../shared/guards/auth.guard";
-import {CreateAttachmentDto} from "./attachments.interface";
+import {AuthenticatedUser} from "../../types";
+import {
+    ATTACHMENT_TARGET_TYPES,
+    AttachmentResponseDto,
+    EntityAttachmentType,
+} from "./attachments.dto";
 import {AttachmentsService} from "./attachments.service";
+
+const MAX_SIZE = 10 * 1024 * 1024;
 
 @UseGuards(AuthGuard)
 @Controller("attachments")
@@ -28,26 +39,33 @@ export class AttachmentsController {
         @UploadedFile(
             new ParseFilePipe({
                 validators: [
-                    new MaxFileSizeValidator({maxSize: 10 * 1024 * 1024}),
+                    new MaxFileSizeValidator({maxSize: MAX_SIZE}),
                     new FileTypeValidator({
-                        fileType: /(jpg|jpeg|png|webp)$/,
+                        fileType: /^image\/(jpeg|png|webp)$/,
                     }),
                 ],
             }),
         )
         file: Express.Multer.File,
-        @Param() createData: CreateAttachmentDto,
-    ) {
+        @Param("entityType", new ParseEnumPipe(ATTACHMENT_TARGET_TYPES))
+        entityType: EntityAttachmentType,
+        @Param("entityId", ParseUUIDPipe) entityId: string,
+        @CurrentUser() actor: AuthenticatedUser,
+    ): Promise<AttachmentResponseDto> {
         return this.attachmentsService.attachImage(
             file,
-            createData.entityType,
-            createData.entityId,
+            entityType,
+            entityId,
+            actor,
         );
     }
 
-    @Delete(":url")
-    @UseInterceptors(FileInterceptor("file"))
-    async delete(@Param() url: string) {
-        return this.attachmentsService.deleteAttachmentByUrl(url);
+    @Delete(":id")
+    @HttpCode(HttpStatus.NO_CONTENT)
+    async delete(
+        @Param("id", ParseUUIDPipe) id: string,
+        @CurrentUser() actor: AuthenticatedUser,
+    ): Promise<void> {
+        await this.attachmentsService.deleteAttachmentById(id, actor);
     }
 }

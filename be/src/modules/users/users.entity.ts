@@ -2,18 +2,17 @@ import {Column, Entity} from "typeorm";
 
 import {BaseEntity} from "../../shared/utils/entity";
 import {Role} from "../../types";
-import {UserStatus} from "../../types/user";
 
 @Entity("users")
 export class User extends BaseEntity {
     @Column()
-    username: string;
+    username!: string;
 
     @Column({unique: true})
-    email: string;
+    email!: string;
 
-    @Column()
-    password: string;
+    @Column({select: false})
+    password!: string;
 
     @Column({
         type: "enum",
@@ -21,7 +20,7 @@ export class User extends BaseEntity {
         enum: Role,
         default: "User",
     })
-    role: Role;
+    role!: Role;
 
     @Column({nullable: true})
     avatar?: string;
@@ -37,7 +36,4 @@ export class User extends BaseEntity {
 
     @Column({nullable: true})
     nowListening?: string;
-
-    @Column({nullable: true})
-    status?: UserStatus;
 }

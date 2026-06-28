@@ -1,4 +1,4 @@
-import {Card, CardProps, Flex, theme} from 'antd';
+import {Card, CardProps, Flex} from 'antd';
 import block from 'bem-cn-lite';
 import React from 'react';
 
@@ -18,17 +18,14 @@ interface FlexibleCardProps extends Omit<CardProps, 'actions'> {
 
 export const FlexibleCard: React.FC<FlexibleCardProps> = ({
     actions = [],
-    actionsAlign = 'right',
+    actionsAlign = 'end',
     actionsVertical = false,
     className,
     children,
     ...cardProps
 }) => {
-    const {
-        token: {},
-    } = theme.useToken();
     return (
-        <Card {...cardProps} className={b(null, className)}>
+        <Card {...cardProps} className={b(undefined, className)}>
             {children}
 
             {actions && actions.length > 0 && (

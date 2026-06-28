@@ -1,29 +1,74 @@
 import {
     BadRequestException,
+    ForbiddenException,
     Injectable,
-    NotAcceptableException,
     NotFoundException,
 } from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
 
+import {AggregateDeletionService} from "../../processes/aggregate-deletion/aggregate-deletion.service";
+import {PaginatedResponseDto} from "../../shared/dto/paginated-response.dto";
+import {AuthenticatedUser, Order, Role, SortBy} from "../../types";
 import {LikesService} from "../likes/likes.service";
 import {UsersService} from "../users/users.service";
 import {
+    ArticleResponseDto,
     CreateArticleDto,
     RequestGetArticles,
     ResponseArticle,
     ResponseGetArticles,
     UpdateArticleDto,
-} from "./article.interface";
+} from "./article.dto";
 import {Article} from "./articles.entity";
+import {ArticlesMapper} from "./articles.mapper";
 import {Tag} from "./tags/tags.entity";
+import {TagsService} from "./tags/tags.service";
 
-type FindAll = Omit<RequestGetArticles, "tags"> & {
+interface CreateArticleCommand {
+    actor: AuthenticatedUser;
+    data: CreateArticleDto;
+}
+
+interface UpdateArticleCommand {
+    actor: AuthenticatedUser;
+    data: UpdateArticleDto;
+    id: string;
+}
+
+interface FindArticleCommand {
+    actor: AuthenticatedUser;
+    id: string;
+}
+
+interface DeleteArticleCommand {
+    actor: AuthenticatedUser;
+    id: string;
+}
+
+interface PublishArticleCommand {
+    actor: AuthenticatedUser;
+    id: string;
+}
+
+type FindArticlesQuery = Omit<RequestGetArticles, "tags"> & {
     tags?: string[];
 };
 
-const {S3_PUBLIC_DOMAIN} = process.env;
+interface FindArticlesByAuthorQuery {
+    actor?: AuthenticatedUser;
+    authorId: string;
+    drafts?: boolean;
+}
+
+const DEFAULT_ARTICLE_IMAGE = `${
+    process.env.S3_PUBLIC_DOMAIN ?? ""
+}/draft-placeholder/image.png`;
+
+const SORT_COLUMNS: Record<SortBy, string> = {
+    createdAt: "article.createdAt",
+    updatedAt: "article.updatedAt",
+};
 
 @Injectable()
 export class ArticlesService {
@@ -32,118 +77,88 @@ export class ArticlesService {
         private articlesRepository: Repository<Article>,
         private likesService: LikesService,
         private usersService: UsersService,
+        private tagsService: TagsService,
+        private aggregateDeletionService: AggregateDeletionService,
     ) {}
 
-    async create(
-        authorId: string,
-        createArticleData: CreateArticleDto,
-    ): Promise<ResponseArticle> {
-        const {title, content, readTime} = createArticleData;
-        const author = await this.usersService.findById(authorId);
-
-        const result = this.articlesRepository.create({
+    async create({
+        actor,
+        data,
+    }: CreateArticleCommand): Promise<ResponseArticle> {
+        const author = await this.usersService.findById(actor.id);
+        const tags = await this.resolveTags(data.tags);
+        const article = this.articlesRepository.create({
             author,
-            content,
-            image: `${S3_PUBLIC_DOMAIN}/draft-placeholder/image.png`,
-            readTime,
-            title,
+            content: data.content,
+            image: DEFAULT_ARTICLE_IMAGE,
+            isDraft: true,
+            readTime: data.readTime,
+            tags,
+            title: data.title,
         });
 
-        const resultWithLike: ResponseArticle = {...result, hasLiked: false};
-
-        return await this.articlesRepository.save(resultWithLike);
+        return ArticlesMapper.toResponse(
+            await this.articlesRepository.save(article),
+            false,
+        );
     }
 
-    async update(id: string, updateArticleData: UpdateArticleDto) {
-        const article = await this.findOneForUpdate(id);
-        Object.assign(article, updateArticleData);
-        return await this.articlesRepository.save(article);
+    async update({
+        id,
+        actor,
+        data,
+    }: UpdateArticleCommand): Promise<ResponseArticle> {
+        const article = await this.findOneForMutation(id, actor);
+        const tags = await this.resolveTags(data.tags);
+
+        Object.assign(article, {
+            content: data.content ?? article.content,
+            image: data.image ?? article.image,
+            readTime: data.readTime ?? article.readTime,
+            tags: data.tags ? tags : article.tags,
+            title: data.title ?? article.title,
+        });
+
+        return ArticlesMapper.toResponse(
+            await this.articlesRepository.save(article),
+            false,
+        );
     }
 
-    async updateTags(id: string, tags: Tag[]): Promise<Article> {
-        const article = await this.findOneForUpdate(id);
-        article.tags = tags;
-        await this.articlesRepository.save(article);
-        return (await this.articlesRepository.findOne({
-            where: {id},
-            relations: ["tags"],
-        }))!;
+    async publish({
+        id,
+        actor,
+    }: PublishArticleCommand): Promise<ResponseArticle> {
+        const article = await this.findOneForMutation(id, actor);
+        if (!article.isDraft) {
+            throw new BadRequestException("Article has already been published");
+        }
+
+        article.isDraft = false;
+        return ArticlesMapper.toResponse(
+            await this.articlesRepository.save(article),
+            false,
+        );
     }
 
-    async updateTitle(id: string, title: string): Promise<Article> {
-        const article = await this.findOneForUpdate(id);
-        article.title = title;
-        await this.articlesRepository.save(article);
-
-        return (await this.articlesRepository.findOne({
-            where: {id},
-            relations: ["tags"],
-        }))!;
-    }
-
-    async updateContent(id: string, content: string): Promise<Article> {
-        const article = await this.findOneForUpdate(id);
-        article.content = content;
-        await this.articlesRepository.save(article);
-
-        return (await this.articlesRepository.findOne({
-            where: {id},
-            relations: ["tags"],
-        }))!;
-    }
-
-    async updateImage(id: string, image: string): Promise<Article> {
-        const article = await this.findOneForUpdate(id);
-        article.image = image;
-        await this.articlesRepository.save(article);
-
-        return (await this.articlesRepository.findOne({
-            where: {id},
-            relations: ["tags"],
-        }))!;
-    }
-
-    async updateReadTime(id: string, readTime: number): Promise<Article> {
-        const article = await this.findOneForUpdate(id);
-        article.readTime = readTime;
-        await this.articlesRepository.save(article);
-
-        return (await this.articlesRepository.findOne({
-            where: {id},
-            relations: ["tags"],
-        }))!;
-    }
-
-    async updateDraftStatus(id: string, isDraft: boolean): Promise<Article> {
-        const article = await this.findOneForUpdate(id);
-        article.isDraft = isDraft;
-        await this.articlesRepository.save(article);
-
-        return (await this.articlesRepository.findOne({
-            where: {id},
-            relations: ["tags"],
-        }))!;
-    }
-
-    async findAll(filters: FindAll): Promise<ResponseGetArticles> {
+    async findAll(filters: FindArticlesQuery): Promise<ResponseGetArticles> {
         const {
-            page,
-            limit,
+            page = 1,
+            limit = 10,
             search,
             authorId,
             tags,
             minLikes,
             createdAfter,
-            sortBy,
-            order,
+            sortBy = SortBy.CREATED_AT,
+            order = Order.DESC,
         } = filters;
-
-        const skip = (page - 1) * limit;
 
         const queryBuilder = this.articlesRepository
             .createQueryBuilder("article")
             .leftJoinAndSelect("article.author", "author")
-            .leftJoinAndSelect("article.tags", "tags");
+            .leftJoinAndSelect("article.tags", "tags")
+            .andWhere("article.isDraft = :isDraft", {isDraft: false});
 
         if (search) {
             queryBuilder.andWhere("article.title ILIKE :search", {
@@ -153,23 +168,27 @@ export class ArticlesService {
         if (authorId) {
             queryBuilder.andWhere("article.authorId = :authorId", {authorId});
         }
-        if (tags) {
-            const tagArray = Array.isArray(tags) ? tags : [tags];
+        if (tags && tags.length > 0) {
             queryBuilder
                 .andWhere((qb) => {
                     const subQuery = qb
                         .subQuery()
                         .select("1")
-                        .from("article_tags", "at")
-                        .innerJoin("at.tag", "t")
-                        .where("at.articleId = article.id")
-                        .andWhere("t.name IN (:...tags)")
+                        .from("article_tags", "article_tag")
+                        .innerJoin(
+                            Tag,
+                            "tag",
+                            'tag.id = article_tag."tagId"',
+                        )
+                        .where('article_tag."articleId" = article.id')
+                        .andWhere("tag.name IN (:...tags)")
                         .getQuery();
-                    return `EXISTS (${subQuery})`;
+
+                    return `EXISTS ${subQuery}`;
                 })
-                .setParameter("tags", tagArray);
+                .setParameter("tags", tags);
         }
-        if (minLikes) {
+        if (minLikes !== undefined) {
             queryBuilder.andWhere("article.likesCount >= :minLikes", {
                 minLikes,
             });
@@ -180,25 +199,28 @@ export class ArticlesService {
             });
         }
 
-        queryBuilder.orderBy(`article.${sortBy}`, order as "ASC" | "DESC");
+        queryBuilder
+            .orderBy(SORT_COLUMNS[sortBy], order)
+            .skip((page - 1) * limit)
+            .take(limit);
 
-        queryBuilder.skip(skip).take(limit + 1);
+        const [articles, total] = await queryBuilder.getManyAndCount();
+        const items = articles.map((article) =>
+            ArticlesMapper.toResponse(article, false),
+        );
 
-        const result = await queryBuilder.getMany();
-
-        const articles = result.slice(0, -1);
-
-        const next = result.at(-1)?.id;
-
-        return {
-            articles,
+        return new PaginatedResponseDto<ArticleResponseDto>(
+            items,
             page,
             limit,
-            next,
-        };
+            total,
+        );
     }
 
-    async findOne(id: string, userId: string): Promise<ResponseArticle> {
+    async findOne({
+        id,
+        actor,
+    }: FindArticleCommand): Promise<ResponseArticle> {
         const article = await this.articlesRepository.findOne({
             where: {id},
             relations: ["author", "tags"],
@@ -206,82 +228,90 @@ export class ArticlesService {
         if (!article) {
             throw new NotFoundException("Article not found");
         }
+        if (article.isDraft) {
+            this.assertCanMutate(article, actor);
+        }
 
         const likedArticle = await this.likesService.hasLiked({
             entityId: id,
-            userId,
+            userId: actor.id,
             entityType: "article",
         });
 
-        return {...article, hasLiked: Boolean(likedArticle)};
+        return ArticlesMapper.toResponse(article, Boolean(likedArticle));
     }
 
-    private async findOneForUpdate(id: string): Promise<Article> {
-        const article = await this.articlesRepository.findOne({
-            where: {id},
-            relations: ["tags"],
-        });
-        if (!article) {
-            throw new NotFoundException("Article not found");
+    async findAllByAuthorId({
+        authorId,
+        actor,
+        drafts = false,
+    }: FindArticlesByAuthorQuery): Promise<ResponseArticle[]> {
+        if (drafts) {
+            this.assertCanReadDrafts(authorId, actor);
         }
-        return article;
-    }
 
-    async findAllByAuthorId(authorId: string, drafts = false) {
-        return await this.articlesRepository.find({
+        const articles = await this.articlesRepository.find({
             where: {author: {id: authorId}, isDraft: drafts},
             relations: ["author", "tags"],
             order: {
                 createdAt: "DESC",
             },
         });
+
+        return articles.map((article) => ArticlesMapper.toResponse(article));
     }
 
-    async publish(id: string, userId: string) {
+    async delete({id, actor}: DeleteArticleCommand): Promise<void> {
+        const article = await this.findOneForMutation(id, actor);
+        await this.aggregateDeletionService.deleteArticleAggregate(article.id);
+    }
+
+    private async findOneForMutation(
+        id: string,
+        actor: AuthenticatedUser,
+    ): Promise<Article> {
         const article = await this.articlesRepository.findOne({
             where: {id},
-            relations: ["author"],
+            relations: ["author", "tags"],
         });
-        if (userId !== article?.author.id) {
-            throw new NotAcceptableException();
-        }
-        if (article.isDraft === true) {
-            throw new BadRequestException(
-                "Article have been publiched already",
-            );
-        }
-        article.isDraft = true;
-        await this.articlesRepository.save(article);
-        return true;
-    }
-
-    async delete(id: string) {
-        const result = await this.articlesRepository.delete(id);
-        if (result.affected === 0) {
+        if (!article) {
             throw new NotFoundException("Article not found");
         }
+        this.assertCanMutate(article, actor);
+        return article;
     }
 
-    async incrementLikesCount(articleId: string): Promise<void> {
-        await this.articlesRepository
-            .createQueryBuilder()
-            .update(Article)
-            .set({
-                likesCount: () => "likesCount + 1",
-            })
-            .where("id = :articleId", {articleId})
-            .execute();
+    private assertCanMutate(
+        article: Article,
+        actor: AuthenticatedUser,
+    ): void {
+        if (article.author.id === actor.id || actor.role === Role.ADMIN) {
+            return;
+        }
+
+        throw new ForbiddenException("You do not have access to this article");
     }
 
-    async decrementLikesCount(articleId: string): Promise<void> {
-        await this.articlesRepository
-            .createQueryBuilder()
-            .update(Article)
-            .set({
-                likesCount: () => "likesCount - 1",
-            })
-            .where("id = :articleId", {articleId})
-            .andWhere("likesCount > 0")
-            .execute();
+    private assertCanReadDrafts(
+        authorId: string,
+        actor?: AuthenticatedUser,
+    ): void {
+        if (actor && (actor.id === authorId || actor.role === Role.ADMIN)) {
+            return;
+        }
+
+        throw new ForbiddenException("You do not have access to these drafts");
+    }
+
+    private async resolveTags(tags?: CreateArticleDto["tags"]): Promise<Tag[]> {
+        if (!tags || tags.length === 0) {
+            return [];
+        }
+
+        const tagNames = tags
+            .map((tag) => tag.name.trim().toLowerCase())
+            .filter((name) => name.length > 0);
+
+        return this.tagsService.findOrCreateByNames([...new Set(tagNames)]);
     }
 }

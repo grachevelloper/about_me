@@ -6,17 +6,27 @@ import {
     HttpCode,
     HttpStatus,
     Param,
+    ParseEnumPipe,
+    ParseUUIDPipe,
     Patch,
     Post,
-    Req,
+    Query,
     UseGuards,
 } from "@nestjs/common";
-import {Request} from "express";
 
+import {CurrentUser} from "../../shared/decorators/current-user.decorator";
 import {AuthGuard} from "../../shared/guards/auth.guard";
-import {Order} from "../../types";
-import {CreateCommentDto, UpdateCommentDto} from "./comemnts.interface";
+import {AuthenticatedUser, Order} from "../../types";
+import {
+    COMMENT_TARGET_TYPES,
+    CommentResponseDto,
+    CreateCommentDto,
+    QueryCommentsDto,
+    ResponseGetComments,
+    UpdateCommentDto,
+} from "./comments.dto";
 import {EntityCommentType} from "./comments.entity";
+import {CommentsMapper} from "./comments.mapper";
 import {CommentsService} from "./comments.service";
 
 @UseGuards(AuthGuard)
@@ -27,46 +37,70 @@ export class CommentsController {
     @HttpCode(HttpStatus.CREATED)
     @Post()
     async create(
-        @Req() req: Request,
+        @CurrentUser() user: AuthenticatedUser,
         @Body() createCommentData: CreateCommentDto,
-    ) {
-        const authorId = req.user.id;
-
-        return await this.commentsService.create(authorId, createCommentData);
+    ): Promise<CommentResponseDto> {
+        return CommentsMapper.toResponse(
+            await this.commentsService.create(user, createCommentData),
+        );
     }
 
     @HttpCode(HttpStatus.OK)
     @Get(":id")
-    async getByid(@Param() id: string) {
-        return await this.commentsService.findOne(id);
+    async getByid(
+        @Param("id", ParseUUIDPipe) id: string,
+    ): Promise<CommentResponseDto> {
+        return CommentsMapper.toResponse(await this.commentsService.findOne(id));
     }
 
     @HttpCode(HttpStatus.OK)
     @Get(":entityType/:entityId")
     async getByEntityId(
-        @Param("entityType") entityType: EntityCommentType,
-        @Param("entityId") entityId: string,
-        @Body() order: Order,
-    ) {
-        return await this.commentsService.findByEntity(
+        @Param("entityType", new ParseEnumPipe(COMMENT_TARGET_TYPES))
+        entityType: EntityCommentType,
+        @Param("entityId", ParseUUIDPipe) entityId: string,
+        @CurrentUser() user: AuthenticatedUser,
+        @Query() query: QueryCommentsDto,
+    ): Promise<ResponseGetComments> {
+        const commentsPage = await this.commentsService.findByEntity({
+            actor: user,
             entityType,
             entityId,
-            order,
-        );
+            limit: query.limit,
+            order: query.order as Order | undefined,
+            page: query.page,
+        });
+
+        return {
+            ...commentsPage,
+            items: commentsPage.items.map((comment) =>
+                CommentsMapper.toResponse(comment),
+            ),
+        };
     }
 
     @HttpCode(HttpStatus.OK)
     @Patch(":id")
     async update(
-        @Param() id: string,
+        @CurrentUser() user: AuthenticatedUser,
+        @Param("id", ParseUUIDPipe) id: string,
         @Body() updateCommentData: UpdateCommentDto,
-    ) {
-        return await this.commentsService.update({...updateCommentData, id});
+    ): Promise<CommentResponseDto> {
+        return CommentsMapper.toResponse(
+            await this.commentsService.update({
+                actor: user,
+                id,
+                data: updateCommentData,
+            }),
+        );
     }
 
-    @HttpCode(HttpStatus.OK)
+    @HttpCode(HttpStatus.NO_CONTENT)
     @Delete(":id")
-    async delete(@Param() id: string) {
-        return await this.commentsService.delete(id);
+    async delete(
+        @CurrentUser() user: AuthenticatedUser,
+        @Param("id", ParseUUIDPipe) id: string,
+    ): Promise<void> {
+        await this.commentsService.delete({id, actor: user});
     }
 }

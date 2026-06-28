@@ -1,8 +1,20 @@
-import {Body, Controller, Req, UseGuards} from "@nestjs/common";
-import {Request} from "express";
+import {
+    Controller,
+    Delete,
+    HttpCode,
+    HttpStatus,
+    Param,
+    ParseEnumPipe,
+    ParseUUIDPipe,
+    Post,
+    UseGuards,
+} from "@nestjs/common";
 
+import {CurrentUser} from "../../shared/decorators/current-user.decorator";
 import {AuthGuard} from "../../shared/guards/auth.guard";
-import {CreateLikeDto, DeleteLikeDto} from "./likes.interface";
+import {AuthenticatedUser} from "../../types";
+import {LIKE_TARGET_TYPES} from "./likes.dto";
+import {EntityLikeType} from "./likes.entity";
 import {LikesService} from "./likes.service";
 
 @UseGuards(AuthGuard)
@@ -10,21 +22,24 @@ import {LikesService} from "./likes.service";
 export class LikesController {
     constructor(private readonly likesService: LikesService) {}
 
-    async create(@Req() req: Request, @Body() createLikeData: CreateLikeDto) {
-        const createLikeDataWithUserId: CreateLikeDto = {
-            ...createLikeData,
-            authorId: req.user.id,
-        };
-
-        return await this.likesService.create(createLikeDataWithUserId);
+    @Post(":entityType/:entityId")
+    async create(
+        @CurrentUser() user: AuthenticatedUser,
+        @Param("entityType", new ParseEnumPipe(LIKE_TARGET_TYPES))
+        entityType: EntityLikeType,
+        @Param("entityId", ParseUUIDPipe) entityId: string,
+    ) {
+        return await this.likesService.create({actor: user, entityType, entityId});
     }
 
-    async delete(@Req() req: Request, @Body() deleteLikeData: DeleteLikeDto) {
-        const createLikeDataWithUserId: CreateLikeDto = {
-            ...deleteLikeData,
-            authorId: req.user.id,
-        };
-
-        return await this.likesService.delete(createLikeDataWithUserId);
+    @Delete(":entityType/:entityId")
+    @HttpCode(HttpStatus.NO_CONTENT)
+    async delete(
+        @CurrentUser() user: AuthenticatedUser,
+        @Param("entityType", new ParseEnumPipe(LIKE_TARGET_TYPES))
+        entityType: EntityLikeType,
+        @Param("entityId", ParseUUIDPipe) entityId: string,
+    ) {
+        await this.likesService.delete({actor: user, entityType, entityId});
     }
 }

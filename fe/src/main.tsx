@@ -7,6 +7,10 @@ import {worker} from './__test__/mocks';
 import App from './entries/App';
 
 const container = document.getElementById('root');
+if (!container) {
+    throw new Error('Root element not found');
+}
+
 const root = createRoot(container);
 
 const enableMocking = async () => {

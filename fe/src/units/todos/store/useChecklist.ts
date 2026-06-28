@@ -32,11 +32,11 @@ export const useChecklistMutations = (todoId: string) => {
     const queryClient = useQueryClient();
 
     const baseMutation: UseMutationResult<
-        ChecklistData,
+        ChecklistData | void,
         Error,
         MutationVariables,
         MutationContext
-    > = useMutation({
+    > = useMutation<ChecklistData | void, Error, MutationVariables, MutationContext>({
         mutationFn: (variables: MutationVariables) => {
             switch (variables.type) {
                 case 'addItem':

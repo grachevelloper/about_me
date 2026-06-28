@@ -1,11 +1,42 @@
-import {Injectable, NotFoundException} from "@nestjs/common";
+import {
+    BadRequestException,
+    ForbiddenException,
+    forwardRef,
+    Inject,
+    Injectable,
+    NotFoundException,
+} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
-import {Repository} from "typeorm";
+import {In, Repository} from "typeorm";
 
-import {Order} from "../../types";
+import {PaginatedResponseDto} from "../../shared/dto/paginated-response.dto";
+import {AuthenticatedUser, Order, Role} from "../../types";
+import {ArticlesService} from "../articles/articles.service";
+import {Like} from "../likes/likes.entity";
+import {TodosService} from "../todos/todos.service";
 import {UsersService} from "../users/users.service";
-import {CreateCommentDto, UpdateCommentDto} from "./comemnts.interface";
+import {CreateCommentDto, UpdateCommentDto} from "./comments.dto";
 import {Comment, EntityCommentType} from "./comments.entity";
+
+interface UpdateCommentCommand {
+    actor: AuthenticatedUser;
+    data: UpdateCommentDto;
+    id: string;
+}
+
+interface DeleteCommentCommand {
+    actor: AuthenticatedUser;
+    id: string;
+}
+
+interface FindEntityCommentsCommand {
+    actor: AuthenticatedUser;
+    entityId: string;
+    entityType: EntityCommentType;
+    limit?: number;
+    order?: Order;
+    page?: number;
+}
 
 @Injectable()
 export class CommentsService {
@@ -13,19 +44,36 @@ export class CommentsService {
         @InjectRepository(Comment)
         private commentRepository: Repository<Comment>,
         private usersService: UsersService,
+        @Inject(forwardRef(() => TodosService))
+        private todosService: TodosService,
+        private articlesService: ArticlesService,
     ) {}
 
-    async create(authorId: string, createCommentData: CreateCommentDto) {
-        const author = await this.usersService.findById(authorId);
-        if (!author) {
-            throw new NotFoundException("User not found");
-        }
+    async create(
+        actor: AuthenticatedUser,
+        createCommentData: CreateCommentDto,
+    ): Promise<Comment> {
+        await this.assertCanReadTarget(
+            createCommentData.entityType,
+            createCommentData.entityId,
+            actor,
+        );
+
+        const author = await this.usersService.findById(actor.id);
 
         let depth = 0;
         if (createCommentData.parentId) {
             const parentComment = await this.findOne(
                 createCommentData.parentId,
             );
+            if (
+                parentComment.entityType !== createCommentData.entityType ||
+                parentComment.entityId !== createCommentData.entityId
+            ) {
+                throw new BadRequestException(
+                    "Parent comment must belong to the same target",
+                );
+            }
             depth = parentComment.depth + 1;
         }
 
@@ -38,21 +86,33 @@ export class CommentsService {
         return await this.commentRepository.save(comment);
     }
 
-    async update(updatedComment: UpdateCommentDto): Promise<Comment> {
-        const comment = await this.findOne(updatedComment.id);
-        if (!comment) {
-            throw new NotFoundException("Comment not found");
-        }
+    async update({id, actor, data}: UpdateCommentCommand): Promise<Comment> {
+        const comment = await this.findOne(id);
+        this.assertCanMutate(comment, actor);
 
-        Object.assign(comment, updatedComment);
+        Object.assign(comment, data);
         return this.commentRepository.save(comment);
     }
 
-    async delete(id: string) {
-        const result = await this.commentRepository.delete(id);
-        if (result.affected === 0) {
-            throw new NotFoundException("Comment not found");
-        }
+    async delete({id, actor}: DeleteCommentCommand): Promise<void> {
+        const comment = await this.findOne(id);
+        this.assertCanMutate(comment, actor);
+
+        const comments = await this.commentRepository.find({
+            where: {
+                entityType: comment.entityType,
+                entityId: comment.entityId,
+            },
+        });
+        const branchIds = this.getBranchIds(comments, comment.id);
+
+        await this.commentRepository.manager.transaction(async (manager) => {
+            await manager.delete(Like, {
+                entityType: "comment",
+                entityId: In(branchIds),
+            });
+            await manager.delete(Comment, {id: In(branchIds)});
+        });
     }
 
     async findOne(id: string): Promise<Comment> {
@@ -66,52 +126,70 @@ export class CommentsService {
         return comment;
     }
 
-    async findByEntity(
-        entityType: EntityCommentType,
-        entityId: string,
-        order = Order.DESC,
-    ): Promise<Comment[]> {
-        const comments = await this.commentRepository.find({
+    async findByEntity({
+        actor,
+        entityType,
+        entityId,
+        limit = 100,
+        order = Order.ASC,
+        page = 1,
+    }: FindEntityCommentsCommand): Promise<PaginatedResponseDto<Comment>> {
+        await this.assertCanReadTarget(entityType, entityId, actor);
+
+        const [comments, total] = await this.commentRepository.findAndCount({
             where: {entityType, entityId},
             relations: ["author"],
+            order: {
+                createdAt: order,
+                id: order,
+            },
+            skip: (page - 1) * limit,
+            take: limit,
         });
 
-        if (order === Order.DESC)
-            comments.sort((a, b) => {
-                if (a.parentId === b.id) return 1;
-                if (b.parentId === a.id) return -1;
-
-                const timeA = new Date(a.createdAt).getTime();
-                const timeB = new Date(b.createdAt).getTime();
-
-                if (timeA < timeB) return -1;
-                if (timeA > timeB) return 1;
-                return 0;
-            });
-
-        return comments;
+        return new PaginatedResponseDto<Comment>(comments, page, limit, total);
     }
 
-    async incrementLikesCount(commentId: string): Promise<void> {
-        await this.commentRepository
-            .createQueryBuilder()
-            .update(Comment)
-            .set({
-                likesCount: () => "likesCount + 1",
-            })
-            .where("id = :commentId", {commentId})
-            .execute();
+    private async assertCanReadTarget(
+        entityType: EntityCommentType,
+        entityId: string,
+        actor: AuthenticatedUser,
+    ): Promise<void> {
+        if (entityType === "todo") {
+            await this.todosService.findOne({id: entityId, actor});
+            return;
+        }
+
+        await this.articlesService.findOne({id: entityId, actor});
     }
 
-    async decrementLikesCount(commentId: string): Promise<void> {
-        await this.commentRepository
-            .createQueryBuilder()
-            .update(Comment)
-            .set({
-                likesCount: () => "likesCount - 1",
-            })
-            .where("id = :commentId", {commentId})
-            .andWhere("likesCount > 0")
-            .execute();
+    private assertCanMutate(comment: Comment, actor: AuthenticatedUser): void {
+        if (comment.author.id === actor.id || actor.role === Role.ADMIN) {
+            return;
+        }
+
+        throw new ForbiddenException("You do not have access to this comment");
+    }
+
+    private getBranchIds(comments: Comment[], rootId: string): string[] {
+        const childIdsByParent = comments.reduce<Record<string, string[]>>(
+            (acc, comment) => {
+                if (!comment.parentId) {
+                    return acc;
+                }
+                acc[comment.parentId] ??= [];
+                acc[comment.parentId].push(comment.id);
+                return acc;
+            },
+            {},
+        );
+        const branchIds = [rootId];
+
+        for (let index = 0; index < branchIds.length; index += 1) {
+            const childIds = childIdsByParent[branchIds[index]] ?? [];
+            branchIds.push(...childIds);
+        }
+
+        return branchIds;
     }
 }

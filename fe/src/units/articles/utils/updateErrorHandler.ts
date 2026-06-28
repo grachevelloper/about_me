@@ -39,7 +39,7 @@ export const updateErrorHandler = (updateFields: UpdateDraftField[]) => {
         const field = updateFields[0];
 
         const messages: Record<
-            UpdateField,
+            UpdateDraftField,
             {message: string; description: string}
         > = {
             content: {
@@ -80,7 +80,11 @@ export const updateErrorHandler = (updateFields: UpdateDraftField[]) => {
             },
         };
 
-        const {message, description} = messages[field!];
+        if (!field) {
+            return;
+        }
+
+        const {message, description} = messages[field];
         api.error({message, description});
     };
 

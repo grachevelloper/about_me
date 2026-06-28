@@ -1,1 +1,0 @@
-export {GreetingsEnvelope} from './GreetingsEnvelope'

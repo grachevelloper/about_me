@@ -5,14 +5,14 @@ import {UnUpdatableBaseEntity} from "../../../shared/utils/entity";
 @Entity("refresh_tokens")
 export class RefreshToken extends UnUpdatableBaseEntity {
     @Column("uuid")
-    userId: string;
+    userId!: string;
 
     @Column()
-    tokenHash: string;
+    tokenHash!: string;
 
     @Column()
-    expiresAt: Date;
+    expiresAt!: Date;
 
     @Column({default: false})
-    revoked: boolean;
+    revoked!: boolean;
 }

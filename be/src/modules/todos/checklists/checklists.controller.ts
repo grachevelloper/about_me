@@ -3,25 +3,37 @@ import {
     Controller,
     Delete,
     Get,
+    HttpCode,
+    HttpStatus,
     Param,
+    ParseIntPipe,
+    ParseUUIDPipe,
     Patch,
     Post,
 } from "@nestjs/common";
-import {IsString} from "class-validator";
+import {Type} from "class-transformer";
+import {IsInt, IsNotEmpty, IsString} from "class-validator";
+import {CurrentUser} from "src/shared/decorators/current-user.decorator";
+import {AuthenticatedUser} from "src/types";
 
 import {ChecklistService} from "./checklists.service";
 
 class AddItemDto {
-    text: string;
+    @IsString()
+    @IsNotEmpty()
+    text!: string;
 }
 
 class UpdateItemTextDto {
     @IsString()
-    text: string;
+    @IsNotEmpty()
+    text!: string;
 }
 
 class UpdateProgressDto {
-    delta: number;
+    @Type(() => Number)
+    @IsInt()
+    delta!: number;
 }
 
 @Controller("todos/:todoId/checklist")
@@ -29,44 +41,85 @@ export class ChecklistController {
     constructor(private readonly checklistService: ChecklistService) {}
 
     @Post()
-    createChecklist(@Param("todoId") todoId: string) {
-        return this.checklistService.create(todoId, []);
+    createChecklist(
+        @Param("todoId", ParseUUIDPipe) todoId: string,
+        @CurrentUser() user: AuthenticatedUser,
+    ) {
+        return this.checklistService.create({
+            todoId,
+            initialText: [],
+            actor: user,
+        });
     }
 
     @Get()
-    getChecklist(@Param("todoId") todoId: string) {
-        return this.checklistService.getByTodoId(todoId);
+    getChecklist(
+        @Param("todoId", ParseUUIDPipe) todoId: string,
+        @CurrentUser() user: AuthenticatedUser,
+    ) {
+        return this.checklistService.getByTodoId({todoId, actor: user});
     }
 
     @Post("items")
-    addItem(@Param("todoId") todoId: string, @Body() dto: AddItemDto) {
-        return this.checklistService.addItem(todoId, dto.text);
+    addItem(
+        @Param("todoId", ParseUUIDPipe) todoId: string,
+        @Body() dto: AddItemDto,
+        @CurrentUser() user: AuthenticatedUser,
+    ) {
+        return this.checklistService.addItem({
+            todoId,
+            text: dto.text,
+            actor: user,
+        });
     }
 
     @Patch("items/:index")
     updateItemText(
-        @Param("todoId") todoId: string,
-        @Param("index") index: number,
+        @Param("todoId", ParseUUIDPipe) todoId: string,
+        @Param("index", ParseIntPipe) index: number,
         @Body() dto: UpdateItemTextDto,
+        @CurrentUser() user: AuthenticatedUser,
     ) {
-        return this.checklistService.updateItemText(todoId, index, dto.text);
+        return this.checklistService.updateItemText({
+            todoId,
+            itemIndex: index,
+            text: dto.text,
+            actor: user,
+        });
     }
 
     @Patch("progress")
     updateProgress(
-        @Param("todoId") todoId: string,
+        @Param("todoId", ParseUUIDPipe) todoId: string,
         @Body() dto: UpdateProgressDto,
+        @CurrentUser() user: AuthenticatedUser,
     ) {
-        return this.checklistService.updateProgress(todoId, dto.delta);
+        return this.checklistService.updateProgress({
+            todoId,
+            delta: dto.delta,
+            actor: user,
+        });
     }
 
     @Delete("items/:index")
-    removeItem(@Param("todoId") todoId: string, @Param("index") index: number) {
-        return this.checklistService.removeItem(todoId, index);
+    removeItem(
+        @Param("todoId", ParseUUIDPipe) todoId: string,
+        @Param("index", ParseIntPipe) index: number,
+        @CurrentUser() user: AuthenticatedUser,
+    ) {
+        return this.checklistService.removeItem({
+            todoId,
+            itemIndex: index,
+            actor: user,
+        });
     }
 
     @Delete()
-    deleteChecklist(@Param("todoId") todoId: string) {
-        return this.checklistService.deleteChecklist(todoId);
+    @HttpCode(HttpStatus.NO_CONTENT)
+    async deleteChecklist(
+        @Param("todoId", ParseUUIDPipe) todoId: string,
+        @CurrentUser() user: AuthenticatedUser,
+    ) {
+        await this.checklistService.deleteChecklist({todoId, actor: user});
     }
 }

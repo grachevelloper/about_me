@@ -1,7 +1,7 @@
 import {QueryClient} from '@tanstack/react-query';
 import axios, {AxiosInstance, AxiosRequestConfig, AxiosResponse} from 'axios';
 
-import {ApiErrorResponse, CustomAxiosError} from '@/typings/axios';
+import {CustomAxiosError} from '@/typings/axios';
 
 export const apiAxios: AxiosInstance = axios.create({
     baseURL: `/api`,
@@ -34,16 +34,9 @@ apiAxios.interceptors.response.use(
                 await apiAxios.post('/auth/refresh');
                 return apiAxios(originalRequest);
             } catch (refreshError) {
-                console.error('Token refresh failed:', refreshError);
+                return Promise.reject(error.response.data);
             }
         }
-
-        const errorData: ApiErrorResponse = error.response?.data || {
-            message: 'Unknown error occurred',
-        };
-
-        console.error('Error from backend:', errorData);
-        return Promise.reject(error.response.data);
     }
 );
 

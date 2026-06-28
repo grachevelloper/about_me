@@ -13,6 +13,7 @@ import block from 'bem-cn-lite';
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 
+import {useLayout} from '../../../../hooks';
 import {useSpecialization, useTimeline} from '../../hooks';
 
 import './AboutMe.scss';
@@ -33,6 +34,7 @@ export const AboutMe = () => {
     const {
         token: {colorPrimaryText, borderRadiusSM, borderRadius},
     } = theme.useToken();
+    const {isMobile} = useLayout();
 
     useEffect(() => {
         const timelineElements =
@@ -137,8 +139,8 @@ export const AboutMe = () => {
                         >
                             <Image
                                 src={skill.icon}
-                                width={80}
-                                height={80}
+                                width={isMobile ? 64 : 80}
+                                height={isMobile ? 64 : 80}
                                 preview={false}
                                 className={b('image-skill-root', {
                                     visible: isSpecializationVisible,
@@ -224,9 +226,6 @@ export const AboutMe = () => {
                         justify='center'
                         style={{height: '100%'}}
                     >
-                        <Typography.Title level={2}>
-                            {t('about.work_experience')}
-                        </Typography.Title>
                         <Timeline items={renderTimelineItems} />
                     </Flex>
                 </Col>

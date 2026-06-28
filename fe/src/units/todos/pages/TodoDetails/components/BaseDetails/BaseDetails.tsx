@@ -29,7 +29,6 @@ export const BaseDetails = ({initialData}: BaseDetailsProps) => {
         updateTitle,
         updatePriority,
         updateState,
-        updateChecklist,
         updateContent,
         isPending,
     } = useTodoMutations();
@@ -48,9 +47,6 @@ export const BaseDetails = ({initialData}: BaseDetailsProps) => {
             case 'state':
                 updateState(initialData.id, newValue as TodoState);
                 break;
-            case 'checklist':
-                updateChecklist(initialData.id, newValue as any[]);
-                break;
             case 'content':
                 updateContent(initialData.id, newValue as string);
                 break;
@@ -64,7 +60,7 @@ export const BaseDetails = ({initialData}: BaseDetailsProps) => {
 
     return (
         <div className={b()}>
-            <Divider orientation='left' orientationMargin={0}>
+            <Divider titlePlacement='start' orientationMargin={0}>
                 <TodoTitle onEnd={handleEnd} content={initialData.title} />
             </Divider>
             <Row gutter={32} justify='start'>

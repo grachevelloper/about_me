@@ -1,6 +1,5 @@
 import {Injectable} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
-import bcrypt from "bcrypt";
 import {randomUUID} from "crypto";
 import {MoreThan, Repository} from "typeorm";
 
@@ -44,9 +43,9 @@ export class RefreshTokensService {
     }
 
     async revokeToken(userId: string, token: string): Promise<void> {
-        const tokenHash = await bcrypt.hash(token, 10);
+        const tokenHash = hashToken(token);
         await this.refreshTokenRepo.update(
-            {userId, tokenHash},
+            {userId, tokenHash, revoked: false},
             {revoked: true},
         );
     }

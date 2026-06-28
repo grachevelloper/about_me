@@ -38,7 +38,7 @@ export const useGetAuthorDrafts = () => {
     });
 };
 
-export const useGetArticlesByAuthor = (authorId: string | undefined) => {
+const useGetArticlesByAuthor = (authorId: string | undefined) => {
     return useQuery<Article[], Error>({
         queryKey: articleKeys.byAuthor(authorId || ''),
         queryFn: () => api.getByAuthorId(authorId!),
@@ -138,7 +138,7 @@ export const useUpdateArticle = () => {
     };
 };
 
-export const useDeleteArticle = () => {
+const useDeleteArticle = () => {
     return useMutation<void, Error, string>({
         mutationFn: (id) => api.delete(id),
         onSuccess: (_, id) => {
@@ -148,7 +148,7 @@ export const useDeleteArticle = () => {
     });
 };
 
-export const usePublishArticle = () => {
+const usePublishArticle = () => {
     return useMutation<boolean, Error, string>({
         mutationFn: (id) => api.publish(id),
         onSuccess: (_, id) => {

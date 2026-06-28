@@ -3,6 +3,8 @@ import {
     Controller,
     Delete,
     Get,
+    HttpCode,
+    HttpStatus,
     Param,
     ParseUUIDPipe,
     Patch,
@@ -10,44 +12,97 @@ import {
 } from "@nestjs/common";
 import {ApiTags} from "@nestjs/swagger";
 
+import {CurrentUser} from "../../shared/decorators/current-user.decorator";
 import {Roles} from "../../shared/decorators/role.decorator";
-import {AuthGuard} from "../../shared/guards/auth.guard";
 import {RolesGuard} from "../../shared/guards/roles.guard";
-import {Role} from "../../types";
-import {UpdateUserDto} from "./user.interface";
-import {User} from "./users.entity";
+import {AuthenticatedUser, Role} from "../../types";
+import {UserResponseDto} from "./dto/user-response.dto";
+import {ChangePasswordDto, UpdateUserDto} from "./user.dto";
+import {UsersMapper} from "./users.mapper";
 import {UsersService} from "./users.service";
 
 @ApiTags("Users")
 @Controller("users")
-@UseGuards(RolesGuard, AuthGuard)
+@UseGuards(RolesGuard)
 export class UsersController {
     constructor(private readonly usersService: UsersService) {}
 
+    @Get("me")
+    async getMe(
+        @CurrentUser() actor: AuthenticatedUser,
+    ): Promise<UserResponseDto> {
+        const user = await this.usersService.findForActor(actor.id, actor);
+        return UsersMapper.toResponse(user);
+    }
+
+    @Patch("me")
+    async updateMe(
+        @Body() updateUserDto: UpdateUserDto,
+        @CurrentUser() actor: AuthenticatedUser,
+    ): Promise<UserResponseDto> {
+        const user = await this.usersService.update(
+            actor.id,
+            updateUserDto,
+            actor,
+        );
+        return UsersMapper.toResponse(user);
+    }
+
+    @Patch("me/password")
+    @HttpCode(HttpStatus.NO_CONTENT)
+    async changeMyPassword(
+        @Body() changePasswordDto: ChangePasswordDto,
+        @CurrentUser() actor: AuthenticatedUser,
+    ): Promise<void> {
+        await this.usersService.changePassword(
+            actor.id,
+            changePasswordDto.currentPassword,
+            changePasswordDto.newPassword,
+            actor,
+        );
+    }
+
     @Get(":id")
+    async findOne(
+        @Param("id", ParseUUIDPipe) id: string,
+        @CurrentUser() actor: AuthenticatedUser,
+    ): Promise<UserResponseDto> {
+        const user = await this.usersService.findForActor(id, actor);
+        return UsersMapper.toResponse(user);
+    }
+
     @Patch(":id")
     async update(
         @Param("id", ParseUUIDPipe) id: string,
         @Body() updateUserDto: UpdateUserDto,
-    ): Promise<User> {
-        return await this.usersService.update(id, updateUserDto);
+        @CurrentUser() actor: AuthenticatedUser,
+    ): Promise<UserResponseDto> {
+        const user = await this.usersService.update(id, updateUserDto, actor);
+        return UsersMapper.toResponse(user);
     }
 
     @Patch(":id/password")
+    @HttpCode(HttpStatus.NO_CONTENT)
     async changePassword(
         @Param("id", ParseUUIDPipe) id: string,
-        @Body() newPassword: string,
-    ): Promise<{message: string}> {
-        await this.usersService.changePassword(id, newPassword);
-        return {message: "Пароль успешно изменен"};
+        @Body() changePasswordDto: ChangePasswordDto,
+        @CurrentUser() actor: AuthenticatedUser,
+    ): Promise<void> {
+        await this.usersService.changePassword(
+            id,
+            changePasswordDto.currentPassword,
+            changePasswordDto.newPassword,
+            actor,
+        );
     }
 
     @Delete(":id")
     @Roles(Role.ADMIN)
+    @HttpCode(HttpStatus.NO_CONTENT)
     async delete(
         @Param("id", ParseUUIDPipe) id: string,
-    ): Promise<{message: string}> {
-        await this.usersService.delete(id);
-        return {message: "Пользователь успешно удален"};
+        @CurrentUser() actor: AuthenticatedUser,
+    ): Promise<void> {
+        await this.usersService.delete(id, actor);
     }
 }

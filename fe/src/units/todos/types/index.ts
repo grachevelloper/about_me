@@ -10,17 +10,15 @@ export interface Todo extends LikedEntity {
 }
 
 export enum TodoPriority {
-    LOW = 'low',
-    MEDIUM = 'medium',
-    HIGH = 'high',
-    SUPER = 'super',
+    LOW = 'Low',
+    MEDIUM = 'Medium',
+    HIGH = 'High',
+    SUPER = 'Super',
 }
 
 export enum TodoState {
-    IN_WORK = 'in_work',
-    PLANNING = 'planning',
-    FINISHED = 'finished',
-    CANCELED = 'canceled',
+    IN_WORK = 'In_work',
+    PLANNING = 'Planning',
+    FINISHED = 'Finished',
+    CANCELED = 'Canceled',
 }
-
-export type EditValue = 'state' | 'priority';

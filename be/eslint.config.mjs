@@ -1,5 +1,6 @@
 import eslint from "@eslint/js";
 import stylistic from "@stylistic/eslint-plugin";
+import jestPlugin from "eslint-plugin-jest";
 import simpleImportSort from "eslint-plugin-simple-import-sort";
 import globals from "globals";
 import tseslint from "typescript-eslint";
@@ -82,6 +83,9 @@ const baseConfig = tseslint.config(
 // Конфиг для тестов
 const testConfig = tseslint.config({
     files: ["**/*.e2e-spec.ts", "**/*.test.ts", "**/*.spec.ts"],
+    plugins: {
+        jest: jestPlugin,
+    },
     rules: {
         // Отключаем строгие проверки для тестов
         "@typescript-eslint/no-unsafe-return": "off",

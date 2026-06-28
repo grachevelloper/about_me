@@ -1,19 +1,26 @@
-import {NotFoundException} from "@nestjs/common";
+import {beforeEach, describe, expect, it, jest} from "@jest/globals";
+import {ForbiddenException, NotFoundException} from "@nestjs/common";
 import {Test, TestingModule} from "@nestjs/testing";
 import {getRepositoryToken} from "@nestjs/typeorm";
-import {Repository} from "typeorm";
-
-import {CreateTodoDto, UpdateTodoDto} from "@/todos/todo.interface";
-import {TodoState} from "@/types/todo";
-import {beforeEach, describe, expect, it, jest} from "@jest/globals";
 import {CommentsService} from "src/modules/comments/comments.service";
 import {Todo} from "src/modules/todos/todos.entity";
 import {TodosService} from "src/modules/todos/todos.service";
+import {AggregateDeletionService} from "src/processes/aggregate-deletion/aggregate-deletion.service";
+import {AuthenticatedUser, Role} from "src/types";
+import {EntityManager, Repository} from "typeorm";
+
+import {CreateTodoDto, UpdateTodoDto} from "@/todos/todo.dto";
+import {TodoState} from "@/types/todo";
 
 describe("TodosService", () => {
     let service: TodosService;
     let repository: jest.Mocked<Repository<Todo>>;
     let commentsService: jest.Mocked<CommentsService>;
+    let aggregateDeletionService: jest.Mocked<AggregateDeletionService>;
+    const entityManager = {
+        delete: jest.fn<EntityManager["delete"]>(),
+        find: jest.fn<EntityManager["find"]>(),
+    };
 
     const mockTodo: Todo = {
         id: "1",
@@ -24,6 +31,18 @@ describe("TodosService", () => {
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
     };
+    const owner = {
+        id: "user-123",
+        role: Role.USER,
+    } as AuthenticatedUser;
+    const stranger = {
+        id: "user-456",
+        role: Role.USER,
+    } as AuthenticatedUser;
+    const admin = {
+        id: "admin-123",
+        role: Role.ADMIN,
+    } as AuthenticatedUser;
 
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
@@ -36,8 +55,18 @@ describe("TodosService", () => {
                         save: jest.fn(),
                         findOne: jest.fn(),
                         find: jest.fn(),
+                        findAndCount: jest.fn(),
                         delete: jest.fn(),
                         createQueryBuilder: jest.fn(),
+                        manager: {
+                            transaction: jest.fn(
+                                async (
+                                    callback: (
+                                        manager: typeof entityManager,
+                                    ) => Promise<unknown>,
+                                ) => callback(entityManager),
+                            ),
+                        },
                     },
                 },
                 {
@@ -46,87 +75,145 @@ describe("TodosService", () => {
                         findByEntity: jest.fn(),
                     },
                 },
+                {
+                    provide: AggregateDeletionService,
+                    useValue: {
+                        deleteTodoAggregate: jest.fn(),
+                    },
+                },
             ],
         }).compile();
 
         service = module.get<TodosService>(TodosService);
         repository = module.get(getRepositoryToken(Todo));
         commentsService = module.get(CommentsService);
-    });
-
-    it("should be defined", () => {
-        expect(service).toBeDefined();
+        aggregateDeletionService = module.get(AggregateDeletionService);
+        entityManager.delete.mockReset();
+        entityManager.find.mockReset();
     });
 
     describe("create", () => {
-        it("should create a todo", async () => {
+        it("should create a todo and return a mapped response", async () => {
             const createTodoData: CreateTodoDto = {
                 title: "New Todo",
                 content: "Description",
-                authorId: "user-123",
             };
+            const todoWithRelation = {
+                ...mockTodo,
+                checklist: {id: "checklist-1"},
+            } as Todo;
 
             repository.create.mockReturnValue(mockTodo);
-            repository.save.mockResolvedValue(mockTodo);
+            repository.save.mockResolvedValue(todoWithRelation);
 
-            const result = await service.create(createTodoData);
+            const result = await service.create({data: createTodoData, actor: owner});
 
-            expect(repository.create).toHaveBeenCalledWith(createTodoData);
+            expect(repository.create).toHaveBeenCalledWith({
+                ...createTodoData,
+                authorId: owner.id,
+            });
             expect(repository.save).toHaveBeenCalledWith(mockTodo);
-            expect(result).toEqual(mockTodo);
+            expect(result).toEqual({
+                id: mockTodo.id,
+                title: mockTodo.title,
+                content: mockTodo.content,
+                authorId: mockTodo.authorId,
+                priority: null,
+                state: null,
+                likesCount: 0,
+                createdAt: mockTodo.createdAt,
+                updatedAt: mockTodo.updatedAt,
+            });
+            expect(result).not.toHaveProperty("checklist");
         });
     });
 
     describe("findOne", () => {
-        it("should return todo if found", async () => {
+        it("should find todo by id", async () => {
             repository.findOne.mockResolvedValue(mockTodo);
 
-            const result = await service.findOne("1");
+            await service.findOne({id: "1", actor: owner});
 
             expect(repository.findOne).toHaveBeenCalledWith({where: {id: "1"}});
-            expect(result).toEqual(mockTodo);
+        });
+
+        it("should allow an administrator to read another user's todo", async () => {
+            repository.findOne.mockResolvedValue(mockTodo);
+
+            await expect(service.findOne({id: "1", actor: admin})).resolves.toEqual({
+                id: mockTodo.id,
+                title: mockTodo.title,
+                content: mockTodo.content,
+                authorId: mockTodo.authorId,
+                priority: null,
+                state: null,
+                likesCount: 0,
+                createdAt: mockTodo.createdAt,
+                updatedAt: mockTodo.updatedAt,
+            });
+        });
+
+        it("should forbid regular users from reading another user's todo", async () => {
+            repository.findOne.mockResolvedValue(mockTodo);
+
+            await expect(
+                service.findOne({id: "1", actor: stranger}),
+            ).rejects.toBeInstanceOf(ForbiddenException);
         });
 
         it("should throw NotFoundException if todo not found", async () => {
             repository.findOne.mockResolvedValue(null);
 
-            await expect(service.findOne("999")).rejects.toThrow(
+            await expect(
+                service.findOne({id: "999", actor: owner}),
+            ).rejects.toThrow(
                 NotFoundException,
             );
         });
     });
 
     describe("findAll", () => {
-        it("should return all todos for author", async () => {
+        it("should find todos by author", async () => {
             const todos = [mockTodo, {...mockTodo, id: "2"}];
-            repository.find.mockResolvedValue(todos);
+            repository.findAndCount.mockResolvedValue([todos, 2]);
 
-            const result = await service.findAll("user-123");
-
-            expect(repository.find).toHaveBeenCalledWith({
-                where: {authorId: "user-123"},
+            const result = await service.findAll("user-123", {
+                page: 2,
+                limit: 1,
             });
-            expect(result).toEqual(todos);
-        });
 
-        it("should return empty array if no todos", async () => {
-            repository.find.mockResolvedValue([]);
-
-            const result = await service.findAll("user-123");
-
-            expect(repository.find).toHaveBeenCalledWith({
+            expect(repository.findAndCount).toHaveBeenCalledWith({
                 where: {authorId: "user-123"},
+                order: {createdAt: "DESC", id: "DESC"},
+                skip: 1,
+                take: 1,
             });
-            expect(result).toEqual([]);
+            expect(result).toEqual({
+                items: todos.map((todo) => ({
+                    id: todo.id,
+                    title: todo.title,
+                    content: todo.content,
+                    authorId: todo.authorId,
+                    priority: null,
+                    state: null,
+                    likesCount: 0,
+                    createdAt: todo.createdAt,
+                    updatedAt: todo.updatedAt,
+                })),
+                page: 2,
+                limit: 1,
+                total: 2,
+                hasNext: false,
+            });
         });
     });
 
     describe("findActive", () => {
-        it("should return active todos for author", async () => {
+        it("should find in-progress todos by author", async () => {
             const activeTodos = [mockTodo];
             repository.find.mockResolvedValue(activeTodos);
 
-            const result = await service.findActive("user-123");
+            await service.findActive("user-123");
 
             expect(repository.find).toHaveBeenCalledWith({
                 where: {
@@ -134,7 +221,6 @@ describe("TodosService", () => {
                     authorId: "user-123",
                 },
             });
-            expect(result).toEqual(activeTodos);
         });
     });
 
@@ -146,42 +232,103 @@ describe("TodosService", () => {
             repository.findOne.mockResolvedValue(mockTodo);
             repository.save.mockResolvedValue(updatedTodo);
 
-            const result = await service.update("1", updateData);
+            const result = await service.update({id: "1", data: updateData, actor: owner});
 
             expect(repository.findOne).toHaveBeenCalledWith({where: {id: "1"}});
             expect(repository.save).toHaveBeenCalledWith({
                 ...mockTodo,
                 ...updateData,
             });
-            expect(result).toEqual(updatedTodo);
+            expect(mockTodo.title).toBe("Test Todo");
+            expect(result).toEqual({
+                id: mockTodo.id,
+                title: "Updated Todo",
+                content: mockTodo.content,
+                authorId: mockTodo.authorId,
+                priority: null,
+                state: null,
+                likesCount: 0,
+                createdAt: mockTodo.createdAt,
+                updatedAt: mockTodo.updatedAt,
+            });
         });
 
         it("should throw NotFoundException if todo not found", async () => {
             repository.findOne.mockResolvedValue(null);
 
             await expect(
-                service.update("999", {title: "Updated"}),
+                service.update({
+                    id: "999",
+                    data: {title: "Updated"},
+                    actor: owner,
+                }),
             ).rejects.toThrow(NotFoundException);
+        });
+
+        it("should forbid regular users from updating another user's todo", async () => {
+            repository.findOne.mockResolvedValue(mockTodo);
+
+            await expect(
+                service.update({
+                    id: "1",
+                    data: {title: "Updated"},
+                    actor: stranger,
+                }),
+            ).rejects.toBeInstanceOf(ForbiddenException);
+            expect(repository.save).not.toHaveBeenCalled();
+        });
+
+        it("should allow an administrator to update another user's todo", async () => {
+            const updateData: UpdateTodoDto = {title: "Admin Updated Todo"};
+            repository.findOne.mockResolvedValue(mockTodo);
+            repository.save.mockResolvedValue({...mockTodo, ...updateData});
+
+            await service.update({id: "1", data: updateData, actor: admin});
+
+            expect(repository.save).toHaveBeenCalledWith({
+                ...mockTodo,
+                ...updateData,
+            });
         });
     });
 
     describe("delete", () => {
         it("should delete todo", async () => {
             repository.findOne.mockResolvedValue(mockTodo);
-            repository.delete.mockResolvedValue({raw: [], affected: 1} as any);
+            aggregateDeletionService.deleteTodoAggregate.mockResolvedValue();
 
-            await service.delete("1");
+            await service.delete({id: "1", actor: owner});
 
             expect(repository.findOne).toHaveBeenCalledWith({where: {id: "1"}});
-            expect(repository.delete).toHaveBeenCalledWith("1");
+            expect(aggregateDeletionService.deleteTodoAggregate).toHaveBeenCalledWith("1");
         });
 
         it("should throw NotFoundException if todo not found", async () => {
             repository.findOne.mockResolvedValue(null);
 
-            await expect(service.delete("999")).rejects.toThrow(
+            await expect(service.delete({id: "999", actor: owner})).rejects.toThrow(
                 NotFoundException,
             );
+        });
+
+        it("should forbid regular users from deleting another user's todo", async () => {
+            repository.findOne.mockResolvedValue(mockTodo);
+
+            await expect(
+                service.delete({id: "1", actor: stranger}),
+            ).rejects.toBeInstanceOf(ForbiddenException);
+            expect(aggregateDeletionService.deleteTodoAggregate).not.toHaveBeenCalled();
+        });
+
+        it("should propagate aggregate deletion errors", async () => {
+            repository.findOne.mockResolvedValue(mockTodo);
+            aggregateDeletionService.deleteTodoAggregate.mockRejectedValue(
+                new Error("storage failed"),
+            );
+
+            await expect(
+                service.delete({id: "1", actor: owner}),
+            ).rejects.toThrow("storage failed");
         });
     });
 
@@ -190,90 +337,47 @@ describe("TodosService", () => {
             const mockComments = [{id: "1", content: "Test comment"}];
 
             repository.findOne.mockResolvedValue(mockTodo);
-            commentsService.findByEntity.mockResolvedValue(mockComments as any);
+            commentsService.findByEntity.mockResolvedValue({
+                items: mockComments,
+                page: 1,
+                limit: 100,
+                total: 1,
+                hasNext: false,
+            } as any);
 
-            const result = await service.findTodoWithComments("1");
+            const result = await service.findTodoWithComments({
+                todoId: "1",
+                actor: owner,
+            });
 
             expect(repository.findOne).toHaveBeenCalledWith({where: {id: "1"}});
-            expect(commentsService.findByEntity).toHaveBeenCalledWith(
-                "todo",
-                "1",
-            );
-            expect(result).toEqual({...mockTodo, comments: mockComments});
-        });
-
-        it("should return todo with empty comments if no comments", async () => {
-            repository.findOne.mockResolvedValue(mockTodo);
-            commentsService.findByEntity.mockResolvedValue([]);
-
-            const result = await service.findTodoWithComments("1");
-
-            expect(result).toEqual({...mockTodo, comments: []});
-        });
-
-        it("should return null todo if not found", async () => {
-            repository.findOne.mockResolvedValue(null);
-            commentsService.findByEntity.mockResolvedValue([]);
-
-            const result = await service.findTodoWithComments("999");
-            expect(result).toEqual({comments: []});
-        });
-    });
-
-    describe("incrementLikesCount", () => {
-        it("should increment likes count", async () => {
-            const mockQueryBuilder = {
-                update: jest.fn().mockReturnThis(),
-                set: jest.fn().mockReturnThis(),
-                where: jest.fn().mockReturnThis(),
-                execute: jest.fn().mockResolvedValue({} as never),
-            };
-
-            repository.createQueryBuilder.mockReturnValue(
-                mockQueryBuilder as any,
-            );
-
-            await service.incrementLikesCount("1");
-
-            expect(repository.createQueryBuilder).toHaveBeenCalled();
-            expect(mockQueryBuilder.update).toHaveBeenCalledWith(Todo);
-            expect(mockQueryBuilder.set).toHaveBeenCalledWith({
-                likesCount: expect.any(Function),
+            expect(commentsService.findByEntity).toHaveBeenCalledWith({
+                actor: owner,
+                entityType: "todo",
+                entityId: "1",
             });
-            expect(mockQueryBuilder.where).toHaveBeenCalledWith(
-                "id = :todoId",
-                {todoId: "1"},
-            );
-            expect(mockQueryBuilder.execute).toHaveBeenCalled();
+            expect(result).toEqual({
+                id: mockTodo.id,
+                title: mockTodo.title,
+                content: mockTodo.content,
+                authorId: mockTodo.authorId,
+                priority: null,
+                state: null,
+                likesCount: 0,
+                createdAt: mockTodo.createdAt,
+                updatedAt: mockTodo.updatedAt,
+                comments: mockComments,
+            });
+        });
+
+        it("should throw NotFoundException if todo not found", async () => {
+            repository.findOne.mockResolvedValue(null);
+
+            await expect(
+                service.findTodoWithComments({todoId: "999", actor: owner}),
+            ).rejects.toBeInstanceOf(NotFoundException);
+            expect(commentsService.findByEntity).not.toHaveBeenCalled();
         });
     });
 
-    describe("decrementLikesCount", () => {
-        it("should decrement likes count", async () => {
-            const mockQueryBuilder = {
-                update: jest.fn().mockReturnThis(),
-                set: jest.fn().mockReturnThis(),
-                where: jest.fn().mockReturnThis(),
-                andWhere: jest.fn().mockReturnThis(),
-                execute: jest.fn().mockResolvedValue({} as never),
-            };
-
-            repository.createQueryBuilder.mockReturnValue(
-                mockQueryBuilder as any,
-            );
-
-            await service.decrementLikesCount("1");
-
-            expect(repository.createQueryBuilder).toHaveBeenCalled();
-            expect(mockQueryBuilder.update).toHaveBeenCalledWith(Todo);
-            expect(mockQueryBuilder.where).toHaveBeenCalledWith(
-                "id = :todoId",
-                {todoId: "1"},
-            );
-            expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith(
-                "likesCount > 0",
-            );
-            expect(mockQueryBuilder.execute).toHaveBeenCalled();
-        });
-    });
 });

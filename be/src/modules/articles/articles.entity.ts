@@ -1,13 +1,4 @@
 import {
-    IsArray,
-    IsNotEmpty,
-    IsNumber,
-    IsOptional,
-    IsString,
-    IsUrl,
-    Min,
-} from "class-validator";
-import {
     Column,
     Entity,
     JoinColumn,
@@ -23,45 +14,32 @@ import {Tag} from "./tags/tags.entity";
 @Entity("articles")
 export class Article extends BaseEntity {
     @Column()
-    @IsString()
-    @IsNotEmpty()
-    title: string;
+    title!: string;
 
     @Column()
-    @IsUrl()
-    @IsNotEmpty()
-    image: string;
+    image!: string;
 
     @Column("text")
-    @IsString()
-    @IsNotEmpty()
-    content: string;
+    content!: string;
 
-    @ManyToMany(() => Tag, {cascade: true, eager: true})
+    @ManyToMany(() => Tag, {eager: true})
     @JoinTable({
         name: "article_tags",
         joinColumn: {name: "articleId", referencedColumnName: "id"},
         inverseJoinColumn: {name: "tagId", referencedColumnName: "id"},
     })
-    @IsArray()
-    @IsOptional()
     tags?: Tag[];
 
     @Column({nullable: true})
-    @IsNumber()
-    @Min(1)
-    @IsOptional()
     readTime?: number;
 
     @Column({default: 0})
-    @IsNumber()
-    @Min(0)
-    likesCount: number;
+    likesCount!: number;
 
-    @ManyToOne(() => User, {cascade: true})
+    @ManyToOne(() => User)
     @JoinColumn({name: "authorId"})
-    author: User;
+    author!: User;
 
     @Column({default: true})
-    isDraft: boolean;
+    isDraft!: boolean;
 }
