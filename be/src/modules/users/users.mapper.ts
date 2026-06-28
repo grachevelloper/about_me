@@ -13,7 +13,6 @@ export class UsersMapper {
             nowWatch: user.nowWatch ?? null,
             nowBeingIn: user.nowBeingIn ?? null,
             nowListening: user.nowListening ?? null,
-            status: user.status ?? null,
             createdAt: user.createdAt,
             updatedAt: user.updatedAt,
         };

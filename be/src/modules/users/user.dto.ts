@@ -2,7 +2,6 @@ import {ApiProperty, ApiPropertyOptional} from "@nestjs/swagger";
 import {
     IsEmail,
     IsEnum,
-    IsInt,
     IsOptional,
     IsString,
     Length,
@@ -10,8 +9,6 @@ import {
     MaxLength,
     MinLength,
 } from "class-validator";
-
-import {UserStatus} from "@/types/user";
 
 import {Role} from "../../types";
 
@@ -60,10 +57,6 @@ export class UpdateUserDto {
     @IsString()
     @IsOptional()
     avatar?: string;
-
-    @IsInt()
-    @IsOptional()
-    status?: UserStatus;
 
     @IsString()
     @IsOptional()

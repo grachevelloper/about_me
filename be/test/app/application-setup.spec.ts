@@ -10,11 +10,11 @@ import request from "supertest";
 
 class ValidationTestDto {
     @IsString()
-    name: string;
+    name!: string;
 
     @Type(() => Number)
     @IsInt()
-    count: number;
+    count!: number;
 }
 
 @Controller("stage-two-test")

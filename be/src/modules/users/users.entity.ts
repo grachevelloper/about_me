@@ -2,7 +2,6 @@ import {Column, Entity} from "typeorm";
 
 import {BaseEntity} from "../../shared/utils/entity";
 import {Role} from "../../types";
-import {UserStatus} from "../../types/user";
 
 @Entity("users")
 export class User extends BaseEntity {
@@ -37,7 +36,4 @@ export class User extends BaseEntity {
 
     @Column({nullable: true})
     nowListening?: string;
-
-    @Column({type: "integer", nullable: true})
-    status?: UserStatus;
 }

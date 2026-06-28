@@ -16,7 +16,6 @@ describe("UsersMapper", () => {
             nowWatch: undefined,
             nowBeingIn: undefined,
             nowListening: undefined,
-            status: undefined,
             createdAt: "2026-01-01T00:00:00.000Z",
             updatedAt: "2026-01-02T00:00:00.000Z",
         });
@@ -33,7 +32,6 @@ describe("UsersMapper", () => {
             nowWatch: null,
             nowBeingIn: null,
             nowListening: null,
-            status: null,
             createdAt: user.createdAt,
             updatedAt: user.updatedAt,
         });
