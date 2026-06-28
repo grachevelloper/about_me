@@ -1,4 +1,4 @@
-# Fullstack exemplary app
+# Сайт Николая Грачева
 
 The application is available at <http://fe_fullstack-app.localhost> in both supported development modes. Local HTTPS is not configured.
 
