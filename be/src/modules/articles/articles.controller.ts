@@ -12,6 +12,7 @@ import {
     Query,
 } from "@nestjs/common";
 
+import {Public} from "../../shared/decorators/auth.decorator";
 import {CurrentUser} from "../../shared/decorators/current-user.decorator";
 import {AuthenticatedUser} from "../../types";
 import {
@@ -50,6 +51,7 @@ export class ArticlesController {
     }
 
     @Get("author/:authorId")
+    @Public()
     async findAllByAuthorId(
         @Param("authorId", ParseUUIDPipe) authorId: string,
     ): Promise<ResponseArticle[]> {
@@ -57,8 +59,9 @@ export class ArticlesController {
     }
 
     @Get(":id")
+    @Public()
     async findOne(
-        @CurrentUser() user: AuthenticatedUser,
+        @CurrentUser() user: AuthenticatedUser | undefined,
         @Param("id", ParseUUIDPipe) id: string,
     ): Promise<ResponseArticle> {
         return await this.articlesService.findOne({id, actor: user});
@@ -91,6 +94,7 @@ export class ArticlesController {
     }
 
     @Get()
+    @Public()
     async findAll(
         @Query() query: RequestGetArticles,
     ): Promise<ResponseGetArticles> {

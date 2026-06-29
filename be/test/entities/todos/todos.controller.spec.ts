@@ -3,6 +3,7 @@ import {HttpStatus, ParseUUIDPipe} from "@nestjs/common";
 import {HTTP_CODE_METADATA, ROUTE_ARGS_METADATA} from "@nestjs/common/constants";
 import {TodosController} from "src/modules/todos/todos.controller";
 import {TodosService} from "src/modules/todos/todos.service";
+import {IS_PUBLIC_KEY} from "src/shared/decorators/auth.decorator";
 import {AuthenticatedUser, Role} from "src/types";
 
 describe("TodosController", () => {
@@ -42,7 +43,7 @@ describe("TodosController", () => {
         });
     });
 
-    it("passes pagination query and actor id to the service", async () => {
+    it("exposes list endpoint publicly and passes only pagination query to the service", async () => {
         const service = {
             findAll: jest.fn<TodosService["findAll"]>().mockResolvedValue({
                 items: [],
@@ -55,11 +56,29 @@ describe("TodosController", () => {
         const controller = new TodosController(service);
         const query = {page: 1, limit: 10};
 
-        await controller.findAll(actor, query);
+        await controller.findAll(query);
 
-        expect(service.findAll).toHaveBeenCalledWith(actor.id, query);
+        expect(
+            Reflect.getMetadata(IS_PUBLIC_KEY, TodosController.prototype.findAll),
+        ).toBe(true);
+        expect(service.findAll).toHaveBeenCalledWith(query);
     });
 
+    it("exposes detail endpoint publicly and passes only todo id to the service", async () => {
+        const service = {
+            findOne: jest.fn<TodosService["findOne"]>().mockResolvedValue({} as never),
+        } as unknown as TodosService;
+        const controller = new TodosController(service);
+
+        await controller.findOne("82c130b1-1c47-4a0c-8a1c-e79cc39282ad");
+
+        expect(
+            Reflect.getMetadata(IS_PUBLIC_KEY, TodosController.prototype.findOne),
+        ).toBe(true);
+        expect(service.findOne).toHaveBeenCalledWith({
+            id: "82c130b1-1c47-4a0c-8a1c-e79cc39282ad",
+        });
+    });
 
     it("declares no-content status for deletion", () => {
         expect(

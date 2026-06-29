@@ -208,6 +208,26 @@ describe("ArticlesService", () => {
         expect(queryBuilder.take).toHaveBeenCalledWith(10);
     });
 
+    it("allows anonymous users to read published article details without liked state", async () => {
+        repository.findOne.mockResolvedValue({...article, isDraft: false});
+
+        const result = await service.findOne({id: article.id});
+
+        expect(result.hasLiked).toBe(false);
+        expect(repository.findOne).toHaveBeenCalledWith({
+            where: {id: article.id},
+            relations: ["author", "tags"],
+        });
+    });
+
+    it("forbids anonymous users from reading draft article details", async () => {
+        repository.findOne.mockResolvedValue({...article, isDraft: true});
+
+        await expect(service.findOne({id: article.id})).rejects.toBeInstanceOf(
+            ForbiddenException,
+        );
+    });
+
     it("forbids reading another user's drafts", async () => {
         await expect(
             service.findAllByAuthorId({

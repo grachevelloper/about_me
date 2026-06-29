@@ -3,6 +3,7 @@ import {HttpStatus, ParseUUIDPipe} from "@nestjs/common";
 import {HTTP_CODE_METADATA, ROUTE_ARGS_METADATA} from "@nestjs/common/constants";
 import {ArticlesController} from "src/modules/articles/articles.controller";
 import {ArticlesService} from "src/modules/articles/articles.service";
+import {IS_PUBLIC_KEY} from "src/shared/decorators/auth.decorator";
 import {AuthenticatedUser, Role} from "src/types";
 
 describe("ArticlesController", () => {
@@ -63,6 +64,48 @@ describe("ArticlesController", () => {
         expect(service.publish).toHaveBeenCalledWith({
             actor,
             id: "82c130b1-1c47-4a0c-8a1c-e79cc39282ad",
+        });
+    });
+
+    it("exposes published list endpoint publicly", async () => {
+        const service = {
+            findAll: jest.fn<ArticlesService["findAll"]>().mockResolvedValue({
+                items: [],
+                page: 1,
+                limit: 10,
+                total: 0,
+                hasNext: false,
+            }),
+        } as unknown as ArticlesService;
+        const controller = new ArticlesController(service);
+
+        await controller.findAll({});
+
+        expect(
+            Reflect.getMetadata(IS_PUBLIC_KEY, ArticlesController.prototype.findAll),
+        ).toBe(true);
+        expect(service.findAll).toHaveBeenCalledWith({});
+    });
+
+    it("exposes published detail endpoint publicly", async () => {
+        const service = {
+            findOne: jest.fn<ArticlesService["findOne"]>().mockResolvedValue(
+                {} as never,
+            ),
+        } as unknown as ArticlesService;
+        const controller = new ArticlesController(service);
+
+        await controller.findOne(
+            undefined,
+            "82c130b1-1c47-4a0c-8a1c-e79cc39282ad",
+        );
+
+        expect(
+            Reflect.getMetadata(IS_PUBLIC_KEY, ArticlesController.prototype.findOne),
+        ).toBe(true);
+        expect(service.findOne).toHaveBeenCalledWith({
+            id: "82c130b1-1c47-4a0c-8a1c-e79cc39282ad",
+            actor: undefined,
         });
     });
 

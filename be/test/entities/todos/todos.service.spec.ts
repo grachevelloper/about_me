@@ -5,6 +5,7 @@ import {getRepositoryToken} from "@nestjs/typeorm";
 import {CommentsService} from "src/modules/comments/comments.service";
 import {Todo} from "src/modules/todos/todos.entity";
 import {TodosService} from "src/modules/todos/todos.service";
+import {UsersService} from "src/modules/users/users.service";
 import {AggregateDeletionService} from "src/processes/aggregate-deletion/aggregate-deletion.service";
 import {AuthenticatedUser, Role} from "src/types";
 import {EntityManager, Repository} from "typeorm";
@@ -17,6 +18,7 @@ describe("TodosService", () => {
     let repository: jest.Mocked<Repository<Todo>>;
     let commentsService: jest.Mocked<CommentsService>;
     let aggregateDeletionService: jest.Mocked<AggregateDeletionService>;
+    let usersService: jest.Mocked<UsersService>;
     const entityManager = {
         delete: jest.fn<EntityManager["delete"]>(),
         find: jest.fn<EntityManager["find"]>(),
@@ -81,6 +83,12 @@ describe("TodosService", () => {
                         deleteTodoAggregate: jest.fn(),
                     },
                 },
+                {
+                    provide: UsersService,
+                    useValue: {
+                        findByEmail: jest.fn(),
+                    },
+                },
             ],
         }).compile();
 
@@ -88,6 +96,11 @@ describe("TodosService", () => {
         repository = module.get(getRepositoryToken(Todo));
         commentsService = module.get(CommentsService);
         aggregateDeletionService = module.get(AggregateDeletionService);
+        usersService = module.get(UsersService);
+        usersService.findByEmail.mockResolvedValue({
+            id: "user-123",
+            email: "gracheveloper@gmail.com",
+        } as never);
         entityManager.delete.mockReset();
         entityManager.find.mockReset();
     });
@@ -132,9 +145,14 @@ describe("TodosService", () => {
         it("should find todo by id", async () => {
             repository.findOne.mockResolvedValue(mockTodo);
 
-            await service.findOne({id: "1", actor: owner});
+            await service.findOne({id: "1"});
 
-            expect(repository.findOne).toHaveBeenCalledWith({where: {id: "1"}});
+            expect(usersService.findByEmail).toHaveBeenCalledWith(
+                "gracheveloper@gmail.com",
+            );
+            expect(repository.findOne).toHaveBeenCalledWith({
+                where: {id: "1", authorId: "user-123"},
+            });
         });
 
         it("should allow an administrator to read another user's todo", async () => {
@@ -173,15 +191,18 @@ describe("TodosService", () => {
     });
 
     describe("findAll", () => {
-        it("should find todos by author", async () => {
+        it("should find all todos for public read", async () => {
             const todos = [mockTodo, {...mockTodo, id: "2"}];
             repository.findAndCount.mockResolvedValue([todos, 2]);
 
-            const result = await service.findAll("user-123", {
+            const result = await service.findAll({
                 page: 2,
                 limit: 1,
             });
 
+            expect(usersService.findByEmail).toHaveBeenCalledWith(
+                "gracheveloper@gmail.com",
+            );
             expect(repository.findAndCount).toHaveBeenCalledWith({
                 where: {authorId: "user-123"},
                 order: {createdAt: "DESC", id: "DESC"},

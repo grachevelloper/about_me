@@ -12,6 +12,7 @@ import {
     Query,
     UseGuards,
 } from "@nestjs/common";
+import {Public} from "src/shared/decorators/auth.decorator";
 import {CurrentUser} from "src/shared/decorators/current-user.decorator";
 import {AuthGuard} from "src/shared/guards/auth.guard";
 import {AuthenticatedUser} from "src/types";
@@ -36,19 +37,19 @@ export class TodosController {
     }
 
     @Get()
+    @Public()
     async findAll(
-        @CurrentUser() user: AuthenticatedUser,
         @Query() query: QueryTodosDto,
     ): Promise<ResponseGetTodos> {
-        return await this.todosService.findAll(user.id, query);
+        return await this.todosService.findAll(query);
     }
 
     @Get(":id")
+    @Public()
     async findOne(
         @Param("id", ParseUUIDPipe) id: string,
-        @CurrentUser() user: AuthenticatedUser,
     ) {
-        return this.todosService.findOne({id, actor: user});
+        return this.todosService.findOne({id});
     }
 
     @Patch(":id")

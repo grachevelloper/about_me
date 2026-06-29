@@ -37,7 +37,7 @@ interface UpdateArticleCommand {
 }
 
 interface FindArticleCommand {
-    actor: AuthenticatedUser;
+    actor?: AuthenticatedUser;
     id: string;
 }
 
@@ -229,14 +229,16 @@ export class ArticlesService {
             throw new NotFoundException("Article not found");
         }
         if (article.isDraft) {
-            this.assertCanMutate(article, actor);
+            this.assertCanReadDraft(article, actor);
         }
 
-        const likedArticle = await this.likesService.hasLiked({
-            entityId: id,
-            userId: actor.id,
-            entityType: "article",
-        });
+        const likedArticle = actor
+            ? await this.likesService.hasLiked({
+                  entityId: id,
+                  userId: actor.id,
+                  entityType: "article",
+              })
+            : false;
 
         return ArticlesMapper.toResponse(article, Boolean(likedArticle));
     }
@@ -301,6 +303,18 @@ export class ArticlesService {
         }
 
         throw new ForbiddenException("You do not have access to these drafts");
+    }
+
+    private assertCanReadDraft(
+        article: Article,
+        actor?: AuthenticatedUser,
+    ): void {
+        if (actor) {
+            this.assertCanMutate(article, actor);
+            return;
+        }
+
+        throw new ForbiddenException("You do not have access to this article");
     }
 
     private async resolveTags(tags?: CreateArticleDto["tags"]): Promise<Tag[]> {
