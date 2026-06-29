@@ -72,6 +72,7 @@
         display: grid;
         grid-template-columns: 16px minmax(0, 1fr);
         gap: 22px;
+        cursor: pointer;
 
         &::before {
             content: '';
@@ -103,12 +104,29 @@
     }
 
     &__item-head {
+        justify-content: space-between;
         margin-bottom: 8px;
 
         h3 {
             margin: 0 !important;
             font-size: clamp(18px, 2.4vw, 24px) !important;
         }
+    }
+
+    &__item-heading-copy {
+        display: flex;
+        min-width: 0;
+        flex: 1 1 280px;
+        flex-wrap: wrap;
+        gap: 8px 12px;
+        align-items: baseline;
+    }
+
+    &__experience-toggle {
+        flex: 0 0 auto;
+        transition:
+            background-color 180ms ease,
+            transform 180ms ease;
     }
 
     &__period {
@@ -118,9 +136,29 @@
         font-size: 13px;
     }
 
+    &__description-wrap {
+        display: grid;
+        grid-template-rows: 0fr;
+        overflow: hidden;
+        transition:
+            grid-template-rows 280ms ease,
+            opacity 220ms ease,
+            transform 220ms ease;
+        opacity: 0;
+        transform: translateY(-6px);
+
+        &_expanded {
+            grid-template-rows: 1fr;
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
     &__description {
+        min-height: 0;
         margin: 0 !important;
         font-size: 16px;
+        white-space: pre-line;
     }
 
     &__education-card,
@@ -159,6 +197,13 @@
     &__skill-tag {
         margin: 0;
         white-space: normal;
+    }
+
+    &__skill-tooltip {
+        .ant-tooltip-arrow::before {
+            background: #fff;
+            border: 1px solid rgb(229 231 235);
+        }
     }
 
     @media (max-width: 991px) {

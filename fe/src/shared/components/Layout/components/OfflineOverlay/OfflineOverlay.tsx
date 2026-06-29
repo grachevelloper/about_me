@@ -1,4 +1,4 @@
-import {Flex, theme, Typography} from 'antd';
+import {Flex, Typography} from 'antd';
 import block from 'bem-cn-lite';
 import Lottie from 'lottie-react';
 import {useEffect} from 'react';
@@ -11,9 +11,6 @@ import './OfflineOverlay.scss';
 const b = block('offline-overlay');
 
 export const OfflineOverlay = () => {
-    const {
-        token: {},
-    } = theme.useToken();
     const {t} = useTranslation('common');
 
     useEffect(() => {

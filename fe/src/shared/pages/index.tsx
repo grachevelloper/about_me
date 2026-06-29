@@ -9,7 +9,7 @@ export const sharedPagesRoutes: RouteProps[] = [
         element: <NoPermissionPage />,
     },
     {
-        path: 'not-found',
+        path: '*',
         element: <NotFoundPage />,
     },
 ];

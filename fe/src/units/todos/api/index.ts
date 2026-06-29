@@ -6,13 +6,17 @@ import {DtoCreateTodo, type DtoUpdateTodo, type TodoApi} from './types';
 
 const Api: TodoApi = {
     listTodos: async () => {
-        const listTodos = await query.get(`/todos`);
+        const listTodos = await query.get(`/todos`, {
+            skipAuthRedirect: true,
+        });
 
         return listTodos;
     },
 
     getTodoById: async (id: string) => {
-        const todoData = await query.get<Todo>(`/todos/${id}`);
+        const todoData = await query.get<Todo>(`/todos/${id}`, {
+            skipAuthRedirect: true,
+        });
 
         return todoData;
     },

@@ -26,10 +26,6 @@
         font-size: 16px;
     }
 
-    &__actions {
-        flex-shrink: 0;
-    }
-
     &__hero-accent {
         position: absolute;
         inset: auto -12% -48% auto;
@@ -42,13 +38,5 @@
 
     @media (max-width: 575px) {
         padding: 0 16px 40px;
-
-        &__actions {
-            width: 100%;
-
-            .ant-btn {
-                flex: 1 1 100%;
-            }
-        }
     }
 }

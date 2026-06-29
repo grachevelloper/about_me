@@ -1,4 +1,4 @@
-export function getTimeOfDay(name: string, hour: number): string {
+export function getTimeOfDay(hour: number, name = 'путник'): string {
     if (hour >= 5 && hour < 12) {
         return `Доброе утро, ${name}`;
     } else if (hour >= 12 && hour < 17) {
@@ -10,7 +10,6 @@ export function getTimeOfDay(name: string, hour: number): string {
 }
 
 export const getSticker = (hour: number) => {
-    console.log(hour);
     let randomSticker;
     if (hour >= 5 && hour < 12) {
         randomSticker = MORNINGS_STICKERS[0];

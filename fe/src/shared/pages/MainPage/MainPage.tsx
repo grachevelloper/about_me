@@ -1,8 +1,6 @@
-import {BookOutlined, FileTextOutlined} from '@ant-design/icons';
-import {Button, Card, Col, Flex, Row, theme, Typography} from 'antd';
+import {Card, Col, Flex, Row, theme, Typography} from 'antd';
 import block from 'bem-cn-lite';
 import {useTranslation} from 'react-i18next';
-import {useNavigate} from 'react-router-dom';
 
 import {useTodosQuery} from '@/todos/store';
 
@@ -17,9 +15,12 @@ const b = block('main-page');
 export const MainPage = () => {
     const {t} = useTranslation('common');
     const {data: todos} = useTodosQuery();
-    const navigate = useNavigate();
     const {
-        token: {colorBgContainer, colorBorderSecondary, colorPrimaryBg},
+        token: {
+            colorBgContainer,
+            colorBorderSecondary,
+            colorPrimaryBg,
+        },
     } = theme.useToken();
 
     return (
@@ -46,23 +47,6 @@ export const MainPage = () => {
                                     {t('main.lead')}
                                 </Typography.Paragraph>
                             </div>
-                            <Flex className={b('actions')} gap={12} wrap='wrap'>
-                                <Button
-                                    type='primary'
-                                    size='large'
-                                    icon={<FileTextOutlined />}
-                                    onClick={() => void navigate('/resume')}
-                                >
-                                    {t('layout.top.resume')}
-                                </Button>
-                                <Button
-                                    size='large'
-                                    icon={<BookOutlined />}
-                                    onClick={() => void navigate('/articles')}
-                                >
-                                    {t('layout.top.articles')}
-                                </Button>
-                            </Flex>
                         </Flex>
                         <div
                             className={b('hero-accent')}
@@ -70,10 +54,10 @@ export const MainPage = () => {
                         />
                     </Card>
                 </Col>
-                <Col xs={24} xl={16}>
+                <Col xs={24}>
                     <TodoListTable todos={todos} />
                 </Col>
-                <Col xs={24} xl={8}>
+                <Col xs={24}>
                     <Nowadays />
                 </Col>
             </Row>

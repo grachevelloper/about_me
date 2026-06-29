@@ -72,7 +72,9 @@ const api: ArticleApi = {
     },
 
     getById: async (id: string): Promise<Article> => {
-        const response = await query.get<Article>(`articles/${id}`);
+        const response = await query.get<Article>(`articles/${id}`, {
+            skipAuthRedirect: true,
+        });
         return response;
     },
 
@@ -83,13 +85,16 @@ const api: ArticleApi = {
 
     getByAuthorId: async (authorId: string): Promise<Article[]> => {
         const response = await query.get<Article[]>(
-            `articles/author/${authorId}`
+            `articles/author/${authorId}`,
+            {skipAuthRedirect: true}
         );
         return response;
     },
 
     getAll: async () => {
-        const response = await query.get('articles');
+        const response = await query.get('articles', {
+            skipAuthRedirect: true,
+        });
         return response;
     },
 

@@ -3,6 +3,7 @@
     "todo.priority.medium": "Medium",
     "todo.priority.high": "High",
     "todo.priority.super": "Super",
+    "todo.table.title": "Today's tasks",
     "todo.table.col.todo": "Mission",
     "todo.state.in_work": "In work",
     "todo.state.planning": "Planning",

@@ -11,12 +11,14 @@ import {useAuth} from '../../context';
 import {useSidebar} from '../../context/Sidebar';
 import {useCookie} from '../../hooks/useCookie';
 import {useLayout} from '../../hooks/useLayout';
+import {useNetworkStatus} from '../../hooks/useNetworkStatus';
 
 import {isMe} from './api';
 import {Animation} from './components/Animation';
 import {Sider} from './components/Sider';
 
 import './Layout.scss';
+import {COOKIE_ACCEPT_KEY} from './constants';
 
 const b = block('layout');
 
@@ -47,10 +49,9 @@ export const Layout = () => {
     const {setUserData} = useAuth();
     const location = useLocation();
     const {isDesktop} = useLayout();
-    const {value} = useCookie('cookie-accept');
+    const {isOffline} = useNetworkStatus();
+    const {value} = useCookie(COOKIE_ACCEPT_KEY);
     const {isCollapsed, toggleCollapsed, setCollapsed} = useSidebar();
-
-    const isOffline = !window.navigator.onLine;
 
     const {
         token: {colorPrimary, colorTextLightSolid},
@@ -58,11 +59,15 @@ export const Layout = () => {
 
     useEffect(() => {
         const getUser = async () => {
-            const user = await isMe();
-            setUserData(user);
+            try {
+                const user = await isMe();
+                setUserData(user);
+            } catch {
+                setUserData(undefined);
+            }
         };
         getUser();
-    }, []);
+    }, [setUserData]);
 
     useEffect(() => {
         if (!isDesktop) {

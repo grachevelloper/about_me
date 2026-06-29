@@ -1,8 +1,10 @@
 import {Layout, Spin, theme} from 'antd';
 import {Content} from 'antd/es/layout/layout';
 import block from 'bem-cn-lite';
-import {useEffect, useState} from 'react';
+import {lazy, Suspense, useEffect, useState} from 'react';
 import {Navigate, Outlet} from 'react-router-dom';
+
+import {useNetworkStatus} from '@/shared/hooks';
 
 import authBackground from '@/public/assets/auth.jpeg';
 
@@ -16,6 +18,11 @@ const authBackgroundUrl =
     process.env.NODE_ENV === 'development'
         ? '/assets/auth.jpeg'
         : authBackground;
+const OfflineOverlay = lazy(() =>
+    import('../Layout/components/OfflineOverlay').then(({OfflineOverlay}) => ({
+        default: OfflineOverlay,
+    }))
+);
 
 export const AuthLayout = () => {
     const {
@@ -24,6 +31,7 @@ export const AuthLayout = () => {
     const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(
         null
     );
+    const {isOffline} = useNetworkStatus();
 
     useEffect(() => {
         const verifyAuth = async () => {
@@ -48,6 +56,11 @@ export const AuthLayout = () => {
 
     return (
         <Layout className={b()}>
+            {isOffline && (
+                <Suspense fallback={null}>
+                    <OfflineOverlay />
+                </Suspense>
+            )}
             <img className={b('background')} src={authBackgroundUrl} alt='' />
             <div
                 aria-hidden='true'

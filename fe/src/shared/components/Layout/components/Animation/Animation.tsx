@@ -16,7 +16,27 @@ const millisecondsSinceStartOfDay = CURRENT_TIME - START_OF_DAY;
 const minutesSinceStartOfDay = millisecondsSinceStartOfDay / (1000 * 60) - 1;
 
 const progress = (millisecondsSinceStartOfDay / TOTAL_DAY_DURATION) * 100;
-const STAR_COUNT = 72;
+const STAR_COUNT = 160;
+const styleMods = ['style1', 'style2', 'style3', 'style4'] as const;
+const sizeMods = ['size1', 'size1', 'size1', 'size2', 'size3'] as const;
+const opacityMods = [
+    'opacity1',
+    'opacity1',
+    'opacity1',
+    'opacity2',
+    'opacity2',
+    'opacity3',
+] as const;
+
+type StarMod<T extends string> = readonly [T, ...T[]];
+
+const getRandomInt = (min: number, max: number) =>
+    Math.floor(Math.random() * (max - min)) + min;
+
+const getRandomPercent = () => `${Math.random() * 100}%`;
+
+const getRandomMod = <T extends string>(mods: StarMod<T>) =>
+    mods[getRandomInt(0, mods.length)] ?? mods[0];
 
 const formatter: StatisticProps['formatter'] = () => (
     <CountUp
@@ -45,11 +65,12 @@ export const Animation = () => {
         () =>
             Array.from({length: STAR_COUNT}, (_, index) => ({
                 id: index,
-                left: `${(index * 37) % 100}%`,
-                top: `${(index * 61) % 72}%`,
-                delay: `${(index % 9) * 0.18}s`,
-                scale: 0.7 + (index % 4) * 0.35,
-                opacity: 0.24 + (index % 5) * 0.12,
+                left: getRandomPercent(),
+                top: getRandomPercent(),
+                delay: `${Math.random() * 2}s`,
+                styleMod: getRandomMod(styleMods),
+                sizeMod: getRandomMod(sizeMods),
+                opacityMod: getRandomMod(opacityMods),
             })),
         []
     );
@@ -59,7 +80,8 @@ export const Animation = () => {
     };
 
     useEffect(() => {
-        if (window.location.pathname !== '/') {
+        const approvedRoutes = ['/', '/resume'];
+        if (!approvedRoutes.includes(window.location.pathname)) {
             setStopped(true);
             return;
         }
@@ -81,14 +103,16 @@ export const Animation = () => {
                             {stars.map((star) => (
                                 <span
                                     key={star.id}
-                                    className={b('star')}
+                                    className={b('star', {
+                                        style: star.styleMod,
+                                        size: star.sizeMod,
+                                        opacity: star.opacityMod,
+                                    })}
                                     style={
                                         {
                                             '--star-left': star.left,
                                             '--star-top': star.top,
                                             '--star-delay': star.delay,
-                                            '--star-scale': star.scale,
-                                            '--star-opacity': star.opacity,
                                         } as CSSProperties
                                     }
                                 />

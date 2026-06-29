@@ -5,7 +5,7 @@ import {LuCookie} from 'react-icons/lu';
 
 import {useCookie} from '@/shared/hooks/useCookie';
 
-import {ANIMATION__DURATION_IN_MS} from '../../constants';
+import {ANIMATION__DURATION_IN_MS, COOKIE_ACCEPT_KEY} from '../../constants';
 
 const {Text} = Typography;
 
@@ -13,7 +13,7 @@ export const CookieMessage = () => {
     const {t} = useTranslation('common');
     const {token} = theme.useToken();
     const [api, contextHolder] = notification.useNotification();
-    const {setValue} = useCookie('cookie-accept');
+    const {setValue} = useCookie(COOKIE_ACCEPT_KEY);
     const notificationKey = 'cookie-notification';
 
     const handleAccept = () => {

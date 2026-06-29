@@ -1,82 +1,87 @@
-import {Table, Typography} from 'antd';
-import {type ColumnsType} from 'antd/es/table';
+import {Typography} from 'antd';
 import block from 'bem-cn-lite';
 import {useTranslation} from 'react-i18next';
 import {useNavigate} from 'react-router-dom';
 
 import {Todo, TodoPriority, TodoState} from '@/todos/types';
 
-import {PriorityCell} from './components/PriorityCell';
-import {StateCell} from './components/StateCell';
+import './TodoListTable.scss';
 
 const b = block('todo-list-table');
-
-import './TodoListTable.scss';
 
 interface TodoListTableProps {
     todos: Todo[];
 }
 
-type TodoTableColumns = Pick<Todo, 'title' | 'priority' | 'state' | 'id'>;
+const priorityKeyByValue: Record<TodoPriority, string> = {
+    [TodoPriority.LOW]: 'low',
+    [TodoPriority.MEDIUM]: 'medium',
+    [TodoPriority.HIGH]: 'high',
+    [TodoPriority.SUPER]: 'super',
+};
 
 export const TodoListTable = ({todos}: TodoListTableProps) => {
     const {t} = useTranslation('todo');
     const navigate = useNavigate();
-
-    const columns: ColumnsType<TodoTableColumns> = [
-        {
-            key: 'title',
-            title: t('todo.table.col.todo'),
-            dataIndex: 'title',
-        },
-        {
-            key: 'priority',
-            title: t('todo.table.col.priority'),
-            dataIndex: 'priority',
-            render: (priority: TodoPriority, record: TodoTableColumns) => {
-                return <PriorityCell priority={priority} todoId={record.id} />;
-            },
-            shouldCellUpdate(record, prevRecord) {
-                return record.priority !== prevRecord.priority;
-            },
-        },
-        {
-            key: 'state',
-            title: t('todo.table.col.state'),
-            dataIndex: 'state',
-            render: (state: TodoState, record: TodoTableColumns) => (
-                <StateCell state={state} todoId={record.id} />
-            ),
-            shouldCellUpdate(record, prevRecord) {
-                return record.state !== prevRecord.state;
-            },
-        },
-    ];
+    const completedTodosCount = todos.filter(
+        (todo) => todo.state === TodoState.FINISHED
+    ).length;
+    const progressPercent = todos.length
+        ? (completedTodosCount / todos.length) * 100
+        : 0;
 
     const handleRowClick = (index: string) => {
-        navigate(`/todos/${index}`);
+        void navigate(`/todos/${index}`);
     };
 
     return (
         <section className={b()}>
-            <Typography.Title level={3}>
-                {t('todo.table.title')}
-            </Typography.Title>
-            <Table<TodoTableColumns>
-                rootClassName={b('table')}
-                columns={columns}
-                dataSource={todos}
-                size='middle'
-                rowClassName={b('row')}
-                rowHoverable
-                onRow={(record) => {
-                    return {
-                        onClick: () => handleRowClick(record.id),
-                    };
-                }}
-                scroll={{x: 'max-content', y: 55 * 5}}
-                pagination={{pageSize: 5, simple: true}}
-            />
+            <div className={b('head')}>
+                <Typography.Title level={3} className={b('title')}>
+                    {t('todo.table.title')}
+                </Typography.Title>
+                <span className={b('counter')}>
+                    {completedTodosCount}/{todos.length}
+                </span>
+            </div>
+            <div className={b('progress')} aria-hidden='true'>
+                <span
+                    className={b('progress-value')}
+                    style={{width: `${progressPercent}%`}}
+                />
+            </div>
+            <div className={b('list')}>
+                {todos.map((todo) => {
+                    const isCompleted = todo.state === TodoState.FINISHED;
+                    const priorityKey = priorityKeyByValue[todo.priority];
+
+                    return (
+                        <button
+                            className={b('item', {completed: isCompleted})}
+                            key={todo.id}
+                            type='button'
+                            onClick={() => handleRowClick(todo.id)}
+                        >
+                            <span
+                                className={b('checkbox', {
+                                    checked: isCompleted,
+                                })}
+                                aria-hidden='true'
+                            />
+                            <span className={b('item-title')}>
+                                {todo.title}
+                            </span>
+                            <span
+                                className={b('priority', {
+                                    [priorityKey]: true,
+                                })}
+                            >
+                                {t(`todo.priority.${priorityKey}`)}
+                            </span>
+                        </button>
+                    );
+                })}
+            </div>
         </section>
     );
 };

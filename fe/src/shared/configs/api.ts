@@ -3,6 +3,12 @@ import axios, {AxiosInstance, AxiosRequestConfig, AxiosResponse} from 'axios';
 
 import {CustomAxiosError} from '@/typings/axios';
 
+const redirectTo = (pathname: string) => {
+    if (window.location.pathname !== pathname) {
+        window.location.assign(pathname);
+    }
+};
+
 export const apiAxios: AxiosInstance = axios.create({
     baseURL: `/api`,
     timeout: 3000,
@@ -14,29 +20,40 @@ apiAxios.interceptors.response.use(
     (response: AxiosResponse) => response.data,
     async (error: CustomAxiosError) => {
         const originalRequest = error.config;
+        const status = error.response?.status;
 
         if (originalRequest.url?.includes('/auth/refresh')) {
-            if (error.response?.status === 401) {
-                console.error('Refresh token expired');
-                if (!window.location.pathname.startsWith('/auth')) {
-                    window.location.pathname = 'auth/signin';
-                }
-                return Promise.reject(error.response.data);
+            if (status === 401) {
+                return Promise.reject(error);
             }
         }
 
         if (
-            error.response?.status === 401 &&
+            status === 401 &&
             originalRequest &&
-            !originalRequest._retry
+            !originalRequest._retry &&
+            !originalRequest.skipAuthRedirect
         ) {
             try {
-                await apiAxios.post('/auth/refresh');
+                originalRequest._retry = true;
+                await apiAxios.post('/auth/refresh', undefined, {
+                    skipAuthRedirect: originalRequest.skipAuthRedirect,
+                });
                 return apiAxios(originalRequest);
-            } catch (refreshError) {
-                return Promise.reject(error.response.data);
+            } catch {
+                return Promise.reject(error);
             }
         }
+
+        if (status === 403) {
+            redirectTo('/no-permission');
+        }
+
+        if (status === 404) {
+            redirectTo('/not-found');
+        }
+
+        return Promise.reject(error);
     }
 );
 

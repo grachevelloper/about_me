@@ -1,8 +1,178 @@
 .todo-list-table {
     min-width: 0;
+    padding: clamp(20px, 4vw, 32px);
+    border: 1px solid rgb(229 231 235);
+    border-radius: 8px;
+    background: #fff;
 
-    &__table {
-        width: 100%;
+    &__head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+    &__title {
+        margin: 0 !important;
+        font-size: 20px !important;
+        line-height: 1.25 !important;
+    }
+
+    &__counter {
+        display: inline-flex;
+        min-width: 42px;
+        height: 26px;
+        align-items: center;
+        justify-content: center;
+        border-radius: 999px;
+        background: #f0eff8;
+        color: #5e5c78;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    &__progress {
+        height: 5px;
+        margin-bottom: 20px;
         overflow: hidden;
+        border-radius: 999px;
+        background: #f0f0f4;
+    }
+
+    &__progress-value {
+        display: block;
+        height: 100%;
+        border-radius: inherit;
+        background: #5448e5;
+        transition: width 240ms ease;
+    }
+
+    &__list {
+        display: grid;
+        gap: 12px;
+    }
+
+    &__item {
+        display: grid;
+        width: 100%;
+        min-height: 52px;
+        grid-template-columns: 18px minmax(0, 1fr) auto;
+        gap: 12px;
+        align-items: center;
+        padding: 12px 16px;
+        border: 1px solid rgb(229 231 235);
+        border-radius: 8px;
+        background: #fff;
+        color: inherit;
+        cursor: pointer;
+        font: inherit;
+        text-align: left;
+        transition:
+            border-color 160ms ease,
+            box-shadow 160ms ease,
+            transform 160ms ease;
+
+        &:hover,
+        &:focus-visible {
+            border-color: #c7c3ff;
+            box-shadow: 0 10px 24px rgb(45 39 121 / 8%);
+            outline: none;
+            transform: translateY(-1px);
+        }
+
+        &_completed {
+            background: #fbfbfd;
+        }
+    }
+
+    &__checkbox {
+        position: relative;
+        width: 16px;
+        height: 16px;
+        border: 2px solid #8a8fa8;
+        border-radius: 3px;
+        background: #fff;
+
+        &_checked {
+            border-color: #9a95ff;
+
+            &::after {
+                content: '';
+                position: absolute;
+                top: 1px;
+                left: 4px;
+                width: 5px;
+                height: 9px;
+                border: solid #8d86ff;
+                border-width: 0 2px 2px 0;
+                transform: rotate(45deg);
+            }
+        }
+    }
+
+    &__item-title {
+        min-width: 0;
+        overflow: hidden;
+        font-size: 15px;
+        line-height: 1.35;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    &__item_completed &__item-title {
+        color: #a0a3ad;
+        text-decoration: line-through;
+    }
+
+    &__priority {
+        display: inline-flex;
+        min-width: 76px;
+        min-height: 24px;
+        align-items: center;
+        justify-content: center;
+        padding: 2px 10px;
+        border: 1px solid;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        line-height: 1.2;
+        white-space: nowrap;
+
+        &_super,
+        &_high {
+            border-color: #ffd8d8;
+            background: #fff7f7;
+            color: #ff1515;
+        }
+
+        &_medium {
+            border-color: #ffe7a8;
+            background: #fffaf0;
+            color: #ff961f;
+        }
+
+        &_low {
+            border-color: #c7f3de;
+            background: #f0fdf7;
+            color: #11b981;
+        }
+    }
+
+    @media (max-width: 575px) {
+        padding: 20px 14px;
+
+        &__item {
+            grid-template-columns: 18px minmax(0, 1fr);
+        }
+
+        &__priority {
+            grid-column: 2;
+            justify-self: start;
+        }
+
+        &__item-title {
+            white-space: normal;
+        }
     }
 }
