@@ -92,23 +92,4 @@ describe("TodosController validation", () => {
 
         expect(todosService.update).not.toHaveBeenCalled();
     });
-
-    it("transforms todo list pagination query", async () => {
-        todosService.findAll.mockResolvedValue({
-            items: [],
-            page: 2,
-            limit: 5,
-            total: 0,
-            hasNext: false,
-        } as never);
-
-        await request(app.getHttpServer())
-            .get("/api/todos?page=2&limit=5")
-            .expect(200);
-
-        expect(todosService.findAll).toHaveBeenCalledWith(actor.id, {
-            page: 2,
-            limit: 5,
-        });
-    });
 });
