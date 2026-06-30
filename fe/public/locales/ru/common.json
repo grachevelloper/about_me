@@ -15,6 +15,7 @@
     "layout.top.main": "Главная",
     "layout.top.resume": "Резюме",
     "layout.top.user": "Моя страница",
+    "layout.top.user.signin": "Войти",
     "layout.top.user.signup": "Зарегистрироваться",
     "layout.top.articles": "Статьи",
     "layout.top.drafts": "Мои черновики",
@@ -108,6 +109,7 @@
     "comments.delete": "Удалить",
     "comments.noComments": "Комментариев пока нет",
     "comments.beFirst": "Будьте первым!",
+    "comments.error": "Не удалось загрузить комментарии",
 
     "pagination.previous": "Назад",
     "pagination.next": "Далее",
@@ -120,6 +122,7 @@
     "no_internet.description": "Возвращайся сюда, когда он появится ☺️",
 
     "like": "Поставить лайк",
+    "unlike": "Убрать лайк",
     "edit": "Изменить",
     "create": "Создать",
     "cancel": "Отменить",

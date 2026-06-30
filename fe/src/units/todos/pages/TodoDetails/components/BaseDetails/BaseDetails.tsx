@@ -1,8 +1,11 @@
-import {Col, Divider, Row, theme} from 'antd';
+import {Card, Col, Row, Space, Typography} from 'antd';
 import TextArea from 'antd/es/input/TextArea';
 import block from 'bem-cn-lite';
+import {useTranslation} from 'react-i18next';
 
 import {CommentsWrapper} from '@/shared/components/CommentsWrapper';
+import {LikeButton} from '@/shared/components/LikeButton';
+import {useToggleLikeMutation} from '@/shared/entities/Like';
 
 import {Priority} from '@/todos/components/Priority';
 import {State} from '@/todos/components/State';
@@ -22,9 +25,9 @@ interface BaseDetailsProps {
 }
 
 export const BaseDetails = ({initialData}: BaseDetailsProps) => {
-    const {
-        token: {borderRadius, colorBorder},
-    } = theme.useToken();
+    const {t} = useTranslation('todo');
+    const {mutate: toggleLike, isPending: isLikePending} =
+        useToggleLikeMutation();
     const {
         updateTitle,
         updatePriority,
@@ -56,56 +59,82 @@ export const BaseDetails = ({initialData}: BaseDetailsProps) => {
     const handleContentChange = (value: string) => {
         handleEnd('content', value);
     };
-    console.log(`${borderRadius}px solid ${colorBorder}`);
+
+    const handleLikeClick = () => {
+        toggleLike({
+            entityId: initialData.id,
+            entityType: 'todo',
+            hasLiked: initialData.hasLiked,
+        });
+    };
 
     return (
         <div className={b()}>
-            <Divider titlePlacement='start' orientationMargin={0}>
-                <TodoTitle onEnd={handleEnd} content={initialData.title} />
-            </Divider>
-            <Row gutter={32} justify='start'>
-                <Col>
-                    <Priority
-                        priority={initialData.priority}
-                        onUpdate={(priority: TodoPriority) =>
-                            handleEnd('priority', priority)
-                        }
-                        isLoading={isPending}
-                    />
+            <Row className={b('header')} gutter={[16, 16]} align='top'>
+                <Col xs={24} md={18}>
+                    <TodoTitle onEnd={handleEnd} content={initialData.title} />
+                    <Space size={[12, 12]} wrap className={b('meta')}>
+                        <Priority
+                            priority={initialData.priority}
+                            onUpdate={(priority: TodoPriority) =>
+                                handleEnd('priority', priority)
+                            }
+                            isLoading={isPending}
+                        />
+                        <State
+                            state={initialData.state}
+                            onUpdate={(state: TodoState) =>
+                                handleEnd('state', state)
+                            }
+                            isLoading={isPending}
+                        />
+                    </Space>
                 </Col>
-                <Col>
-                    <State
-                        state={initialData.state}
-                        onUpdate={(state: TodoState) =>
-                            handleEnd('state', state)
-                        }
-                        isLoading={isPending}
+                <Col xs={24} md={6} className={b('like')}>
+                    <LikeButton
+                        isLiked={initialData.hasLiked}
+                        likesCount={initialData.likesCount}
+                        onClick={handleLikeClick}
+                        disabled={isLikePending}
                     />
                 </Col>
             </Row>
-            <Row justify='end' align='top' gutter={32}>
-                <Col xs={24} lg={16}>
-                    <TextArea
-                        className={b('content')}
-                        defaultValue={initialData.content}
-                        variant='borderless'
-                        autoSize={{minRows: 6, maxRows: 24}}
-                        onBlur={(e) => handleContentChange(e.target.value)}
-                        style={{
-                            border: `2px solid ${colorBorder}`,
-                        }}
-                    />
+
+            <Row align='top' gutter={[24, 24]} className={b('body')}>
+                <Col xs={24} lg={16} className={b('main')}>
+                    <Card
+                        className={b('panel')}
+                        title={
+                            <Typography.Text strong>
+                                {t('todo.details.description')}
+                            </Typography.Text>
+                        }
+                    >
+                        <TextArea
+                            className={b('content')}
+                            defaultValue={initialData.content}
+                            variant='borderless'
+                            autoSize={{minRows: 8, maxRows: 24}}
+                            onBlur={(e) => handleContentChange(e.target.value)}
+                        />
+                    </Card>
+
+                    <Card
+                        className={b('panel')}
+                        title={
+                            <Typography.Text strong>
+                                {t('todo.details.comments')}
+                            </Typography.Text>
+                        }
+                    >
+                        <CommentsWrapper
+                            entityId={initialData.id}
+                            entityType='todo'
+                        />
+                    </Card>
                 </Col>
-                <Col xs={24} lg={8}>
+                <Col xs={24} lg={8} className={b('aside')}>
                     <Checklist todoId={initialData.id} />
-                </Col>
-            </Row>
-            <Row>
-                <Col xs={24} lg={16}>
-                    <CommentsWrapper
-                        entityId={initialData.id}
-                        entityType='todo'
-                    />
                 </Col>
             </Row>
         </div>

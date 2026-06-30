@@ -1,4 +1,5 @@
 import {Flex, Form, theme, Typography} from 'antd';
+import axios from 'axios';
 import block from 'bem-cn-lite';
 import {useCallback} from 'react';
 import {useTranslation} from 'react-i18next';
@@ -8,6 +9,7 @@ import {ButtonAccept} from '@/shared/components/actions';
 import {FlexibleCard} from '@/shared/components/FlexibleCard';
 import {FormInput} from '@/shared/components/FormInput';
 import {useAuth} from '@/shared/context';
+import {ApiErrorResponse} from '@/typings/axios';
 
 import {useSigninMutatuon} from '../../store';
 
@@ -21,6 +23,33 @@ interface SignInForm {
     email: string;
     password: string;
 }
+
+const getSignInErrorKey = (error: Error | null): string | undefined => {
+    if (!error) return undefined;
+
+    if (axios.isAxiosError<ApiErrorResponse>(error)) {
+        const status = error.response?.status;
+        const message = error.response?.data?.message;
+        const apiMessage = Array.isArray(message) ? message[0] : message;
+
+        if (apiMessage === 'Incorrect password') {
+            return 'auth.sign.incorrect_password';
+        }
+
+        if (
+            status === 400 ||
+            status === 401 ||
+            apiMessage === 'Invalid credentials' ||
+            apiMessage === 'User not found'
+        ) {
+            return 'auth.sign.invalid_credentials';
+        }
+
+        return undefined;
+    }
+
+    return undefined;
+};
 
 export const SigninPage = () => {
     const {
@@ -38,8 +67,10 @@ export const SigninPage = () => {
             form.resetFields();
             setUserData(user);
             navigate('/');
-        } catch {
-            form.setFieldValue('password', '');
+        } catch (submitError) {
+            if (!axios.isAxiosError(submitError)) {
+                return;
+            }
         }
     }, [form, mutateAsync, navigate, setUserData]);
     const signInFields = useSignInFields(form);
@@ -54,16 +85,7 @@ export const SigninPage = () => {
     }, [paddingSM, signInFields]);
 
     const renderErrors = useCallback(() => {
-        const errorText = () => {
-            switch (error?.message) {
-                case 'Invalid credentials':
-                    return t('auth.sign.invalid_credentials');
-                case 'Incorrect password':
-                    return t('auth.sign.incorrect_password');
-                default:
-                    return '';
-            }
-        };
+        const errorKey = getSignInErrorKey(error);
 
         return (
             <span
@@ -73,7 +95,7 @@ export const SigninPage = () => {
                 }}
                 className={b('server-error')}
             >
-                {errorText()}
+                {errorKey ? t(errorKey) : null}
             </span>
         );
     }, [colorError, error, paddingSM, t]);

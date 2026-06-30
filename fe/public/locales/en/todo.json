@@ -16,5 +16,16 @@
     "todo.change.state": "Change state",
     "todo.change.priority": "Change priority",
     "todo.change.content": "Change text",
-    "todo.change.title": "Change title"
+    "todo.change.title": "Change title",
+    "todo.details.description": "Description",
+    "todo.details.comments": "Comments",
+    "new-todo-form.title": "Suggest an idea",
+    "new-todo-form.ok": "Suggest",
+    "new-todo-form.close": "Cancel",
+    "new-todo-form.your-title.placeholder": "Title...",
+    "new-todo-form.your-content.placeholder": "Your description...",
+    "new-todo-page.title": "New task",
+    "new-todo-page.subtitle": "Create a task with description, priority, and starting status in one place.",
+    "new-todo-page.create": "Create task",
+    "new-todo-page.success": "Task created"
 }

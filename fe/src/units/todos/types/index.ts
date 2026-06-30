@@ -3,6 +3,7 @@ import {LikedEntity} from '@/typings/common';
 export interface Todo extends LikedEntity {
     title: string;
     content: string;
+    likesCount: number;
     priority: TodoPriority;
     state: TodoState;
     checklist?: string[];

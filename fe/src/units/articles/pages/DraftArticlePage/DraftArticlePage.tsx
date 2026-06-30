@@ -1,5 +1,16 @@
 import {MDXEditorMethods} from '@mdxeditor/editor';
-import {Col, Dropdown, Image, Input, Row, theme, Typography} from 'antd';
+import {
+    Button,
+    Col,
+    Image,
+    Input,
+    InputNumber,
+    Row,
+    Space,
+    Spin,
+    theme,
+    Typography,
+} from 'antd';
 import block from 'bem-cn-lite';
 import {useCallback, useEffect, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
@@ -48,19 +59,21 @@ export const DraftArticlePage = () => {
     const {
         data: serverArticle,
         isLoading: isArticleLoading,
-        error: articleError,
     } = useGetArticleById(draftId);
 
     // Локальное состояние
     const [localArticle, setLocalArticle] = useState<Partial<Article> | null>(
         null
     );
-    const {title, content, updatedAt, tags, author, image} = localArticle || {
-        title: '',
-        content: '',
-        tags: [],
-        id: '',
-    };
+    const {
+        title = '',
+        content = '',
+        updatedAt,
+        tags = [],
+        author,
+        image = '',
+        readTime,
+    } = localArticle || {};
 
     const {error: errorUpdatingContent, mutateAsync: mutateContent} =
         updateContent;
@@ -75,13 +88,11 @@ export const DraftArticlePage = () => {
 
     const {
         error: errorUpdatingReadTime,
-        isPending: isReadTimePending,
         mutateAsync: mutateReadTime,
     } = updateReadTime;
 
     const {
         error: errorUpdatingImage,
-        isPending: isImagePending,
         mutateAsync: mutateImage,
     } = updateImage;
 
@@ -95,10 +106,16 @@ export const DraftArticlePage = () => {
     };
 
     const errorFields: UpdateDraftField[] = Object.entries(updateErrors)
-        .filter(([_, hasError]) => hasError)
+        .filter(([, hasError]) => hasError)
         .map(([field]) => field as UpdateDraftField);
 
     const contextHolder = useUpdateErrors(errorFields);
+    const isSaving =
+        updateTitle.isPending ||
+        updateContent.isPending ||
+        updateTags.isPending ||
+        updateImage.isPending ||
+        updateReadTime.isPending;
 
     useEffect(() => {
         if (!isArticleLoading && serverArticle) {
@@ -113,7 +130,7 @@ export const DraftArticlePage = () => {
             await mutateTitle(draftId, title);
         },
         FIVE_SECONDS_IN_MS,
-        [draftId, updateTitle, t]
+        [draftId, mutateTitle]
     );
 
     const debouncedUpdateContent = useDebouncedCallback(
@@ -123,7 +140,27 @@ export const DraftArticlePage = () => {
             await mutateContent(draftId, content);
         },
         FIVE_SECONDS_IN_MS,
-        [draftId, updateContent, t]
+        [draftId, mutateContent]
+    );
+
+    const debouncedUpdateImage = useDebouncedCallback(
+        async (newImage: string) => {
+            if (!draftId) return;
+
+            await mutateImage(draftId, newImage);
+        },
+        FIVE_SECONDS_IN_MS,
+        [draftId, mutateImage]
+    );
+
+    const debouncedUpdateReadTime = useDebouncedCallback(
+        async (newReadTime: number) => {
+            if (!draftId) return;
+
+            await mutateReadTime(draftId, newReadTime);
+        },
+        FIVE_SECONDS_IN_MS,
+        [draftId, mutateReadTime]
     );
 
     const handleTagsChange = useCallback(
@@ -132,28 +169,7 @@ export const DraftArticlePage = () => {
             setLocalArticle((prev) => ({...prev, tags: newTags}));
             await updateTags.mutateAsync(draftId, newTags);
         },
-        [draftId, updateTags, t]
-    );
-
-    const handleImageChange = useCallback(
-        async (newImage: string) => {
-            if (!draftId) return;
-
-            setLocalArticle((prev) => ({...prev, image: newImage}));
-            await mutateImage(draftId, newImage);
-        },
-        [draftId, updateTags, t]
-    );
-
-    const handleReadTimeChange = useDebouncedCallback(
-        async (newReadTime: number) => {
-            if (!draftId) return;
-
-            setLocalArticle((prev) => ({...prev, readTime: newReadTime}));
-            await mutateReadTime(draftId, newReadTime);
-        },
-        FIVE_SECONDS_IN_MS,
-        [draftId, updateTags, t]
+        [draftId, updateTags]
     );
 
     const handleTitleChange = useCallback(
@@ -172,11 +188,33 @@ export const DraftArticlePage = () => {
         [debouncedUpdateContent]
     );
 
+    const handleImageChange = useCallback(
+        (newImage: string) => {
+            setLocalArticle((prev) => ({...prev, image: newImage}));
+            debouncedUpdateImage(newImage);
+        },
+        [debouncedUpdateImage]
+    );
+
+    const handleReadTimeChange = useCallback(
+        (newReadTime: number | null) => {
+            const normalizedReadTime = newReadTime ?? 1;
+
+            setLocalArticle((prev) => ({
+                ...prev,
+                readTime: normalizedReadTime,
+            }));
+            debouncedUpdateReadTime(normalizedReadTime);
+        },
+        [debouncedUpdateReadTime]
+    );
+
     const handlePublish = useCallback(async () => {
         if (draftId) {
             await mutatePublishDraft(draftId, false);
+            void navigate(`/articles/${draftId}`);
         }
-    }, [draftId]);
+    }, [draftId, mutatePublishDraft, navigate]);
 
     useEffect(() => {
         if (!isArticleLoading && serverArticle?.content) {
@@ -184,10 +222,18 @@ export const DraftArticlePage = () => {
         }
     }, [isArticleLoading, serverArticle?.content]);
 
-    const isSaving = false;
+    useEffect(() => {
+        if (user?.id && author?.id && user.id !== author.id) {
+            void navigate('/no-permission');
+        }
+    }, [author?.id, navigate, user?.id]);
 
-    if (user?.id && author?.id && user?.id !== author?.id) {
-        navigate('/no-permission');
+    if (isArticleLoading && !localArticle) {
+        return (
+            <div className={b('loading')}>
+                <Spin size='large' />
+            </div>
+        );
     }
 
     return (
@@ -195,68 +241,108 @@ export const DraftArticlePage = () => {
             {contextHolder}
 
             <ViewModeToggle />
-            <Row>
-                <Col span={24} md={16} sm={24}>
+            <Row gutter={[16, 16]} align='top' className={b('header')}>
+                <Col xs={24} lg={16}>
                     <Input
                         value={title}
                         onChange={(e) => handleTitleChange(e.target.value)}
-                        placeholder='Введите заголовок статьи'
+                        placeholder={t('articles.form.title.placeholder')}
                         variant='borderless'
                         disabled={updateTitle.isPending}
-                        style={{
-                            fontSize: '32px',
-                            fontWeight: 700,
-                            opacity: updateTitle.isPending ? 0.7 : 1,
-                        }}
+                        className={b('title-input')}
                     />
                 </Col>
-                {updatedAt && (
-                    <Col className={b('updated-at')}>
-                        <Typography.Title level={5}>
-                            {tCommon('updated-at', {
-                                date: new Date(updatedAt).toLocaleString(),
-                            })}
-                        </Typography.Title>
+                <Col xs={24} lg={8} className={b('meta')}>
+                    <Space wrap size={[8, 8]} className={b('meta-actions')}>
+                        {updatedAt && (
+                            <Typography.Text type='secondary'>
+                                {tCommon('updated-at', {
+                                    date: new Date(updatedAt).toLocaleString(),
+                                })}
+                            </Typography.Text>
+                        )}
+                        {isSaving && (
+                            <Typography.Text type='secondary'>
+                                {t('article.draft.saving')}
+                            </Typography.Text>
+                        )}
+                        <Button
+                            type='primary'
+                            loading={isPublishingPending}
+                            onClick={() => {
+                                void handlePublish();
+                            }}
+                        >
+                            {t('article.draft.publish')}
+                        </Button>
+                    </Space>
+                </Col>
+            </Row>
+
+            <Row gutter={[16, 16]} className={b('settings')}>
+                <Col xs={24} lg={16}>
+                    <Input
+                        value={image}
+                        onChange={(e) => handleImageChange(e.target.value)}
+                        placeholder={t('articles.form.image.placeholder')}
+                        addonBefore={t('articles.form.image.label')}
+                        disabled={updateImage.isPending}
+                    />
+                </Col>
+                <Col xs={24} lg={8}>
+                    <InputNumber
+                        min={1}
+                        value={readTime}
+                        onChange={handleReadTimeChange}
+                        addonBefore={t('articles.form.readTime.label')}
+                        addonAfter={t('articles.form.readTime.after')}
+                        disabled={updateReadTime.isPending}
+                        className={b('read-time-input')}
+                    />
+                </Col>
+            </Row>
+
+            {image && (
+                <Row className={b('cover')}>
+                    <Col span={24}>
+                        <Image
+                            src={image}
+                            alt={title}
+                            className={b('cover-image')}
+                            preview={false}
+                        />
                     </Col>
-                )}
-                <Dropdown arrow trigger={['hover']}>
-                    {t('article.options')}
-                </Dropdown>
-            </Row>
+                </Row>
+            )}
 
-            <Row style={{margin: '24px 0'}}>
-                <Col span={24}>
-                    <Image
-                        src={image}
-                        alt={title}
-                        style={{
-                            width: '100%',
-                            maxHeight: '400px',
-                            objectFit: 'cover',
-                            borderRadius: '8px',
-                        }}
-                    />
-                </Col>
-            </Row>
-
-            <Row align='middle' gutter={[8, 8]} style={{marginBottom: '12px'}}>
-                <Col>{t('articles.form.tags.label')}</Col>
+            <Row align='middle' gutter={[12, 12]} className={b('tags-row')}>
                 <Col>
-                    <TagsSelect onChange={handleTagsChange} value={tags} />
+                    <Typography.Text type='secondary'>
+                        {t('articles.form.tags.label')}
+                    </Typography.Text>
+                </Col>
+                <Col flex='auto'>
+                    <Space wrap size={[8, 8]}>
+                        <TagsSelect
+                            onChange={(newTags) => {
+                                void handleTagsChange(newTags);
+                            }}
+                            value={tags}
+                        />
+                        <TagsWrapper
+                            tags={tags}
+                            editable={{
+                                onChange: (newTags) => {
+                                    void handleTagsChange(newTags);
+                                },
+                            }}
+                            isPending={updateTags.isPending}
+                        />
+                    </Space>
                 </Col>
             </Row>
 
-            <Row style={{marginBottom: '24px'}}>
-                <Col>
-                    <TagsWrapper
-                        tags={tags}
-                        editable={{onChange: handleTagsChange}}
-                        isPending={updateTags.isPending}
-                    />
-                </Col>
-            </Row>
-
-            <Row>
+            <Row className={b('editor-row')}>
                 <Col span={24}>
                     <MdEditor
                         ref={mdRef}
@@ -266,16 +352,17 @@ export const DraftArticlePage = () => {
                         editable
                         entityId={draftId || ''}
                         entityType='article'
-                        readOnly={updateContent.isPending}
                     />
                 </Col>
             </Row>
-            <Row justify='end'>
+            <Row justify='end' className={b('footer')}>
                 <Col>
                     <ButtonAccept
-                        text={t('article.draft.pushlish')}
+                        text={t('article.draft.publish')}
                         loading={isPublishingPending}
-                        onClick={handlePublish}
+                        onClick={() => {
+                            void handlePublish();
+                        }}
                         className={b('button-publish')}
                     />
                 </Col>

@@ -13,12 +13,12 @@ import {
     UndoRedo,
 } from '@mdxeditor/editor';
 import '@mdxeditor/editor/style.css';
-import { Flex } from 'antd';
+import {Flex} from 'antd';
 import block from 'bem-cn-lite';
-import { ForwardedRef, memo } from 'react';
+import {ForwardedRef, memo} from 'react';
 
 import './MdEditor.scss';
-import { readPlugins, writePlugins } from './plugins';
+import {readPlugins, writePlugins} from './plugins';
 
 const b = block('md-editor');
 

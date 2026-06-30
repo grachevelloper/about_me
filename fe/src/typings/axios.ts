@@ -19,7 +19,7 @@ export interface CustomAxiosError extends AxiosError {
 }
 
 export interface ApiErrorResponse {
-    message?: string;
+    message?: string | string[];
     error?: string;
     statusCode?: number;
 }

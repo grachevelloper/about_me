@@ -1,8 +1,11 @@
 import {CloseOutlined, EditTwoTone} from '@ant-design/icons';
-import {Divider, Flex, Spin, Typography} from 'antd';
+import {Button, Divider, Flex, Spin, Typography} from 'antd';
 import block from 'bem-cn-lite';
 import {Fragment, useState} from 'react';
 import {useTranslation} from 'react-i18next';
+
+import {LikeButton} from '@/shared/components/LikeButton';
+import {useToggleLikeMutation} from '@/shared/entities/Like';
 
 import {User} from '../../components/User';
 import {useAuth} from '../../context';
@@ -29,6 +32,7 @@ export const Comment = ({comment, className, isNew = false}: CommentProps) => {
         createdAt,
         updatedAt,
         likesCount,
+        hasLiked,
         depth,
         parentId,
         entityId,
@@ -54,22 +58,22 @@ export const Comment = ({comment, className, isNew = false}: CommentProps) => {
     const {
         mutate: mutateDelete,
         isPending: isPendindDelete,
-        isError: isErrorDelete,
     } = deleteMutation;
 
     const {
         mutate: mutateUpdate,
         isPending: isPendindUpdate,
-        isError: isErrorUpdate,
     } = updateMutation;
 
     const {
         mutate: mutateCreate,
         isPending: isPendingCreate,
-        isError: isErrorCreate,
     } = useCreateCommentMutation();
+    const {mutate: toggleLike, isPending: isLikePending} =
+        useToggleLikeMutation();
 
     const isEditable = user?.id === author?.id;
+    const canLike = Boolean(id);
 
     const handleCreate = (content: string, isResponse = false) => {
         mutateCreate({
@@ -101,6 +105,18 @@ export const Comment = ({comment, className, isNew = false}: CommentProps) => {
 
     const handleReply = () => {
         setReplyVisible(true);
+    };
+
+    const handleLike = () => {
+        if (!id) {
+            return;
+        }
+
+        toggleLike({
+            entityId: id,
+            entityType: 'comment',
+            hasLiked,
+        });
     };
 
     if (isNew || isEditing) {
@@ -176,15 +192,28 @@ export const Comment = ({comment, className, isNew = false}: CommentProps) => {
                                 )}
                             </span>
                         ) : (
-                            <span className={b('reply')} onClick={handleReply}>
+                            <Button
+                                className={b('reply')}
+                                type='link'
+                                size='small'
+                                onClick={handleReply}
+                            >
                                 {t('comments.reply')}
-                            </span>
+                            </Button>
                         )}
                     </Flex>
                 </Flex>
                 <Typography.Text className={b('content')}>
                     {content}
                 </Typography.Text>
+                <Flex className={b('actions')} justify='start'>
+                    <LikeButton
+                        isLiked={hasLiked}
+                        likesCount={likesCount}
+                        onClick={handleLike}
+                        disabled={!canLike || isLikePending}
+                    />
+                </Flex>
                 <Divider rootClassName={b('divider')} />
             </Flex>
             {isReplyVisible ? (

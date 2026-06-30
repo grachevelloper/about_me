@@ -1,6 +1,7 @@
-import {Statistic, theme} from 'antd';
+import {HeartFilled, HeartOutlined} from '@ant-design/icons';
+import {Button, Space, theme, Tooltip, Typography} from 'antd';
 import block from 'bem-cn-lite';
-import {IoIosHeart} from 'react-icons/io';
+import {useTranslation} from 'react-i18next';
 
 import './LikeButton.scss';
 
@@ -19,22 +20,32 @@ export const LikeButton = ({
     onClick,
     likesCount,
 }: LikeButtonProps) => {
+    const {t} = useTranslation('common');
     const {
         token: {colorPrimary},
     } = theme.useToken();
+    const HeartIcon = isLiked ? HeartFilled : HeartOutlined;
+
     return (
-        <Statistic
-            prefix={
-                <IoIosHeart
-                    onClick={disabled ? undefined : onClick}
-                    size={18}
-                    color={isLiked ? colorPrimary : undefined}
-                    style={{cursor: disabled ? 'not-allowed' : 'pointer'}}
-                />
-            }
-            value={likesCount}
-            className={b()}
-            aria-label='button'
-        />
+        <Tooltip title={t(isLiked ? 'unlike' : 'like')}>
+            <Button
+                type='text'
+                size='small'
+                disabled={disabled}
+                onClick={onClick}
+                className={b({liked: isLiked})}
+                aria-pressed={isLiked}
+                aria-label={t(isLiked ? 'unlike' : 'like')}
+            >
+                <Space size={4} align='center'>
+                    <HeartIcon
+                        style={{color: isLiked ? colorPrimary : undefined}}
+                    />
+                    <Typography.Text className={b('count')}>
+                        {likesCount ?? 0}
+                    </Typography.Text>
+                </Space>
+            </Button>
+        </Tooltip>
     );
 };

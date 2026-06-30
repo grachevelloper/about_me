@@ -1,5 +1,6 @@
-import {Flex} from 'antd';
+import {Empty, Flex, Spin, Typography} from 'antd';
 import block from 'bem-cn-lite';
+import {useTranslation} from 'react-i18next';
 
 import {useAuth} from '@/shared/context';
 import {
@@ -20,24 +21,50 @@ interface CommentsContainer {
 
 export const CommentsWrapper = ({entityId, entityType}: CommentsContainer) => {
     const {user} = useAuth();
-    const {comments} = useCommentsQuery({
+    const {t} = useTranslation('common');
+    const {comments, isError, isPending} = useCommentsQuery({
         entityId,
         entityType,
     });
+
+    if (!entityId) {
+        return null;
+    }
+
     return (
         <Flex align='start' justify='start' vertical rootClassName={b()}>
-            <Comment
-                isNew
-                comment={{
-                    author: user!,
-                    content: '',
-                    depth: 0,
-                    entityType: 'todo',
-                    parentId: null,
-                    entityId: entityId,
-                    likesCount: 0,
-                }}
-            />
+            {user && (
+                <Comment
+                    isNew
+                    comment={{
+                        author: user,
+                        content: '',
+                        depth: 0,
+                        entityType,
+                        parentId: null,
+                        entityId: entityId,
+                        likesCount: 0,
+                        hasLiked: false,
+                    }}
+                />
+            )}
+            {isPending && (
+                <Flex justify='center' className={b('state')}>
+                    <Spin />
+                </Flex>
+            )}
+            {isError && (
+                <Typography.Text type='danger' className={b('state')}>
+                    {t('comments.error')}
+                </Typography.Text>
+            )}
+            {!isPending && !isError && comments?.length === 0 && (
+                <Empty
+                    className={b('state')}
+                    image={Empty.PRESENTED_IMAGE_SIMPLE}
+                    description={t('comments.noComments')}
+                />
+            )}
             {(comments || []).map((comment: CommentType) => (
                 <Comment key={comment.id} comment={comment} />
             ))}
