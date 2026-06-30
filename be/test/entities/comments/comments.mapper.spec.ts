@@ -36,6 +36,7 @@ describe("CommentsMapper", () => {
             parentId: null,
             depth: 0,
             likesCount: 2,
+            hasLiked: false,
             author: expect.objectContaining({
                 id: comment.author.id,
                 email: "writer@example.com",

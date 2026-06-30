@@ -1,8 +1,8 @@
 import * as dotenv from "dotenv";
-import { DataSource } from "typeorm";
-import { SnakeNamingStrategy } from "typeorm-naming-strategies";
+import {DataSource} from "typeorm";
+import {SnakeNamingStrategy} from "typeorm-naming-strategies";
 
-dotenv.config();
+dotenv.config({path: "../.env"});
 
 const AppDataSource = new DataSource({
     type: "postgres",

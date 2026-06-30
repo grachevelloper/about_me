@@ -2,7 +2,7 @@ import * as dotenv from "dotenv";
 import {DataSourceOptions} from "typeorm";
 import {SnakeNamingStrategy} from "typeorm-naming-strategies";
 
-dotenv.config();
+dotenv.config({path: "../.env"});
 
 const {NODE_ENV} = process.env;
 

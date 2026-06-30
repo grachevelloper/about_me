@@ -73,6 +73,7 @@ export class TodoResponseDto {
     priority!: TodoPriority | null;
     state!: TodoState | null;
     likesCount!: number;
+    hasLiked!: boolean;
     createdAt!: string;
     updatedAt!: string;
 }

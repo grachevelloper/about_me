@@ -3,6 +3,7 @@ import {TypeOrmModule} from "@nestjs/typeorm";
 
 import {AggregateDeletionModule} from "../../processes/aggregate-deletion/aggregate-deletion.module";
 import {CommentsModule} from "../comments/comments.module";
+import {LikesModule} from "../likes/likes.module";
 import {UsersModule} from "../users/users.module";
 import {ChecklistsModule} from "./checklists/checklist.module";
 import {TodosController} from "./todos.controller";
@@ -14,6 +15,7 @@ import {TodosService} from "./todos.service";
         TypeOrmModule.forFeature([Todo]),
         AggregateDeletionModule,
         ChecklistsModule,
+        LikesModule,
         UsersModule,
         forwardRef(() => CommentsModule),
     ],

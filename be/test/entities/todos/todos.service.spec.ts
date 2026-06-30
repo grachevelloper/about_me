@@ -3,6 +3,7 @@ import {ForbiddenException, NotFoundException} from "@nestjs/common";
 import {Test, TestingModule} from "@nestjs/testing";
 import {getRepositoryToken} from "@nestjs/typeorm";
 import {CommentsService} from "src/modules/comments/comments.service";
+import {LikesService} from "src/modules/likes/likes.service";
 import {Todo} from "src/modules/todos/todos.entity";
 import {TodosService} from "src/modules/todos/todos.service";
 import {UsersService} from "src/modules/users/users.service";
@@ -19,6 +20,7 @@ describe("TodosService", () => {
     let commentsService: jest.Mocked<CommentsService>;
     let aggregateDeletionService: jest.Mocked<AggregateDeletionService>;
     let usersService: jest.Mocked<UsersService>;
+    let likesService: jest.Mocked<LikesService>;
     const entityManager = {
         delete: jest.fn<EntityManager["delete"]>(),
         find: jest.fn<EntityManager["find"]>(),
@@ -84,6 +86,12 @@ describe("TodosService", () => {
                     },
                 },
                 {
+                    provide: LikesService,
+                    useValue: {
+                        hasLiked: jest.fn(),
+                    },
+                },
+                {
                     provide: UsersService,
                     useValue: {
                         findByEmail: jest.fn(),
@@ -96,6 +104,7 @@ describe("TodosService", () => {
         repository = module.get(getRepositoryToken(Todo));
         commentsService = module.get(CommentsService);
         aggregateDeletionService = module.get(AggregateDeletionService);
+        likesService = module.get(LikesService);
         usersService = module.get(UsersService);
         usersService.findByEmail.mockResolvedValue({
             id: "user-123",
@@ -134,6 +143,7 @@ describe("TodosService", () => {
                 priority: null,
                 state: null,
                 likesCount: 0,
+                hasLiked: false,
                 createdAt: mockTodo.createdAt,
                 updatedAt: mockTodo.updatedAt,
             });
@@ -157,6 +167,7 @@ describe("TodosService", () => {
 
         it("should allow an administrator to read another user's todo", async () => {
             repository.findOne.mockResolvedValue(mockTodo);
+            likesService.hasLiked.mockResolvedValue(true);
 
             await expect(service.findOne({id: "1", actor: admin})).resolves.toEqual({
                 id: mockTodo.id,
@@ -166,8 +177,14 @@ describe("TodosService", () => {
                 priority: null,
                 state: null,
                 likesCount: 0,
+                hasLiked: true,
                 createdAt: mockTodo.createdAt,
                 updatedAt: mockTodo.updatedAt,
+            });
+            expect(likesService.hasLiked).toHaveBeenCalledWith({
+                entityId: "1",
+                entityType: "todo",
+                userId: admin.id,
             });
         });
 
@@ -218,6 +235,7 @@ describe("TodosService", () => {
                     priority: null,
                     state: null,
                     likesCount: 0,
+                    hasLiked: false,
                     createdAt: todo.createdAt,
                     updatedAt: todo.updatedAt,
                 })),
@@ -269,6 +287,7 @@ describe("TodosService", () => {
                 priority: null,
                 state: null,
                 likesCount: 0,
+                hasLiked: false,
                 createdAt: mockTodo.createdAt,
                 updatedAt: mockTodo.updatedAt,
             });
@@ -385,6 +404,7 @@ describe("TodosService", () => {
                 priority: null,
                 state: null,
                 likesCount: 0,
+                hasLiked: false,
                 createdAt: mockTodo.createdAt,
                 updatedAt: mockTodo.updatedAt,
                 comments: mockComments,

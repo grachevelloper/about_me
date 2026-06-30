@@ -13,10 +13,15 @@ import {PaginatedResponseDto} from "../../shared/dto/paginated-response.dto";
 import {AuthenticatedUser, Order, Role} from "../../types";
 import {ArticlesService} from "../articles/articles.service";
 import {Like} from "../likes/likes.entity";
+import {LikesService} from "../likes/likes.service";
 import {TodosService} from "../todos/todos.service";
 import {UsersService} from "../users/users.service";
 import {CreateCommentDto, UpdateCommentDto} from "./comments.dto";
 import {Comment, EntityCommentType} from "./comments.entity";
+
+type CommentWithLikedState = Comment & {
+    hasLiked?: boolean;
+};
 
 interface UpdateCommentCommand {
     actor: AuthenticatedUser;
@@ -47,6 +52,7 @@ export class CommentsService {
         @Inject(forwardRef(() => TodosService))
         private todosService: TodosService,
         private articlesService: ArticlesService,
+        private likesService: LikesService,
     ) {}
 
     async create(
@@ -133,7 +139,9 @@ export class CommentsService {
         limit = 100,
         order = Order.ASC,
         page = 1,
-    }: FindEntityCommentsCommand): Promise<PaginatedResponseDto<Comment>> {
+    }: FindEntityCommentsCommand): Promise<
+        PaginatedResponseDto<CommentWithLikedState>
+    > {
         await this.assertCanReadTarget(entityType, entityId, actor);
 
         const [comments, total] = await this.commentRepository.findAndCount({
@@ -146,8 +154,23 @@ export class CommentsService {
             skip: (page - 1) * limit,
             take: limit,
         });
+        const commentsWithLikedState = await Promise.all(
+            comments.map(async (comment) => ({
+                ...comment,
+                hasLiked: await this.likesService.hasLiked({
+                    entityId: comment.id,
+                    entityType: "comment",
+                    userId: actor.id,
+                }),
+            })),
+        );
 
-        return new PaginatedResponseDto<Comment>(comments, page, limit, total);
+        return new PaginatedResponseDto<CommentWithLikedState>(
+            commentsWithLikedState,
+            page,
+            limit,
+            total,
+        );
     }
 
     private async assertCanReadTarget(

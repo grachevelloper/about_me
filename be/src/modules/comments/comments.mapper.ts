@@ -2,8 +2,12 @@ import {UsersMapper} from "../users/users.mapper";
 import {CommentResponseDto} from "./comments.dto";
 import {Comment} from "./comments.entity";
 
+type CommentWithLikedState = Comment & {
+    hasLiked?: boolean;
+};
+
 export class CommentsMapper {
-    static toResponse(comment: Comment): CommentResponseDto {
+    static toResponse(comment: CommentWithLikedState): CommentResponseDto {
         return {
             id: comment.id,
             content: comment.content,
@@ -12,6 +16,7 @@ export class CommentsMapper {
             parentId: comment.parentId,
             depth: comment.depth,
             likesCount: comment.likesCount,
+            hasLiked: Boolean(comment.hasLiked),
             author: UsersMapper.toResponse(comment.author),
             createdAt: comment.createdAt,
             updatedAt: comment.updatedAt,

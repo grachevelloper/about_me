@@ -2,6 +2,7 @@ import {forwardRef, Module} from "@nestjs/common";
 import {TypeOrmModule} from "@nestjs/typeorm";
 
 import {ArticlesModule} from "../articles/articles.module";
+import {LikesModule} from "../likes/likes.module";
 import {TodosModule} from "../todos/todos.module";
 import {UsersModule} from "../users/users.module";
 import {CommentsController} from "./comments.controller";
@@ -14,6 +15,7 @@ import {CommentsService} from "./comments.service";
         UsersModule,
         forwardRef(() => TodosModule),
         ArticlesModule,
+        LikesModule,
     ],
     controllers: [CommentsController],
     providers: [CommentsService],

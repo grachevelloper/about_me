@@ -22,14 +22,23 @@ export class SigninUserDto {
         description: "Пароль пользователя",
     })
     @IsString()
+    @MinLength(1)
+    @MaxLength(72)
+    password!: string;
+}
+export class SignupUserDto {
+    @IsEmail()
+    @MaxLength(255)
+    email!: string;
+
+    @IsString()
     @MinLength(8)
     @MaxLength(32)
     @Matches(/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])/, {
         message: "Пароль должен содержать заглавные, строчные буквы и цифры",
     })
     password!: string;
-}
-export class SignupUserDto extends SigninUserDto {
+
     @IsString()
     @Length(1, 50)
     username!: string;
