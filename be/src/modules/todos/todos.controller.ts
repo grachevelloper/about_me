@@ -48,8 +48,9 @@ export class TodosController {
     @Public()
     async findOne(
         @Param("id", ParseUUIDPipe) id: string,
+        @CurrentUser() user: AuthenticatedUser | undefined,
     ) {
-        return this.todosService.findOne({id});
+        return this.todosService.findOne({id, actor: user});
     }
 
     @Patch(":id")

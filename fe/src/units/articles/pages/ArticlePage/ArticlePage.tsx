@@ -4,8 +4,7 @@ import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
 import {CommentsWrapper} from '@/shared/components/CommentsWrapper';
-import {LikeButton} from '@/shared/components/LikeButton';
-import {useToggleLikeMutation} from '@/shared/entities/Like';
+import {Like, useToggleLikeMutation} from '@/shared/entities/Like';
 import {useLayout} from '@/shared/hooks';
 import {formatDate} from '@/shared/utils';
 
@@ -160,7 +159,7 @@ export const ArticlePage = () => {
 
             <Row justify='end'>
                 <Col span='24'>
-                    <LikeButton
+                    <Like
                         isLiked={!!data?.hasLiked}
                         likesCount={data?.likesCount}
                         onClick={handleLikeClick}

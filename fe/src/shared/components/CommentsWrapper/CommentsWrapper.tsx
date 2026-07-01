@@ -44,7 +44,6 @@ export const CommentsWrapper = ({entityId, entityType}: CommentsContainer) => {
                         parentId: null,
                         entityId: entityId,
                         likesCount: 0,
-                        hasLiked: false,
                     }}
                 />
             )}

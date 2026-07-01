@@ -212,7 +212,7 @@ export const DraftArticlePage = () => {
     const handlePublish = useCallback(async () => {
         if (draftId) {
             await mutatePublishDraft(draftId, false);
-            void navigate(`/articles/${draftId}`);
+            navigate(`/articles/${draftId}`);
         }
     }, [draftId, mutatePublishDraft, navigate]);
 
@@ -224,7 +224,7 @@ export const DraftArticlePage = () => {
 
     useEffect(() => {
         if (user?.id && author?.id && user.id !== author.id) {
-            void navigate('/no-permission');
+            navigate('/no-permission');
         }
     }, [author?.id, navigate, user?.id]);
 
@@ -269,9 +269,7 @@ export const DraftArticlePage = () => {
                         <Button
                             type='primary'
                             loading={isPublishingPending}
-                            onClick={() => {
-                                void handlePublish();
-                            }}
+                            onClick={handlePublish}
                         >
                             {t('article.draft.publish')}
                         </Button>
@@ -324,17 +322,13 @@ export const DraftArticlePage = () => {
                 <Col flex='auto'>
                     <Space wrap size={[8, 8]}>
                         <TagsSelect
-                            onChange={(newTags) => {
-                                void handleTagsChange(newTags);
-                            }}
+                            onChange={handleTagsChange}
                             value={tags}
                         />
                         <TagsWrapper
                             tags={tags}
                             editable={{
-                                onChange: (newTags) => {
-                                    void handleTagsChange(newTags);
-                                },
+                                onChange: handleTagsChange,
                             }}
                             isPending={updateTags.isPending}
                         />
@@ -360,9 +354,7 @@ export const DraftArticlePage = () => {
                     <ButtonAccept
                         text={t('article.draft.publish')}
                         loading={isPublishingPending}
-                        onClick={() => {
-                            void handlePublish();
-                        }}
+                        onClick={handlePublish}
                         className={b('button-publish')}
                     />
                 </Col>

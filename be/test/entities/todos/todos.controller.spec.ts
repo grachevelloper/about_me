@@ -64,19 +64,20 @@ describe("TodosController", () => {
         expect(service.findAll).toHaveBeenCalledWith(query);
     });
 
-    it("exposes detail endpoint publicly and passes only todo id to the service", async () => {
+    it("exposes detail endpoint publicly and passes todo id with optional actor to the service", async () => {
         const service = {
             findOne: jest.fn<TodosService["findOne"]>().mockResolvedValue({} as never),
         } as unknown as TodosService;
         const controller = new TodosController(service);
 
-        await controller.findOne("82c130b1-1c47-4a0c-8a1c-e79cc39282ad");
+        await controller.findOne("82c130b1-1c47-4a0c-8a1c-e79cc39282ad", actor);
 
         expect(
             Reflect.getMetadata(IS_PUBLIC_KEY, TodosController.prototype.findOne),
         ).toBe(true);
         expect(service.findOne).toHaveBeenCalledWith({
             id: "82c130b1-1c47-4a0c-8a1c-e79cc39282ad",
+            actor,
         });
     });
 

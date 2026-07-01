@@ -4,8 +4,7 @@ import block from 'bem-cn-lite';
 import {Fragment, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 
-import {LikeButton} from '@/shared/components/LikeButton';
-import {useToggleLikeMutation} from '@/shared/entities/Like';
+import {Like, useToggleLikeMutation} from '@/shared/entities/Like';
 
 import {User} from '../../components/User';
 import {useAuth} from '../../context';
@@ -55,25 +54,18 @@ export const Comment = ({comment, className, isNew = false}: CommentProps) => {
         content
     );
 
-    const {
-        mutate: mutateDelete,
-        isPending: isPendindDelete,
-    } = deleteMutation;
+    const {mutate: mutateDelete, isPending: isPendindDelete} = deleteMutation;
 
-    const {
-        mutate: mutateUpdate,
-        isPending: isPendindUpdate,
-    } = updateMutation;
+    const {mutate: mutateUpdate, isPending: isPendindUpdate} = updateMutation;
 
-    const {
-        mutate: mutateCreate,
-        isPending: isPendingCreate,
-    } = useCreateCommentMutation();
+    const {mutate: mutateCreate, isPending: isPendingCreate} =
+        useCreateCommentMutation();
     const {mutate: toggleLike, isPending: isLikePending} =
         useToggleLikeMutation();
 
     const isEditable = user?.id === author?.id;
     const canLike = Boolean(id);
+    const isLiked = Boolean(hasLiked);
 
     const handleCreate = (content: string, isResponse = false) => {
         mutateCreate({
@@ -115,7 +107,7 @@ export const Comment = ({comment, className, isNew = false}: CommentProps) => {
         toggleLike({
             entityId: id,
             entityType: 'comment',
-            hasLiked,
+            hasLiked: isLiked,
         });
     };
 
@@ -207,8 +199,8 @@ export const Comment = ({comment, className, isNew = false}: CommentProps) => {
                     {content}
                 </Typography.Text>
                 <Flex className={b('actions')} justify='start'>
-                    <LikeButton
-                        isLiked={hasLiked}
+                    <Like
+                        isLiked={isLiked}
                         likesCount={likesCount}
                         onClick={handleLike}
                         disabled={!canLike || isLikePending}

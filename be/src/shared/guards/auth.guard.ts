@@ -32,14 +32,14 @@ export class AuthGuard implements CanActivate {
             [context.getHandler(), context.getClass()],
         );
 
-        if (isPublic) {
-            return true;
-        }
-
         const req: Request = context.switchToHttp().getRequest();
-
         const token = req.cookies.accessToken;
+
         if (!token) {
+            if (isPublic) {
+                return true;
+            }
+
             throw new UnauthorizedException();
         }
 
@@ -60,6 +60,10 @@ export class AuthGuard implements CanActivate {
 
             req["user"] = user;
         } catch {
+            if (isPublic) {
+                return true;
+            }
+
             throw new UnauthorizedException();
         }
 

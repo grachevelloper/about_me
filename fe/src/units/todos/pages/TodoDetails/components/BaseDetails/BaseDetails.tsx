@@ -4,8 +4,7 @@ import block from 'bem-cn-lite';
 import {useTranslation} from 'react-i18next';
 
 import {CommentsWrapper} from '@/shared/components/CommentsWrapper';
-import {LikeButton} from '@/shared/components/LikeButton';
-import {useToggleLikeMutation} from '@/shared/entities/Like';
+import {Like, useToggleLikeMutation} from '@/shared/entities/Like';
 
 import {Priority} from '@/todos/components/Priority';
 import {State} from '@/todos/components/State';
@@ -28,13 +27,8 @@ export const BaseDetails = ({initialData}: BaseDetailsProps) => {
     const {t} = useTranslation('todo');
     const {mutate: toggleLike, isPending: isLikePending} =
         useToggleLikeMutation();
-    const {
-        updateTitle,
-        updatePriority,
-        updateState,
-        updateContent,
-        isPending,
-    } = useTodoMutations();
+    const {updateTitle, updatePriority, updateState, updateContent, isPending} =
+        useTodoMutations();
 
     const handleEnd = <T extends UpdateField>(
         newValueType: T,
@@ -91,7 +85,7 @@ export const BaseDetails = ({initialData}: BaseDetailsProps) => {
                     </Space>
                 </Col>
                 <Col xs={24} md={6} className={b('like')}>
-                    <LikeButton
+                    <Like
                         isLiked={initialData.hasLiked}
                         likesCount={initialData.likesCount}
                         onClick={handleLikeClick}

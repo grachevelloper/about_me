@@ -16,27 +16,25 @@ const detailKeyByEntityType = (
     entityType: EntityLikeType,
     entityId: string
 ) => {
-    if (entityType === 'article') {
-        return ['articles', 'detail', entityId] as const;
+    switch (entityType) {
+        case 'article':
+            return ['articles', 'detail', entityId] as const;
+        case 'comment':
+            return ['comment', entityId] as const;
+        case 'todo':
+            return ['todo', entityId] as const;
     }
-
-    if (entityType === 'comment') {
-        return ['comment', entityId] as const;
-    }
-
-    return ['todo', entityId] as const;
 };
 
 const listsKeyByEntityType = (entityType: EntityLikeType) => {
-    if (entityType === 'article') {
-        return ['articles'] as const;
+    switch (entityType) {
+        case 'article':
+            return ['articles'] as const;
+        case 'comment':
+            return ['comments'] as const;
+        case 'todo':
+            return ['todos'] as const;
     }
-
-    if (entityType === 'comment') {
-        return ['comments'] as const;
-    }
-
-    return ['todos'] as const;
 };
 
 const getOptimisticEntity = <T extends Partial<LikedEntityCache>>(

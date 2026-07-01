@@ -3,23 +3,23 @@ import {Button, Space, theme, Tooltip, Typography} from 'antd';
 import block from 'bem-cn-lite';
 import {useTranslation} from 'react-i18next';
 
-import './LikeButton.scss';
+import './Like.scss';
 
 const b = block('like-button');
 
-interface LikeButtonProps {
+interface LikeProps {
     disabled?: boolean;
     isLiked: boolean;
     onClick: () => void;
     likesCount?: number;
 }
 
-export const LikeButton = ({
+export const Like = ({
     disabled = false,
     isLiked,
     onClick,
     likesCount,
-}: LikeButtonProps) => {
+}: LikeProps) => {
     const {t} = useTranslation('common');
     const {
         token: {colorPrimary},
@@ -30,7 +30,6 @@ export const LikeButton = ({
         <Tooltip title={t(isLiked ? 'unlike' : 'like')}>
             <Button
                 type='text'
-                size='small'
                 disabled={disabled}
                 onClick={onClick}
                 className={b({liked: isLiked})}
