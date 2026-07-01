@@ -30,6 +30,10 @@
 
     "articles.form.title.label": "Заголовок статьи",
     "articles.form.title.placeholder": "Введите заголовок",
+    "articles.form.image.label": "Обложка",
+    "articles.form.image.placeholder": "https://example.com/image.png",
+    "articles.form.readTime.label": "Время чтения",
+    "articles.form.readTime.after": "мин",
     "articles.form.content.label": "Содержание",
     "articles.form.content.placeholder": "Начните писать статью...",
     "articles.form.category.label": "Категория",
@@ -49,6 +53,8 @@
     "articles.form.preview": "Предпросмотр",
     "articles.form.saveDraft": "Сохранить черновик",
     "article.draft.pushlish": "Опубликовать",
+    "article.draft.publish": "Опубликовать",
+    "article.draft.saving": "Сохраняю...",
 
     "articles.draft.message.saved": "Черновик сохранён",
 

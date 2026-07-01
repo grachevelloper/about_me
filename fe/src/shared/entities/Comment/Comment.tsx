@@ -1,8 +1,11 @@
 import {CloseOutlined, EditTwoTone} from '@ant-design/icons';
-import {Divider, Flex, Spin, Typography} from 'antd';
+import {Button, Divider, Flex, Spin, Typography} from 'antd';
 import block from 'bem-cn-lite';
 import {Fragment, useState} from 'react';
 import {useTranslation} from 'react-i18next';
+
+import {Like, useToggleLikeMutation} from '@/shared/entities/Like';
+import {Role} from '@/typings/common';
 
 import {User} from '../../components/User';
 import {useAuth} from '../../context';
@@ -29,6 +32,7 @@ export const Comment = ({comment, className, isNew = false}: CommentProps) => {
         createdAt,
         updatedAt,
         likesCount,
+        hasLiked,
         depth,
         parentId,
         entityId,
@@ -44,42 +48,41 @@ export const Comment = ({comment, className, isNew = false}: CommentProps) => {
     const {t} = useTranslation('common');
     const {updateMutation, deleteMutation} = useCommentMutations();
     const [isEditing, setIsEditing] = useState<boolean>(false);
-    const [isActionIconsVisible, setActionIconsVisible] =
-        useState<boolean>(false);
+    const [formResetKey, setFormResetKey] = useState(0);
     const [localContent, setLocalContent] = useLocalStorage<string>(
         `comment-${id}`,
         content
     );
 
-    const {
-        mutate: mutateDelete,
-        isPending: isPendindDelete,
-        isError: isErrorDelete,
-    } = deleteMutation;
+    const {mutate: mutateDelete, isPending: isPendindDelete} = deleteMutation;
 
-    const {
-        mutate: mutateUpdate,
-        isPending: isPendindUpdate,
-        isError: isErrorUpdate,
-    } = updateMutation;
+    const {mutate: mutateUpdate, isPending: isPendindUpdate} = updateMutation;
 
-    const {
-        mutate: mutateCreate,
-        isPending: isPendingCreate,
-        isError: isErrorCreate,
-    } = useCreateCommentMutation();
+    const {mutate: mutateCreate, isPending: isPendingCreate} =
+        useCreateCommentMutation();
+    const {mutate: toggleLike, isPending: isLikePending} =
+        useToggleLikeMutation();
 
-    const isEditable = user?.id === author?.id;
+    const canMutate = user?.id === author?.id || user?.role === Role.ADMIN;
+    const canLike = Boolean(id);
+    const isLiked = Boolean(hasLiked);
 
     const handleCreate = (content: string, isResponse = false) => {
-        mutateCreate({
-            entityId,
-            entityType,
-            parentId: isResponse ? id! : parentId,
-            content,
-        });
-        setLocalContent('');
-        setReplyVisible(false);
+        mutateCreate(
+            {
+                entityId,
+                entityType,
+                parentId: isResponse ? id! : parentId,
+                content: content.trim(),
+            },
+            {
+                onSuccess: () => {
+                    setLocalContent('');
+                    setFormResetKey((currentKey) => currentKey + 1);
+                    setReplyVisible(false);
+                },
+            }
+        );
     };
 
     const handleUpdate = (content: string) => {
@@ -103,9 +106,22 @@ export const Comment = ({comment, className, isNew = false}: CommentProps) => {
         setReplyVisible(true);
     };
 
+    const handleLike = () => {
+        if (!id) {
+            return;
+        }
+
+        toggleLike({
+            entityId: id,
+            entityType: 'comment',
+            hasLiked: isLiked,
+        });
+    };
+
     if (isNew || isEditing) {
         return (
             <CommentForm
+                key={isEditing ? id : formResetKey}
                 isCompletePending={
                     isEditing ? isPendindUpdate : isPendingCreate
                 }
@@ -120,12 +136,6 @@ export const Comment = ({comment, className, isNew = false}: CommentProps) => {
     return (
         <Fragment>
             <Flex
-                onMouseEnter={() => {
-                    setActionIconsVisible(true);
-                }}
-                onMouseLeave={() => {
-                    setActionIconsVisible(false);
-                }}
                 justify='start'
                 vertical
                 align='start'
@@ -153,38 +163,57 @@ export const Comment = ({comment, className, isNew = false}: CommentProps) => {
                                 {t('updated-at', {date: formatDate(updatedAt)})}
                             </Typography.Text>
                         )}
-                        {isEditable ? (
-                            <span>
-                                {isActionIconsVisible && (
-                                    <Flex gap={6}>
-                                        <EditTwoTone
-                                            onClick={handleSetEditing}
-                                            className={b('icon')}
-                                        />
-
-                                        {isPendindDelete ? (
-                                            <Spin size='small' />
-                                        ) : (
-                                            <CloseOutlined
-                                                className={b('icon', {
-                                                    error: true,
-                                                })}
-                                                onClick={handleRemove}
-                                            />
-                                        )}
-                                    </Flex>
-                                )}
-                            </span>
-                        ) : (
-                            <span className={b('reply')} onClick={handleReply}>
+                        {!canMutate ? (
+                            <Button
+                                className={b('reply')}
+                                type='link'
+                                size='small'
+                                onClick={handleReply}
+                            >
                                 {t('comments.reply')}
-                            </span>
-                        )}
+                            </Button>
+                        ) : null}
                     </Flex>
                 </Flex>
                 <Typography.Text className={b('content')}>
                     {content}
                 </Typography.Text>
+                <Flex className={b('actions')} justify='space-between'>
+                    <Like
+                        isLiked={isLiked}
+                        likesCount={likesCount}
+                        onClick={handleLike}
+                        disabled={!canLike || isLikePending}
+                    />
+                    {canMutate && (
+                        <Flex gap={6}>
+                            <Button
+                                type='link'
+                                size='small'
+                                icon={<EditTwoTone />}
+                                onClick={handleSetEditing}
+                            >
+                                {t('comments.edit')}
+                            </Button>
+                            <Button
+                                danger
+                                type='link'
+                                size='small'
+                                icon={
+                                    isPendindDelete ? (
+                                        <Spin size='small' />
+                                    ) : (
+                                        <CloseOutlined />
+                                    )
+                                }
+                                onClick={handleRemove}
+                                disabled={isPendindDelete}
+                            >
+                                {t('comments.delete')}
+                            </Button>
+                        </Flex>
+                    )}
+                </Flex>
                 <Divider rootClassName={b('divider')} />
             </Flex>
             {isReplyVisible ? (

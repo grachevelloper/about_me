@@ -62,7 +62,7 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 /fe/.temp
 /fe/coverage
 /fe/*.log
-/fe/public/mockServiceWorker.js
+fe/tsconfig.tsbuildinfo
 
 nginx.conf
 */nginx.conf

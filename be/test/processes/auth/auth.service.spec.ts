@@ -44,7 +44,7 @@ describe("AuthService", () => {
         ).resolves.toBe(user);
     });
 
-    it("returns the same generic error for an invalid password", async () => {
+    it("returns an incorrect password error when the email exists", async () => {
         const user = Object.assign(new User(), {
             id: "82c130b1-1c47-4a0c-8a1c-e79cc39282ad",
             email: "reader@example.com",
@@ -60,7 +60,20 @@ describe("AuthService", () => {
 
         await expect(
             service.signIn(user.email, "wrong-password"),
-        ).rejects.toEqual(new UnauthorizedException("Invalid credentials"));
+        ).rejects.toEqual(new UnauthorizedException("Incorrect password"));
+    });
+
+    it("returns a user-not-found error when the email does not exist", async () => {
+        const usersService = {
+            findByEmail: jest
+                .fn<UsersService["findByEmail"]>()
+                .mockResolvedValue(null),
+        };
+        const service = createService({usersService});
+
+        await expect(
+            service.signIn("missing@example.com", "StrongPassword123"),
+        ).rejects.toEqual(new UnauthorizedException("User not found"));
     });
 
     it("rotates a refresh token and signs a new access token with sub and role", async () => {

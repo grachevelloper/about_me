@@ -9,28 +9,15 @@ interface TodoStateCellProps {
     todoId: string;
 }
 
-const switchNewPriority = (priority: TodoPriority): TodoPriority => {
-    switch (priority) {
-        case TodoPriority.LOW:
-            return TodoPriority.MEDIUM;
-        case TodoPriority.MEDIUM:
-            return TodoPriority.HIGH;
-        case TodoPriority.HIGH:
-            return TodoPriority.SUPER;
-        case TodoPriority.SUPER:
-            return TodoPriority.LOW;
-    }
-};
-
 export const PriorityCell = ({priority, todoId}: TodoStateCellProps) => {
     const {isPending} = useTodoQuery(todoId);
     const {updatePriority} = useTodoMutations();
     const isEdited = useRef<boolean>(false);
 
-    const handleUpdatePriority = useCallback(() => {
+    const handleUpdatePriority = useCallback((newPriority: TodoPriority) => {
         isEdited.current = true;
-        updatePriority(todoId, switchNewPriority(priority));
-    }, [todoId, isEdited]);
+        updatePriority(todoId, newPriority);
+    }, [todoId, updatePriority]);
 
     return (
         <Priority

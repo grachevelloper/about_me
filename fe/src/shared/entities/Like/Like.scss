@@ -1,0 +1,13 @@
+.like-button {
+    width: fit-content;
+    height: fit-content;
+    padding-inline: 6px;
+
+    &_liked {
+        font-weight: 600;
+    }
+
+    &__count {
+        line-height: 1;
+    }
+}

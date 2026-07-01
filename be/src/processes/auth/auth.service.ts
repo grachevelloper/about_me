@@ -44,10 +44,10 @@ export class AuthService {
         const user = await this.usersService.findByEmail(email);
 
         if (!user) {
-            throw new UnauthorizedException("Invalid credentials");
+            throw new UnauthorizedException("User not found");
         }
         if (!(await bcrypt.compare(pass, user.password))) {
-            throw new UnauthorizedException("Invalid credentials");
+            throw new UnauthorizedException("Incorrect password");
         }
         return user;
     }

@@ -1,4 +1,9 @@
 .comments-wrapper {
     width: 100% !important;
     height: auto;
+
+    &__state {
+        width: 100%;
+        padding: 16px 0;
+    }
 }

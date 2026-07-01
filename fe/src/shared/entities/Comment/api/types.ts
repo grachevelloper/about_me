@@ -23,6 +23,7 @@ export interface UpdateCommentDto {
 export interface ListComments {
     entityId: string;
     entityType: EntityCommentType;
+    order?: 'ASC' | 'DESC';
 }
 
 export interface CommentsApi {

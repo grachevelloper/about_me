@@ -15,6 +15,7 @@ import {UsersService} from "@/users/users.service";
 
 import {AggregateDeletionService} from "../../processes/aggregate-deletion/aggregate-deletion.service";
 import {CommentsService} from "../comments/comments.service";
+import {LikesService} from "../likes/likes.service";
 import {PUBLIC_TODO_OWNER_EMAIL} from "./constants";
 import {
     CreateTodoDto,
@@ -61,6 +62,7 @@ export class TodosService {
         private commentsService: CommentsService,
         private aggregateDeletionService: AggregateDeletionService,
         private usersService: UsersService,
+        private likesService: LikesService,
     ) {}
 
     async create({data, actor}: CreateTodoCommand): Promise<TodoResponseDto> {
@@ -97,9 +99,14 @@ export class TodosService {
             return TodosMapper.toResponse(await this.findPublicOwnerEntity(id));
         }
 
-        return TodosMapper.toResponse(
-            await this.findEntityForActor({id, actor}),
-        );
+        const todo = await this.findEntityForActor({id, actor});
+        const hasLiked = await this.likesService.hasLiked({
+            entityId: id,
+            entityType: "todo",
+            userId: actor.id,
+        });
+
+        return TodosMapper.toResponse(todo, hasLiked);
     }
 
     async findAll(query: QueryTodosDto = {}): Promise<ResponseGetTodos> {

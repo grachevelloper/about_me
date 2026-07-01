@@ -1,8 +1,8 @@
 import './State.scss';
 
-import {Button} from 'antd';
+import {Button, Popover, Space, type ButtonProps} from 'antd';
 import block from 'bem-cn-lite';
-import {forwardRef, Fragment} from 'react';
+import {forwardRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 
 import {TodoState} from '@/todos/types';
@@ -11,6 +11,20 @@ import {TodoState} from '@/todos/types';
 
 const b = block('state');
 
+const stateKeyByValue: Record<TodoState, string> = {
+    [TodoState.IN_WORK]: 'in_work',
+    [TodoState.PLANNING]: 'planning',
+    [TodoState.FINISHED]: 'finished',
+    [TodoState.CANCELED]: 'canceled',
+};
+
+const availableTransitions: Record<TodoState, TodoState[]> = {
+    [TodoState.PLANNING]: [TodoState.IN_WORK, TodoState.CANCELED],
+    [TodoState.IN_WORK]: [TodoState.FINISHED, TodoState.CANCELED],
+    [TodoState.FINISHED]: [TodoState.IN_WORK],
+    [TodoState.CANCELED]: [TodoState.PLANNING, TodoState.IN_WORK],
+};
+
 interface StateProps {
     state: TodoState;
     editable?: false | {isEdited: boolean};
@@ -18,26 +32,59 @@ interface StateProps {
     isLoading?: boolean;
 }
 
-const getColor = (state: TodoState) => {
+const getCustomize = (state: TodoState): Pick<
+    ButtonProps,
+    'color' | 'variant'
+> => {
     switch (state) {
         case TodoState.CANCELED:
-            return 'red';
+            return {color: 'red', variant: 'filled'};
         case TodoState.FINISHED:
-            return 'green';
+            return {color: 'green', variant: 'filled'};
         case TodoState.IN_WORK:
-            return 'blue';
+            return {color: 'default', variant: 'filled'};
         case TodoState.PLANNING:
-            return 'yellow';
+            return {color: 'default', variant: 'filled'};
     }
 };
 
 export const State = forwardRef<HTMLButtonElement, StateProps>(
     ({state, editable, onUpdate, isLoading}, ref) => {
         const {t} = useTranslation('todo');
+        const [isOpen, setIsOpen] = useState(false);
 
         const isEdited = editable && editable?.isEdited;
+        const transitions = availableTransitions[state];
+        const currentLabel = t(`todo.state.${stateKeyByValue[state]}`);
+        const handleUpdate = (newState: TodoState) => {
+            onUpdate?.(newState);
+            setIsOpen(false);
+        };
+        const content = (
+            <Space direction='vertical' size={4}>
+                {transitions.map((nextState) => (
+                    <Button
+                        key={nextState}
+                        type='text'
+                        size='small'
+                        block
+                        onClick={() => handleUpdate(nextState)}
+                        {...getCustomize(nextState)}
+                    >
+                        {t(`todo.state.${stateKeyByValue[nextState]}`)}
+                    </Button>
+                ))}
+            </Space>
+        );
+
         return (
-            <Fragment>
+            <Popover
+                title={t('todo.change.state')}
+                content={content}
+                trigger='click'
+                open={Boolean(onUpdate) && isOpen}
+                onOpenChange={(nextOpen) => setIsOpen(nextOpen)}
+            >
                 {/* {isRotated ? (
                 <Lottie
                     animationData={fireAnimation}
@@ -54,16 +101,14 @@ export const State = forwardRef<HTMLButtonElement, StateProps>(
                     className={b({
                         'is-edited': isEdited,
                     })}
-                    onClick={() => onUpdate?.(state)}
-                    type='primary'
-                    color={getColor(state)}
-                    variant='solid'
+                    disabled={!onUpdate}
                     loading={isLoading}
                     ref={ref}
+                    {...getCustomize(state)}
                 >
-                    {t(`todo.state.${state}`)}
+                    {currentLabel}
                 </Button>
-            </Fragment>
+            </Popover>
         );
     }
 );

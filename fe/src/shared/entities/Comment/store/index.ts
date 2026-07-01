@@ -1,7 +1,5 @@
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 
-import {queryClient} from '@/shared/configs/api';
-
 import api from '../api';
 import {CreateCommentDto, ListComments, UpdateCommentDto} from '../api/types';
 import {CommentType} from '../types';
@@ -14,21 +12,10 @@ export const useCommentsQuery = (listCommentsData: ListComments) => {
             listCommentsData.entityId,
         ],
         queryFn: () => api.listComments(listCommentsData),
+        enabled: Boolean(listCommentsData.entityId),
     });
 
     return {comments: data?.items, isPending, isError};
-};
-
-const useCommentQuery = (commentId: string) => {
-    const {data, isPending, isError} = useQuery(
-        {
-            queryKey: ['comment', commentId],
-            queryFn: () => api.getComment(commentId),
-        },
-        queryClient
-    );
-
-    return {comment: data, isPending, isError};
 };
 
 export const useCreateCommentMutation = () => {

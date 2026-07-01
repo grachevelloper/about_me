@@ -1,4 +1,4 @@
-import {BulbOutlined, UserOutlined} from '@ant-design/icons';
+import {BulbOutlined, LoginOutlined, UserOutlined} from '@ant-design/icons';
 import {message, notification} from 'antd';
 import {MenuItemType} from 'antd/es/menu/interface';
 import {useTranslation} from 'react-i18next';
@@ -49,10 +49,16 @@ export const useSiderActions = ({onLogoutClick}: UseSiderActionsProps) => {
         if (!user) {
             return [
                 {
+                    icon: <LoginOutlined />,
+                    label: t('layout.top.user.signin'),
+                    key: 'action-guest-0',
+                    onClick: () => void navigate('/auth/signin'),
+                },
+                {
                     icon: <UserOutlined />,
                     label: t('layout.top.user.signup'),
-                    key: 'action-guest-0',
-                    onClick: () => navigate('/auth/signup'),
+                    key: 'action-guest-1',
+                    onClick: () => void navigate('/auth/signup'),
                 },
             ];
         }
@@ -80,7 +86,7 @@ export const useSiderActions = ({onLogoutClick}: UseSiderActionsProps) => {
                 icon: <RiTodoLine />,
                 label: t('layout.left.create_todo'),
                 key: 'action-admin-0',
-                onClick: () => navigate('/todos/new'),
+                onClick: () => void navigate('/todos/new'),
             },
         ];
 

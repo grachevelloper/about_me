@@ -13,7 +13,7 @@ export class Todo extends BaseEntity {
     @Column()
     content: string;
 
-    @Column()
+    @Column({type: "uuid"})
     authorId: string;
 
     @Column({

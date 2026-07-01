@@ -25,6 +25,10 @@ export const CommentForm = ({
     const textAreaRef = useRef<TextAreaRef>(null);
 
     useEffect(() => {
+        setContent(prevContent || '');
+    }, [prevContent]);
+
+    useEffect(() => {
         if (prevContent && textAreaRef.current) {
             //Get to textAreaProps
             const textArea = textAreaRef.current.resizableTextArea?.textArea;
@@ -70,7 +74,7 @@ export const CommentForm = ({
                     onClick={() =>
                         onComplete(content, Boolean(prevContent) === false)
                     }
-                    disabled={!content}
+                    disabled={!content.trim()}
                     loading={isCompletePending}
                     size='middle'
                 />

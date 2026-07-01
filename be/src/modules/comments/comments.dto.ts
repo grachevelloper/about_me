@@ -48,6 +48,7 @@ export class CommentResponseDto {
     parentId!: string | null;
     depth!: number;
     likesCount!: number;
+    hasLiked!: boolean;
     author!: UserResponseDto;
     createdAt!: string;
     updatedAt!: string;

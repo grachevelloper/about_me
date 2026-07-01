@@ -10,6 +10,7 @@ import {ArticlesService} from "src/modules/articles/articles.service";
 import {Comment} from "src/modules/comments/comments.entity";
 import {CommentsService} from "src/modules/comments/comments.service";
 import {Like} from "src/modules/likes/likes.entity";
+import {LikesService} from "src/modules/likes/likes.service";
 import {TodosService} from "src/modules/todos/todos.service";
 import {UsersService} from "src/modules/users/users.service";
 import {AuthenticatedUser, Role} from "src/types";
@@ -21,6 +22,7 @@ describe("CommentsService", () => {
     let usersService: jest.Mocked<UsersService>;
     let todosService: jest.Mocked<TodosService>;
     let articlesService: jest.Mocked<ArticlesService>;
+    let likesService: jest.Mocked<LikesService>;
 
     const entityManager = {
         delete: jest.fn<EntityManager["delete"]>(),
@@ -105,6 +107,12 @@ describe("CommentsService", () => {
                         findOne: jest.fn(),
                     },
                 },
+                {
+                    provide: LikesService,
+                    useValue: {
+                        hasLiked: jest.fn(),
+                    },
+                },
             ],
         }).compile();
 
@@ -113,6 +121,7 @@ describe("CommentsService", () => {
         usersService = module.get(UsersService);
         todosService = module.get(TodosService);
         articlesService = module.get(ArticlesService);
+        likesService = module.get(LikesService);
         entityManager.delete.mockReset();
     });
 
@@ -241,6 +250,7 @@ describe("CommentsService", () => {
 
     it("sorts entity comments by creation time and id", async () => {
         repository.findAndCount.mockResolvedValue([[parent], 1]);
+        likesService.hasLiked.mockResolvedValue(true);
 
         const result = await service.findByEntity({
             actor: owner,
@@ -264,8 +274,13 @@ describe("CommentsService", () => {
             skip: 10,
             take: 10,
         });
+        expect(likesService.hasLiked).toHaveBeenCalledWith({
+            entityId: parent.id,
+            entityType: "comment",
+            userId: owner.id,
+        });
         expect(result).toEqual({
-            items: [parent],
+            items: [expect.objectContaining({id: parent.id, hasLiked: true})],
             page: 2,
             limit: 10,
             total: 1,

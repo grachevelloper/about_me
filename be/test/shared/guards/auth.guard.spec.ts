@@ -3,12 +3,17 @@ import {ExecutionContext, UnauthorizedException} from "@nestjs/common";
 import {Reflector} from "@nestjs/core";
 import {JwtService} from "@nestjs/jwt";
 import {AuthGuard} from "src/shared/guards/auth.guard";
+import {Role} from "src/types";
 
-function contextWithCookies(cookies: Record<string, string>): ExecutionContext {
+function contextWithCookies(
+    cookies: Record<string, string>,
+    request: Record<string, unknown> = {},
+): ExecutionContext {
+    Object.assign(request, {cookies});
     return {
         getHandler: jest.fn(),
         getClass: jest.fn(),
-        switchToHttp: () => ({getRequest: () => ({cookies})}),
+        switchToHttp: () => ({getRequest: () => request}),
     } as unknown as ExecutionContext;
 }
 
@@ -41,4 +46,30 @@ describe("AuthGuard", () => {
             ).rejects.toBeInstanceOf(UnauthorizedException);
         },
     );
+
+    it("hydrates current user on a public request with a valid access cookie", async () => {
+        const request: Record<string, unknown> = {};
+        const jwt = {
+            verifyAsync: jest.fn(async () => ({
+                sub: "user-123",
+                role: Role.USER,
+                iat: 1,
+                exp: 2,
+            })),
+        } as unknown as JwtService;
+        const guard = new AuthGuard(jwt, {
+            getAllAndOverride: jest.fn(() => true),
+        } as unknown as Reflector);
+
+        await expect(
+            guard.canActivate(contextWithCookies({accessToken: "token"}, request)),
+        ).resolves.toBe(true);
+
+        expect(request.user).toEqual({
+            id: "user-123",
+            role: Role.USER,
+            iat: 1,
+            exp: 2,
+        });
+    });
 });

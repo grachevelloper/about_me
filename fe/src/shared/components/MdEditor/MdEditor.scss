@@ -1,5 +1,17 @@
 .md-editor {
+    min-height: 320px;
+
     &__markdown {
-        min-height: 200px;
+        min-height: 320px;
+        padding: 18px;
+        font-size: 16px;
+        line-height: 1.7;
+    }
+
+    &__toolbar {
+        flex-wrap: wrap;
+        padding: 8px;
+        border-bottom: 1px solid var(--ant-color-border);
+        background: var(--ant-color-bg-container);
     }
 }

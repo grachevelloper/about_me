@@ -19,6 +19,8 @@ export interface CommentType {
 
     likesCount: number;
 
+    hasLiked?: boolean;
+
     updatedAt?: Date;
 
     createdAt?: Date;

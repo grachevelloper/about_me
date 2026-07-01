@@ -30,7 +30,7 @@ export const useCreateTag = () => {
 };
 
 export const useDeleteTag = () => {
-    return useMutation<boolean, Error, string>({
+    return useMutation<void, Error, string>({
         mutationFn: (id) => api.deleteTag(id),
         onSuccess: (_, id) => {
             queryClient.removeQueries({queryKey: tagsKeys.detail(id)});

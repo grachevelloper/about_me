@@ -4,6 +4,8 @@
 
 This file applies to everything under `be/`. Follow a more deeply nested `AGENTS.md` if one is added later. Direct user instructions override this file.
 
+You may create design specifications, implementation-plan documents, and other workflow specification files when they materially improve the work. Keep them scoped to the task and avoid producing documentation as ceremony.
+
 Use the repository as evidence, not as unquestionable design authority. The project has not been actively maintained for some time and may contain outdated decisions, accidental inconsistencies, and defects. In descending order of authority, follow direct user guidance, executable configuration, verified tests, repeated coherent patterns, and then the nearest valid implementation. Do not treat an isolated typo, stale script, commented code, repeated workaround, or known defect as a convention.
 
 When a choice is genuinely debatable from an engineering perspective and the repository does not establish a clearly correct answer, stop and ask the user before encoding the choice in code or documentation. Present the concrete options and trade-offs. Do not silently infer the user's preferred architecture from legacy code.

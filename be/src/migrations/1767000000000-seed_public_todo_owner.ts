@@ -3,7 +3,6 @@ import {MigrationInterface, QueryRunner} from "typeorm";
 
 import {
     PUBLIC_TODO_OWNER_EMAIL,
-    PUBLIC_TODO_OWNER_PASSWORD_ENV,
     PUBLIC_TODO_OWNER_USERNAME,
 } from "@/todos/constants";
 
@@ -11,10 +10,10 @@ export class SeedPublicTodoOwner1767000000000 implements MigrationInterface {
     name = "SeedPublicTodoOwner1767000000000";
 
     public async up(queryRunner: QueryRunner): Promise<void> {
-        const password = process.env[PUBLIC_TODO_OWNER_PASSWORD_ENV];
+        const password = process.env.GRACHEVELOPERS_PASSWORD;
         if (!password) {
             throw new Error(
-                `${PUBLIC_TODO_OWNER_PASSWORD_ENV} is required to seed public todo owner`,
+                "GRACHEVELOPERS_PASSWORD is required to seed public todo owner",
             );
         }
 
