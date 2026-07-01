@@ -85,7 +85,19 @@ export const useTodoMutations = () => {
                 }
             },
             onSuccess: (data, variables) => {
-                queryClient.setQueryData(['todo', variables.id], data);
+                queryClient.setQueryData<Todo>(
+                    ['todo', variables.id],
+                    (previous) => {
+                        if (!previous) {
+                            return data;
+                        }
+
+                        return {
+                            ...previous,
+                            ...data,
+                        };
+                    }
+                );
             },
         },
         queryClient

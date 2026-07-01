@@ -30,6 +30,7 @@
     "logout": "Выйти из аккаунта",
     "logout-modal.title": "Вы точно хотите выйти из аккаунта?",
     "logout-modal.deny": "Пока останусь",
+    "logout-modal.error": "Не удалось выйти из аккаунта. Попробуйте еще раз.",
     "main.lead": "Личный workspace для задач.",
     "main.cards.tasks.title": "Задачи",
     "main.cards.tasks.description": "Активных задач: {{count}}. Здесь видно, что сейчас в работе и что стоит сделать дальше.",

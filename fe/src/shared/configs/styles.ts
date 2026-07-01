@@ -60,9 +60,10 @@ const lightTheme: CustomThemeConfig = {
 
         colorBgMask: 'rgba(0, 0, 0, 0.1)',
         colorBgBlur: 'rgba(255, 255, 255, 0.85)',
-        colorBgSpotlight: 'rgba(222, 223, 223, 0.95)',
+        colorBgSpotlight: '#111827',
 
         colorTextBase: '#1f2937',
+        colorTextLightSolid: '#ffffff',
         colorTextSecondary: '#4b5563',
 
         colorTextTertiary: '#6b7280',
@@ -172,8 +173,10 @@ const darkTheme: CustomThemeConfig = {
         colorBgContainer: '#1f2937',
         colorBgElevated: '#374151',
         colorBgLayout: '#111827',
+        colorBgSpotlight: '#f9fafb',
 
         colorTextBase: '#f9fafb',
+        colorTextLightSolid: '#111827',
         colorTextSecondary: '#d1d5db',
         colorTextTertiary: '#9ca3af',
         colorTextQuaternary: '#6b7280',

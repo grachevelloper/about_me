@@ -25,6 +25,7 @@ export const CommentsWrapper = ({entityId, entityType}: CommentsContainer) => {
     const {comments, isError, isPending} = useCommentsQuery({
         entityId,
         entityType,
+        order: 'ASC',
     });
 
     if (!entityId) {

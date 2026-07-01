@@ -29,6 +29,7 @@
     "logout": "Sign out",
     "logout-modal.title": "Are you sure you want to sign out?",
     "logout-modal.deny": "I will stay",
+    "logout-modal.error": "Could not sign out. Please try again.",
     "main.lead": "A personal fullstack workspace for tasks, notes, drafts, and the resume. The home page gathers the things that are useful every day.",
     "main.cards.tasks.title": "Tasks",
     "main.cards.tasks.description": "Active tasks: {{count}}. This shows what is in progress and what should happen next.",

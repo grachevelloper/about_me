@@ -1,8 +1,7 @@
-import {Modal, theme} from 'antd';
+import {Alert, Modal, theme} from 'antd';
 import block from 'bem-cn-lite';
 import {useCallback} from 'react';
 import {useTranslation} from 'react-i18next';
-import {useNavigate} from 'react-router-dom';
 
 import {useLogoutMutation} from '@/users/store';
 
@@ -16,7 +15,6 @@ interface LogoutDialogProps {
 }
 
 export const LogoutDialog = ({isOpen, onCancel}: LogoutDialogProps) => {
-    const navigate = useNavigate();
     const {mutate, isPending, isError} = useLogoutMutation();
     const {
         token: {colorPrimaryBg, colorPrimaryText, colorErrorBg, colorErrorText},
@@ -25,8 +23,7 @@ export const LogoutDialog = ({isOpen, onCancel}: LogoutDialogProps) => {
 
     const handleLogout = useCallback(() => {
         mutate();
-        navigate('auth/signin');
-    }, []);
+    }, [mutate]);
 
     return (
         <Modal
@@ -61,6 +58,14 @@ export const LogoutDialog = ({isOpen, onCancel}: LogoutDialogProps) => {
                 xl: '30%',
                 xxl: '25%',
             }}
-        ></Modal>
+        >
+            {isError && (
+                <Alert
+                    type='error'
+                    showIcon
+                    message={t('logout-modal.error')}
+                />
+            )}
+        </Modal>
     );
 };

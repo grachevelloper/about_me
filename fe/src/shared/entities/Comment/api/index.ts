@@ -13,8 +13,10 @@ const actions: CommentsApi = {
     },
 
     listComments: async (listCommentsData: ListComments) => {
-        const {entityId, entityType} = listCommentsData;
-        return await query.get(`/comments/${entityType}/${entityId}`);
+        const {entityId, entityType, order} = listCommentsData;
+        return await query.get(`/comments/${entityType}/${entityId}`, {
+            params: {order},
+        });
     },
 
     getComment: async (id: string) => {
@@ -22,12 +24,12 @@ const actions: CommentsApi = {
     },
 
     deleteComment: async (id: string) => {
-        return await query.delete(`comments/${id}`);
+        return await query.delete(`/comments/${id}`);
     },
 
     updateComment: async (updateCommentData: UpdateCommentDto) => {
         const {content, id} = updateCommentData;
-        return await query.patch(`comments/${id}`, {content});
+        return await query.patch(`/comments/${id}`, {content});
     },
 };
 export default actions;

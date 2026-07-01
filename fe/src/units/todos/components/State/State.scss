@@ -6,10 +6,8 @@
     width: 125px;
     border-style: solid;
     border-radius: 8px;
-    color: #e6f7ff;
     font-weight: 700;
     padding: 4px;
-    clip-path: polygon(1% 1%, 94% 1%, 100% 30%, 100% 100%, 6% 100%, 0 70%);
 
     &_is-edited {
         animation: fadeOutDown 0.3s ease-out,

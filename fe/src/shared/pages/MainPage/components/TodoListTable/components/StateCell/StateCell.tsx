@@ -9,19 +9,6 @@ interface TodoStateCellProps {
     todoId: string;
 }
 
-const switchNewState = (state: TodoState): TodoState => {
-    switch (state) {
-        case TodoState.CANCELED:
-            return TodoState.IN_WORK;
-        case TodoState.PLANNING:
-            return TodoState.IN_WORK;
-        case TodoState.IN_WORK:
-            return TodoState.FINISHED;
-        case TodoState.FINISHED:
-            return TodoState.IN_WORK;
-    }
-};
-
 export const StateCell = ({state, todoId}: TodoStateCellProps) => {
     const isEdited = useRef<boolean>(false);
     const {updateState} = useTodoMutations();
@@ -29,10 +16,10 @@ export const StateCell = ({state, todoId}: TodoStateCellProps) => {
 
     const stateRef = useRef<HTMLButtonElement>(null);
 
-    const handleUpdateState = useCallback(() => {
+    const handleUpdateState = useCallback((newState: TodoState) => {
         isEdited.current = true;
-        updateState(todoId, switchNewState(state));
-    }, [todoId, isEdited]);
+        updateState(todoId, newState);
+    }, [todoId, updateState]);
 
     return (
         <State
